@@ -1,0 +1,71 @@
+{
+    "version":1,
+    "formatters":{
+        "console":{
+            "format":"%(asctime)s %(levelname)s %(message)s",
+            "datefmt":"%y-%m-%d %H:%M:%S"
+        },
+        "basic":{
+            "format":"%(asctime)s %(levelname)s %(message)s",
+            "datefmt":"%y-%m-%d %H:%M:%S"
+        },
+        "verbose":{
+            "format":"%(asctime)s %(levelname)s %(message)s",
+            "datefmt":"%y-%m-%d %H:%M:%S"
+        }
+    },
+    "handlers":{
+        "console":{
+            "class":"logging.StreamHandler",
+            "level":"DEBUG",
+            "formatter":"console",
+            "stream":"ext://sys.stdout"
+        },
+        "debug":{
+            "class":"src.common.statics._RestrictedFileHandler",
+            "level":"DEBUG",
+            "formatter":"basic",
+            "encoding":"utf8",
+            "filename":"debug.log"
+        },
+        "info":{
+            "class":"src.common.statics._RestrictedFileHandler",
+            "level":"INFO",
+            "formatter":"basic",
+            "encoding":"utf8",
+            "filename":"info.log"
+        },
+        "warning":{
+            "class":"src.common.statics._RestrictedFileHandler",
+            "level":"WARNING",
+            "formatter":"basic",
+            "encoding":"utf8",
+            "filename":"warning.log"
+        },
+        "error":{
+            "class":"src.common.statics._RestrictedFileHandler",
+            "level":"ERROR",
+            "formatter":"basic",
+            "encoding":"utf8",
+            "filename":"error.log"
+        },
+        "verbose":{
+            "class":"logging.FileHandler",
+            "level":"DEBUG",
+            "formatter":"verbose",
+            "encoding":"utf8",
+            "filename":"verbose.log"
+        }
+    },
+    "root":{
+        "level":"DEBUG",
+        "handlers":[
+            "console",
+            "debug",
+            "info",
+            "warning",
+            "error",
+            "verbose"
+        ]
+    }
+}
