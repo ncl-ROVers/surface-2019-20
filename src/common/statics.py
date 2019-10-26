@@ -17,10 +17,7 @@ class _RestrictedFileHandler(_logging.FileHandler):
         TODO: Document
         """
 
-        if not record.levelno == self.level:
-            return
-        else:
-            return _logging.FileHandler.emit(self, record)
+        return _logging.FileHandler.emit(self, record) if record.levelno == self.level else None
 
 
 # Declare path to the root folder (surface)
@@ -29,8 +26,9 @@ ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", "..
 # Declare paths to the main folders
 ASSETS_DIR = _os.path.join(ROOT_DIR, "assets")
 SRC_DIR = _os.path.join(ROOT_DIR, "src")
+LOG_DIR = _os.path.join(ROOT_DIR, "log")
 
 # Declare the paths to the source paths
-COMMON_DIR = _os.path.join(SRC_DIR, "common")
-GUI_DIR = _os.path.join(SRC_DIR, "gui")
-LOG_DIR = _os.path.join(SRC_DIR, "log")
+SRC_COMMON_DIR = _os.path.join(SRC_DIR, "common")
+SRC_GUI_DIR = _os.path.join(SRC_DIR, "gui")
+SRC_LOG_DIR = _os.path.join(SRC_DIR, "log")

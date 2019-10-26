@@ -2,15 +2,15 @@
 TODO: Document
 """
 
+from ..common import LOG_DIR, SRC_LOG_DIR
 import logging as _logging
 import logging.config as _config
 import json as _json
 import subprocess as _subprocess
 import os as _os
-from ..common import LOG_DIR
 
 _DEFAULT_LOG_DIR = LOG_DIR
-_DEFAULT_CONFIG_FILE_PATH = _os.path.join(LOG_DIR, "config.json")
+_DEFAULT_CONFIG_FILE_PATH = _os.path.join(SRC_LOG_DIR, "config.json")
 _FILE_HANDLERS = {"logging.FileHandler", "src.common.statics._RestrictedFileHandler"}
 
 
