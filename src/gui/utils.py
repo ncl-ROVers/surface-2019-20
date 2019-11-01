@@ -5,6 +5,9 @@ import enum as _enum
 class Screen(_enum.Enum):
     """
     TODO: Document
+    TODO: Actually, make it an abstract class instead. It will have to set the background and specify methods
+      for the manager (just like an enum name, value). Maybe do some other config too?
+      Add this for example - self.setStyleSheet("background-color: rgba(34, 51, 54, 255)")
     """
 
     Loading = 0
@@ -37,6 +40,7 @@ class ScreenManager(QWidget):
         self._base.addWidget(self._screens)
         self.setLayout(self._base)
         self.screen = Screen.Loading
+        self.show()
 
     @property
     def screen(self):
