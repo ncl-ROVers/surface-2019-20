@@ -1,11 +1,14 @@
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
+from .utils import Screen as _Screen
+from .. import common as _common
+import os as _os
 
 _MAX_LOADING = 100
 _MIN_LOADING = 0
 
 
-class Loading(QWidget):
+class Loading(_Screen):
     """
     TODO: Document
     """
@@ -43,18 +46,43 @@ class Loading(QWidget):
         self._layout.addWidget(self._bar)
         self._layout.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
+    def _set_style(self):
+        """
+        TODO: Document
+        :return:
+        """
+        x = _os.path.join(_common.GUI_LOADING, "Untitled.png").replace("\\", "/")  # TODO: Error, can't load it :(
+        self._get_manager().setStyleSheet(f"background-image: url({x});")
+
+    def post_init(self):
+        """
+        TODO: Document
+        :return:
+        """
+
+        super().post_init()
+
+    def on_switch(self):
+        """
+        TODO: Document
+        :return:
+        """
+
+        super().on_switch()
+
     @property
     def progress(self):
         """
-
+        TODO: Document
         :return:
         """
+
         return self._progress
 
     @progress.setter
     def progress(self, value: int):
         """
-
+        TODO: Document
         :param value:
         :return:
         """
@@ -67,7 +95,7 @@ class Loading(QWidget):
 
     def load(self):
         """
-
+        TODO: Document
         :return:
         """
 

@@ -13,6 +13,7 @@ def start():
 
     app = _QApplication()
     manager = _ScreenManager(_Loading(), _Home())
+    manager.post_init()
     manager.show()
     manager.screen.load()
     manager.screen = _Screen.Home
