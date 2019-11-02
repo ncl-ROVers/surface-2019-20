@@ -1,7 +1,10 @@
-import enum as _enum
+import enum
+
+SCREEN_HEIGHT = 900
+SCREEN_WIDTH = 1200
 
 
-class Colour(_enum.Enum):
+class Colour(enum.Enum):
     """
     TODO: Document (RGBA 0 - 255)
     """

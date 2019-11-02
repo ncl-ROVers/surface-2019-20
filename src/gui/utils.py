@@ -1,9 +1,9 @@
 from PySide2.QtWidgets import *
-from .statics import Colour as _Colour
-import abc as _abc
+from .statics import *
+import abc
 
 
-class Screen(QWidget, _abc.ABC, metaclass=type("_", (type(_abc.ABC), type(QWidget)), {})):
+class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):
     """
     TODO: Document
     """
@@ -34,7 +34,7 @@ class Screen(QWidget, _abc.ABC, metaclass=type("_", (type(_abc.ABC), type(QWidge
                 parent = parent.parent()
         return None
 
-    @_abc.abstractmethod
+    @abc.abstractmethod
     def _config(self):
         """
         TODO: Document
@@ -44,7 +44,7 @@ class Screen(QWidget, _abc.ABC, metaclass=type("_", (type(_abc.ABC), type(QWidge
 
         pass
 
-    @_abc.abstractmethod
+    @abc.abstractmethod
     def _set_style(self):
         """
         TODO: Document
@@ -53,7 +53,7 @@ class Screen(QWidget, _abc.ABC, metaclass=type("_", (type(_abc.ABC), type(QWidge
 
         pass
 
-    @_abc.abstractmethod
+    @abc.abstractmethod
     def post_init(self):
         """
         TODO: Document
@@ -62,7 +62,7 @@ class Screen(QWidget, _abc.ABC, metaclass=type("_", (type(_abc.ABC), type(QWidge
 
         pass
 
-    @_abc.abstractmethod
+    @abc.abstractmethod
     def on_switch(self):
         """
         TODO: Document
@@ -109,7 +109,9 @@ class ScreenManager(QWidget):
         :return:
         """
 
-        r, g, b, a = _Colour.MAJOR.value
+        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        r, g, b, a = Colour.MAJOR.value
         self.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, {a})")
 
     @property

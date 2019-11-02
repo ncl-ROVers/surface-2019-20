@@ -1,14 +1,14 @@
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
-from .utils import Screen as _Screen
-from .. import common as _common
-import os as _os
+from .utils import Screen as Screen
+from .. import common
+import os
 
 _MAX_LOADING = 100
 _MIN_LOADING = 0
 
 
-class Loading(_Screen):
+class Loading(Screen):
     """
     TODO: Document
     """
@@ -37,7 +37,6 @@ class Loading(_Screen):
         """
 
         self._bar.setRange(_MIN_LOADING, _MAX_LOADING)
-        self._bar.text()
 
         self._label.setText("Loading ...")
         self._label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -51,7 +50,7 @@ class Loading(_Screen):
         TODO: Document
         :return:
         """
-        x = _os.path.join(_common.GUI_LOADING, "Untitled.png").replace("\\", "/")  # TODO: Error, can't load it :(
+        x = os.path.join(common.GUI_LOADING, "download.jpg").replace("\\", "/")  # TODO: Error, can't load it :(
         self._get_manager().setStyleSheet(f"background-image: url({x});")
 
     def post_init(self):
