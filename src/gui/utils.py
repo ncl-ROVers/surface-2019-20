@@ -8,8 +8,8 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
     TODO: Document
     """
 
-    Loading = 1
-    Sample = 0
+    Loading = 0
+    Sample = 1
 
     def __init__(self):
         """
@@ -19,6 +19,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
         # Initialise the GUI window name
         self.name = self.__class__.__name__
+
     def _get_manager(self):
         """
         TODO: Document
@@ -96,11 +97,22 @@ class ScreenManager(QWidget):
             self._screens[screen.name] = screen
         self._base.addWidget(self._screens_stacked)
 
+        self._set_default_style()
+
         # Finally set the layout and the current screen
         self.setLayout(self._base)
         self.screen = Screen.Loading
 
+    def _set_default_style(self):
+        """
+        TODO: Document
+        :return:
+        """
 
+        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        r, g, b, a = Colour.MAJOR.value
+        self.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, {a})")
 
     @property
     def screen(self) -> Screen:

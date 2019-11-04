@@ -21,20 +21,37 @@ class Sample(Screen):
 
         self._progress = 0
 
-        self._layout = QVBoxLayout()
-
-        self.buttonHome = QPushButton()
-        self.buttonInfo = QPushButton()
-        self.buttonHelp = QPushButton()
-        self.Axo = QGraphicsView()
-        self.teamName = QPlainTextEdit()
-        self.title = QTextEdit()
+        self._layout = QHBoxLayout()
+        self.buttonLayout = QHBoxLayout()
+        self.nameLayout = QVBoxLayout()
+        self.topLeftLayout = QHBoxLayout()
+        self.topRightLayout = QHBoxLayout()
+        self.motorLayout = QVBoxLayout()
+        self.bottonLeftLayout = QHBoxLayout()
+        self.leftLayout = QVBoxLayout()
+        self.RightLayout = QVBoxLayout()
+        
+        
+        self.leakLabel = QLabel(self)
+        self.temperatureLabel = QLabel(self)
+        self.depthLabel = QLabel(self)
+        self.accelarationLabel = QLabel(self)
+        self.rotationLabel = QLabel(self)
+        self.buttonHome = QPushButton("Home")
+        self.buttonInfo = QPushButton("Info")
+        self.buttonHelp = QPushButton("Help")
+        self.axo = QGraphicsView()
+        self.teamName = QPlainTextEdit("ROVER GUE")
+        self.title = QTextEdit("Deep Water Exploration")
         self.camera_2 = QGraphicsView()
         self.camera_3 = QGraphicsView()
         self.camera_1 = QGraphicsView()
         self.horizon = QGraphicsView()
         self.links = QGraphicsView()
-        self.slider = QGraphicsView()
+        self.buttonMotorLeft = QPushButton("Left Motor")
+        self.buttonMotorRight = QPushButton("Right Motor")
+        self.buttonMotorFront = QPushButton("Front Motor")
+        self.buttonMotorBack = QPushButton("Back Motor")
 
         self._config()
         self.setLayout(self._layout)
@@ -46,31 +63,50 @@ class Sample(Screen):
 
         :return:
         """
-
-        self.buttonHome.setGeometry(QRect(10, 20, 51, 51))
+        self.leakLabel.setText("Leak Sensor")
+        self.temperatureLabel.setText("Temperature")
+        self.depthLabel.setText("Depth")
+        self.accelarationLabel.setText("Accelaration")
+        self.rotationLabel.setText("Rotation")
         self.buttonHome.setObjectName("buttonHome")
-        self.buttonInfo.setGeometry(QRect(70, 20, 51, 51))
         self.buttonInfo.setObjectName("buttonInfo")
-        self.buttonHelp.setGeometry(QRect(130, 20, 51, 51))
         self.buttonHelp.setObjectName("buttonHelp")
-        self.Axo.setGeometry(QRect(10, 90, 311, 181))
-        self.Axo.setObjectName("Axo")
-        self.teamName.setGeometry(QRect(190, 20, 104, 31))
+        self.axo.setObjectName("Axo")
         self.teamName.setObjectName("teamName")
-        self.title.setGeometry(QRect(190, 50, 161, 31))
         self.title.setObjectName("title")
-        self.camera_2.setGeometry(QRect(470, 20, 81, 51))
+        self.links.setObjectName("Links")
         self.camera_2.setObjectName("camera_2")
-        self.camera_3.setGeometry(QRect(580, 20, 81, 51))
         self.camera_3.setObjectName("camera_3")
-        self.camera_1.setGeometry(QRect(360, 90, 311, 181))
         self.camera_1.setObjectName("camera_1")
-        self.horizon.setGeometry(QRect(360, 20, 81, 51))
         self.horizon.setObjectName("horizon")
-        self.links.setGeometry(QRect(360, 290, 311, 51))
-        self.links.setObjectName("links")
-        self.slider.setGeometry(QRect(10, 290, 311, 51))
-        self.slider.setObjectName("slider")
+
+        self.buttonLayout.addWidget(self.buttonHome)
+        self.buttonLayout.addWidget(self.buttonInfo)
+        self.buttonLayout.addWidget(self.buttonHelp)
+        self.nameLayout.addWidget(self.teamName)
+        self.nameLayout.addWidget(self.axo)
+        self.topRightLayout.addWidget(self.camera_2)
+        self.topRightLayout.addWidget(self.camera_3)
+        self.topRightLayout.addWidget(self.horizon)
+        self.motorLayout.addWidget(self.buttonMotorLeft)
+        self.motorLayout.addWidget(self.buttonMotorRight)
+        self.motorLayout.addWidget(self.buttonMotorFront)
+        self.motorLayout.addWidget(self.buttonMotorBack)
+        self.bottonLeftLayout.addWidget(self.leakLabel)
+        self.bottonLeftLayout.addWidget(self.temperatureLabel)
+        self.bottonLeftLayout.addWidget(self.depthLabel)
+        self.bottonLeftLayout.addWidget(self.accelarationLabel)
+        self.bottonLeftLayout.addWidget(self.rotationLabel)
+        self.topLeftLayout.addLayout(self.buttonLayout)
+        self.topLeftLayout.addLayout(self.nameLayout)
+        self.leftLayout.addLayout(self.topLeftLayout)
+        self.leftLayout.addLayout(self.motorLayout)
+        self.leftLayout.addLayout(self.bottonLeftLayout)
+        self.RightLayout.addLayout(self.topRightLayout)
+        self.RightLayout.addWidget(self.camera_1)
+        self.RightLayout.addWidget(self.links)
+        self._layout.addLayout(self.leftLayout)
+        self._layout.addLayout(self.RightLayout)
 
        
 
@@ -104,25 +140,3 @@ class Sample(Screen):
         """
 
         return self._progress
-
-    """
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(681, 433)
-        MainWindow.setMouseTracking(False)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("res/background.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
-        MainWindow.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
-        
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-    def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "Form", None, -1))
-        self.buttonHome.setText(QtWidgets.QApplication.translate("MainWindow", "HOME", None, -1))
-        self.buttonInfo.setText(QtWidgets.QApplication.translate("MainWindow", "INFO", None, -1))
-        self.buttonHelp.setText(QtWidgets.QApplication.translate("MainWindow", "HELP", None, -1))
-        self.teamName.setPlainText(QtWidgets.QApplication.translate("MainWindow", "ROVER GUE", None, -1))
-    """
