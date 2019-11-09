@@ -13,6 +13,7 @@ Documentation Example
    Introduction
    Documentation
    main
+   another
 
 Indices and tables
 ==================

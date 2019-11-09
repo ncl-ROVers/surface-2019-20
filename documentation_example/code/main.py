@@ -5,7 +5,7 @@ main.py
 The core module of my example project
 """
 
-def about_me(your_name):
+def about_me(your_name: str) -> str:
     """
     Return the most important thing about a person.
 
@@ -13,7 +13,15 @@ def about_me(your_name):
     ----------
     your_name
         A string indicating the name of the person.
+
+    :func:`ExampleClass.about_self` is very nice
+    :py:mod:`another` is also very nice
+
+    :param your_name: Name to put in
+    :return: String
     """
+
+    x = 0
     return "The wise {} loves Python.".format(your_name)
 
 
