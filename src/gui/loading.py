@@ -1,3 +1,10 @@
+"""
+Loading screen
+==============
+
+Module storing an implementation of a loading screen and all values associated with it.
+"""
+
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
@@ -6,20 +13,38 @@ from .utils import Screen
 from .. import common
 import os
 
+# Declare the progress bar's range
 _MAX_LOADING = 100
 _MIN_LOADING = 0
 
 
 class Loading(Screen):
     """
-    TODO: Document
+    Loading screen used to load all assets while displaying a visually-pleasing representation of the mentioned task.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create all QT objects and class-specific fields
+        * _config - a method to place all items created in __init__
+        * _set_style - a method to set the style of the loading screen - this screen uses custom assets
+        * post_init - default implementation of the inherited method
+        * on_switch - default implementation of the inherited method
+        * progress - a property used to handle current progress bar's progress value
+        * load - a function used to load all assets and initialise any objects needed later
+
+    Usage
+    -----
+
+    This screen should only be switched to once, and its func:`load` method called.
     """
 
     def __init__(self):
         """
-        TODO: Document
+        Standard constructor.
         """
-
         super(Loading, self).__init__()
 
         self._progress = 0
@@ -33,11 +58,8 @@ class Loading(Screen):
 
     def _config(self):
         """
-        TODO: Document
-
-        :return:
+        Standard configuration method.
         """
-
         self._bar.setRange(_MIN_LOADING, _MAX_LOADING)
 
         self._label.setText("Loading ...")
@@ -49,13 +71,13 @@ class Loading(Screen):
 
     def _set_style(self):
         """
-        TODO: Document
-        :return:
+        Standard styling method.
         """
+        # Fetch the net image and scale it to fit the window if it's too big
         net = QPixmap(os.path.join(common.GUI_LOADING, "net.png"))
         net = net.scaled(min(SCREEN_WIDTH, net.width()), min(SCREEN_HEIGHT, net.height()))
 
-        # Draw the background and the net
+        # Paint the background and render the net in the middle
         canvas = self._background_pixmap
         painter = QPainter()
         painter.begin(canvas)
@@ -69,35 +91,32 @@ class Loading(Screen):
 
     def post_init(self):
         """
-        TODO: Document
-        :return:
+        Default inherited.
         """
-
         super().post_init()
 
     def on_switch(self):
         """
-        TODO: Document
-        :return:
+        Default inherited.
         """
-
         super().on_switch()
 
     @property
-    def progress(self):
+    def progress(self) -> int:
         """
-        TODO: Document
-        :return:
-        """
+        Getter to the current loading progress.
 
+        :return: An integer between min and max progress
+        """
         return self._progress
 
     @progress.setter
     def progress(self, value: int):
         """
-        TODO: Document
-        :param value:
-        :return:
+        Setter to update the current loading progress.
+
+        :param value: New progress to set, must be between min and max constants
+        :raises: ValueError
         """
 
         if not _MIN_LOADING <= self._progress <= _MAX_LOADING:
@@ -108,11 +127,10 @@ class Loading(Screen):
 
     def load(self):
         """
-        TODO: Document
-        :return:
+        TODO: Currently a sample to be removed later. This function should load all assets and initialise all objects.
+          Storing the objects is undecided as of now, probably put them into the manager because every screen can access
+          the manager. Perhaps create a DataManager instance within the ScreenManager?
         """
-
-        # TODO: Sample to be removed later
         from time import sleep
         for x in range(101):
             QApplication.instance().processEvents()
