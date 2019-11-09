@@ -61,8 +61,9 @@ class Loading(Screen):
         Standard configuration method.
         """
         self._bar.setRange(_MIN_LOADING, _MAX_LOADING)
+        self._bar.setTextVisible(False)
 
-        self._label.setText("Loading ...")
+        self._label.setText("LOADING...")
         self._label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         self._layout.addWidget(self._label)
@@ -73,15 +74,41 @@ class Loading(Screen):
         """
         Standard styling method.
         """
-        # Fetch the net image and scale it to fit the window if it's too big
-        net = QPixmap(os.path.join(common.GUI_LOADING, "net.png"))
-        net = net.scaled(min(SCREEN_WIDTH, net.width()), min(SCREEN_HEIGHT, net.height()))
+        # Style the progress bar
+        self._bar.setStyleSheet("""
+            QProgressBar {
+                background-color: rgba(0, 0, 0, 0);
+                border: 4px solid white;
+                border-radius: 10px;
+                text-align: center;
+                color: white;
+            }
+            QProgressBar::chunk {
+                background-color: white;
+                border-radius: 2px;
+                width: 10px;
+                margin: 2px;
+            }
+            """)
 
-        # Paint the background and render the net in the middle
+        # Style the "loading..." text above the progress bar
+        self._label.setStyleSheet("""
+            QLabel {
+                font-size: 30px;
+                font-weight: bold;
+                color: white;
+            }
+            """)
+
+        # Fetch the model image and scale it to fit the window if it's too big
+        model = QPixmap(os.path.join(common.GUI_LOADING, "model.png"))
+        model = model.scaled(min(SCREEN_WIDTH, model.width()), min(SCREEN_HEIGHT, model.height()))
+
+        # Paint the background and render the net and the model in the middle
         canvas = self._background_pixmap
         painter = QPainter()
         painter.begin(canvas)
-        painter.drawPixmap((SCREEN_WIDTH - net.width()) // 2, (SCREEN_HEIGHT - net.height()) // 2, net)
+        painter.drawPixmap((SCREEN_WIDTH - model.width()) // 2, (SCREEN_HEIGHT - model.height()) // 2, model)
         painter.end()
 
         # Update the manager's palette to display the changes
@@ -132,6 +159,8 @@ class Loading(Screen):
           the manager. Perhaps create a DataManager instance within the ScreenManager?
         """
         from time import sleep
+        QApplication.instance().processEvents()
+        sleep(1)
         for x in range(101):
             QApplication.instance().processEvents()
             self.progress = x
