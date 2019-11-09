@@ -1,7 +1,7 @@
 import enum
 
-SCREEN_HEIGHT = 900
-SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 1080
+SCREEN_WIDTH = 1920
 
 
 class Colour(enum.Enum):

@@ -1,6 +1,8 @@
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
-from .utils import Screen as Screen
+from PySide2.QtGui import *
+from .statics import *
+from .utils import Screen
 from .. import common
 import os
 
@@ -50,8 +52,20 @@ class Loading(Screen):
         TODO: Document
         :return:
         """
-        x = os.path.join(common.GUI_LOADING, "download.jpg").replace("\\", "/")  # TODO: Error, can't load it :(
-        self._get_manager().setStyleSheet(f"background-image: url({x});")
+        net = QPixmap(os.path.join(common.GUI_LOADING, "net.png"))
+        net = net.scaled(min(SCREEN_WIDTH, net.width()), min(SCREEN_HEIGHT, net.height()))
+
+        # Draw the background and the net
+        canvas = self._background_pixmap
+        painter = QPainter()
+        painter.begin(canvas)
+        painter.drawPixmap((SCREEN_WIDTH - net.width()) // 2, (SCREEN_HEIGHT - net.height()) // 2, net)
+        painter.end()
+
+        # Update the manager's palette to display the changes
+        pal = self.manager.palette()
+        pal.setBrush(QPalette.Window, QBrush(canvas))
+        self.manager.setPalette(pal)
 
     def post_init(self):
         """

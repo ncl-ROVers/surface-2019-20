@@ -44,7 +44,8 @@ class _LogConfig:
                 config = _json.load(f)
 
                 # Extract the handlers and update the paths within them to use the correct folder
-                for handler in (handlers := config["handlers"]):
+                handlers = config["handlers"]
+                for handler in (handlers):
                     if handlers[handler]["class"] in _FILE_HANDLERS:
                         handlers[handler]["filename"] = _os.path.join(log_directory, handlers[handler]["filename"])
 

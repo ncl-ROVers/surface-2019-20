@@ -1,4 +1,3 @@
-from PySide2.QtWidgets import *
 from .utils import Screen as _Screen
 
 
@@ -28,7 +27,7 @@ class Home(_Screen):
         :return:
         """
 
-        pass
+        super()._set_style()
 
     def post_init(self):
         """
@@ -36,7 +35,7 @@ class Home(_Screen):
         :return:
         """
 
-        pass
+        super().post_init()
 
     def on_switch(self):
         """
@@ -44,4 +43,4 @@ class Home(_Screen):
         :return:
         """
 
-        pass
+        super().on_switch()

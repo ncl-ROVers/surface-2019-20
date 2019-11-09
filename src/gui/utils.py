@@ -1,5 +1,7 @@
 from PySide2.QtWidgets import *
+from PySide2.QtGui import *
 from .statics import *
+import typing
 import abc
 
 
@@ -20,18 +22,35 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         # Initialise the GUI window name
         self.name = self.__class__.__name__
 
-    def _get_manager(self):
+    @property
+    def _background_pixmap(self) -> QPixmap:
+        """
+        TODO: Document
+        :return:
+        """
+        r, g, b, a = Colour.MAJOR.value
+        brush = QBrush(QColor(r, g, b, a))
+
+        # Create an empty canvas and fill it with the colour
+        canvas = QPixmap(SCREEN_WIDTH, SCREEN_HEIGHT)
+        painter = QPainter()
+        painter.begin(canvas)
+        painter.setBrush(brush)
+        painter.drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+        painter.end()
+
+        return canvas
+
+    @property
+    def manager(self) -> typing.Union[QMainWindow, None]:
         """
         TODO: Document
         :return:
         """
 
-        parent = self.parent()
-        while parent:
-            if "ScreenManager" in repr(parent):
-                return parent
-            else:
-                parent = parent.parent()
+        for widget in QApplication.instance().topLevelWidgets():
+            if "ScreenManager" in repr(widget):
+                return widget
         return None
 
     @abc.abstractmethod
@@ -51,7 +70,9 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         :return:
         """
 
-        pass
+        pal = self.manager.palette()
+        pal.setBrush(QPalette.Window, QBrush(self._background_pixmap))
+        self.manager.setPalette(pal)
 
     @abc.abstractmethod
     def post_init(self):
@@ -72,7 +93,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         self._set_style()
 
 
-class ScreenManager(QWidget):
+class ScreenManager(QMainWindow):
     """
     TODO: Document
     """
@@ -91,28 +112,20 @@ class ScreenManager(QWidget):
         self._screens_stacked = QStackedWidget()
         self._screens = dict()
 
+        # Set some basic window properties
+        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+
         # Add all screens
         for screen in args:
             self._screens_stacked.addWidget(screen)
             self._screens[screen.name] = screen
         self._base.addWidget(self._screens_stacked)
 
-        self._set_default_style()
-
         # Finally set the layout and the current screen
-        self.setLayout(self._base)
+        self._container = QWidget()
+        self._container.setLayout(self._base)
+        self.setCentralWidget(self._container)
         self.screen = Screen.Loading
-
-    def _set_default_style(self):
-        """
-        TODO: Document
-        :return:
-        """
-
-        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-        r, g, b, a = Colour.MAJOR.value
-        self.setStyleSheet(f"background-color: rgba({r}, {g}, {b}, {a})")
 
     @property
     def screen(self) -> Screen:
