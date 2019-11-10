@@ -10,3 +10,4 @@ Shared functions, classes, constants and other objects.
 
 from .statics import *
 from .utils import *
+from .logger import *

@@ -1,3 +1,0 @@
-# Logging
-
-Documentation to follow...

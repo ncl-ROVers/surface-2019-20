@@ -3,9 +3,11 @@ Logger
 ======
 
 Module storing an implementation of a static log class and all values associated with it.
+
+The `config.json` file stored within the assets folder is used to configure most of the logging functionality.
 """
 
-from ..common import LOG_DIR as _LOG_DIR, SRC_LOG_DIR as _SRC_LOG_DIR
+from .statics import LOG_DIR as _LOG_DIR, COMMON_LOGGER as _COMMON_LOGGER
 import logging as _logging
 import logging.config as _config
 import json as _json
@@ -13,8 +15,15 @@ import subprocess as _subprocess
 import os as _os
 
 _DEFAULT_LOG_DIR = _LOG_DIR
-_DEFAULT_CONFIG_FILE_PATH = _os.path.join(_SRC_LOG_DIR, "config.json")
-_FILE_HANDLERS = {"logging.FileHandler", "src.common.statics._RestrictedFileHandler"}
+_DEFAULT_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config.json")
+_FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler"}
+
+
+class LogError(Exception):
+    """
+    A standard exception to handle log-related errors.
+    """
+    pass
 
 
 def _get_logger(config_file_path: str = "", log_directory: str = "") -> _logging.Logger:
@@ -25,7 +34,7 @@ def _get_logger(config_file_path: str = "", log_directory: str = "") -> _logging
 
     :param config_file_path: Path to the JSON configuration file
     :param log_directory: Path to where the logs should be stored
-    :raises: Log.LogError
+    :raises: LogError
     :return: Python's built-in logger object
     """
 
@@ -39,9 +48,9 @@ def _get_logger(config_file_path: str = "", log_directory: str = "") -> _logging
 
     # Verify both paths are correct or throw an error
     if not _os.path.exists(config_file_path):
-        raise Log.LogError(f"Failed to find the log config file at {config_file_path}")
+        raise LogError(f"Failed to find the log config file at {config_file_path}")
     if not _os.path.exists(log_directory):
-        raise Log.LogError(f"The log directory does not exist - {log_directory}")
+        raise LogError(f"The log directory does not exist - {log_directory}")
 
     try:
         with open(config_file_path, "r") as f:
@@ -53,7 +62,7 @@ def _get_logger(config_file_path: str = "", log_directory: str = "") -> _logging
                     handlers[handler]["filename"] = _os.path.join(log_directory, handlers[handler]["filename"])
 
     except OSError as e:
-        raise Log.LogError(f"An error occurred while setting up the logging module - {e}")
+        raise LogError(f"An error occurred while setting up the logging module - {e}")
 
     # Load the configuration and return the logger object
     _config.dictConfig(config)
@@ -64,7 +73,7 @@ class Log:
     """
     Static logging class which uses a Python's built-in logger object for the actual logging tasks.
 
-    Defines a :class:`LogError` class to handle errors and let the calling function handle them.
+    Uses the :class:`LogError` class to handle errors and let the calling function handle them.
 
     Functions
     ---------
@@ -86,12 +95,6 @@ class Log:
 
     # Initialise the logger
     _logger = _get_logger()
-
-    class LogError(Exception):
-        """
-        A standard exception to handle log-related errors.
-        """
-        pass
 
     @classmethod
     def reconfigure(cls, *, config_file_path: str = "", log_directory: str = ""):

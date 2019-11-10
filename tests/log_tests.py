@@ -1,6 +1,5 @@
 from .utils import get_tests
-from src.log import *
-from src.common import LOG_DIR
+from src.common import LOG_DIR, Log
 import os
 
 

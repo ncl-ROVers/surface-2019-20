@@ -9,7 +9,7 @@ program, or are modifying their contents. Includes common to the package functio
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from .statics import *
-from ..log import Log
+from ..common import Log
 import typing
 import abc
 
