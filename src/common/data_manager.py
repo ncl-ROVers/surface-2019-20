@@ -4,17 +4,35 @@ TODO: Document
 import sys as _sys
 import multiprocessing as _mp
 from multiprocessing import shared_memory as _shm
-from ..common import Log
+from ..common import Log as _Log
 
 # Declare names and key: default value pairs for different chunks of shared memory
 _TRANSMISSION_NAME = "transmission"
 _TRANSMISSION_DICT = {
-    "test_t1": 3,
-    "test_t2": "oink"
+    "placeholder": 0
 }
 _CONTROL_NAME = "control"
 _CONTROL_DICT = {
-    "test_c": "hello"
+    "balancing": False,
+    "autonomous": False,
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "sway": 0,
+    "surge": 0,
+    "heave": 0,
+    "yaw_manual": 0,
+    "pitch_manual": 0,
+    "roll_manual": 0,
+    "sway_manual": 0,
+    "surge_manual": 0,
+    "heave_manual": 0,
+    "yaw_autonomous": 0,
+    "pitch_autonomous": 0,
+    "roll_autonomous": 0,
+    "sway_autonomous": 0,
+    "surge_autonomous": 0,
+    "heave_autonomous": 0
 }
 
 
@@ -37,9 +55,12 @@ class _Memory:
         # Create a mapping dictionary which remembers positions of keys for faster access
         self._lookup = {k: i for i, k in enumerate(data)}
 
-        # Create a shared memory object to store the data
-        self._shm = _shm.ShareableList(tuple(v for v in data.values()), name=name)
-        Log.debug(f"Successfully created shared memory \"{name}\" with a total of {len(data)} keys")
+        # Create a shared memory object to store the data or fetch the existing one
+        try:
+            self._shm = _shm.ShareableList(tuple(v for v in data.values()), name=name)
+            _Log.debug(f"Successfully created shared memory \"{name}\" with a total of {len(data)} keys")
+        except FileExistsError:
+            self._shm = _shm.ShareableList(name=name)
 
     def __getitem__(self, item: str):
         """

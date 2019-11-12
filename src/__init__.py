@@ -15,4 +15,5 @@ Each module within the same package should be imported in the following way::
 """
 
 from . import common
-from . import gui
+from . import control
+#from . import gui

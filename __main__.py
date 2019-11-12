@@ -24,9 +24,15 @@ where `python` is Python3.8 version and `surface` is relative or absolute path t
         for handler in handlers:
             #(...)
 """
-
 from src import *
 
 
 if __name__ == "__main__":
-    gui.start()
+    #gui.start()
+    controller = control.Controller()
+
+    if not controller:
+        common.Log.error("Failed to initialise the controller")
+        exit(1)
+
+    controller.start()

@@ -96,6 +96,7 @@ class Loading(Screen):
             QLabel {
                 font-size: 30px;
                 font-weight: bold;
+                font-family: "Courier New", Courier, monospace;
                 color: white;
             }
             """)
