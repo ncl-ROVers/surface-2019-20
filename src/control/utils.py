@@ -1,3 +1,6 @@
+import enum as _enum
+
+
 def normalise(value: float, current_min: float, current_max: float, intended_min: float, intended_max: float) -> float:
     """
     Function used to normalise a value to fit within a given range, knowing its actual range.
@@ -16,3 +19,12 @@ def normalise(value: float, current_min: float, current_max: float, intended_min
         raise ValueError("Current or intended minimum and maximum can not be equal")
 
     return intended_min + (value - current_min) * (intended_max - intended_min) / (current_max - current_min)
+
+
+class DrivingMode(_enum.Enum):
+    """
+    TODO: Document
+    """
+    MANUAL = 0
+    BALANCING = 1
+    AUTONOMOUS = 2

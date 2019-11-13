@@ -1,8 +1,10 @@
+"""
+TODO: Document
+"""
 from ..common import data_manager as _dm, Log as _Log
-from .utils import normalise
+from .utils import normalise, DrivingMode
 import multiprocessing as _mp
 import inputs as _inputs
-import enum as _enum
 
 
 # Initialise the controller, has to be a global variable due to multiprocessing
@@ -68,15 +70,15 @@ def _normalise_trigger(value: float) -> float:
                          _INTENDED_TRIGGER_MIN, _INTENDED_TRIGGER_MAX)
 
 
-class _DrivingMode(_enum.Enum):
-    MANUAL = 0
-    BALANCING = 1
-    AUTONOMOUS = 2
-
-
 class Controller:
+    """
+    TODO: Document
+    """
 
     def __init__(self):
+        """
+        TODO: Document
+        """
 
         # Stop the initialisation early if failed to recognise the controller
         if not _controller:
@@ -84,7 +86,7 @@ class Controller:
             return
 
         self._process = _mp.Process(target=self._read, name="Controller")
-        self._mode = _DrivingMode.MANUAL
+        self._mode = DrivingMode.MANUAL
 
         # Initialise the axis
         self._left_axis_x = 0
@@ -109,8 +111,8 @@ class Controller:
         self.button_RB = False
         self.button_left_stick = False
         self.button_right_stick = False
-        self.button_select = False
-        self.button_start = False
+        self._button_select = False
+        self._button_start = False
 
     def __bool__(self):
         return _controller is not None
@@ -179,6 +181,34 @@ class Controller:
     def hat_y(self, value):
         self._hat_y = value * (-1)
 
+    @property
+    def button_start(self):
+        return self._button_start
+
+    @button_start.setter
+    def button_start(self, value):
+        self._button_start = bool(value)
+        if value:
+            try:
+                # noinspection PyTypeChecker
+                self._mode = DrivingMode(self._mode.value + 1)
+            except ValueError:
+                self._mode = DrivingMode(0)
+
+    @property
+    def button_select(self):
+        return self._button_select
+
+    @button_select.setter
+    def button_select(self, value):
+        self._button_select = bool(value)
+        if value:
+            try:
+                # noinspection PyTypeChecker
+                self._mode = DrivingMode(self._mode.value - 1)
+            except ValueError:
+                self._mode = DrivingMode(len(DrivingMode.__members__) - 1)
+
     def _dispatch_event(self, event: _inputs.InputEvent):
         """
         TODO: Document
@@ -188,9 +218,9 @@ class Controller:
         # Ignore syncing events
         if event.code == "SYN_REPORT":
             return
-        # Check if the mode switching button was pressed
-        # TODO: Yeah, check it!
-        if self._mode == _DrivingMode.MANUAL:
+
+        # If the manual driving mode is on or one of the mode switching buttons was pressed
+        if self._mode == DrivingMode.MANUAL or event.code in {"BTN_START", "BTN_SELECT"}:
             if event.code in _dispatch_map:
                 self.__setattr__(_dispatch_map[event.code], event.state)
                 self._update()
@@ -198,8 +228,12 @@ class Controller:
                 _Log.error(f"Event not registered in the dispatch map - {event.code}")
 
     def _update(self):
-        # TODO: Use the model template and update the data manager values
-        print(self.left_axis_x, self.left_axis_y, self.left_trigger, self.right_trigger)
+        """
+        TODO: Document
+        :return:
+        """
+
+        _dm.control["mode"] = self._mode.value
 
     def _read(self):
         """
@@ -209,7 +243,7 @@ class Controller:
         while True:
             self._dispatch_event(_controller.read()[0])
 
-    def start(self):
+    def start(self) -> int:
         """
         TODO: Document
         :return:
@@ -217,6 +251,8 @@ class Controller:
 
         if not _controller:
             _Log.error("Can not start - no game controllers detected")
+            return -1
         else:
             self._process.start()
             _Log.info("Controller reading process started, pid {}".format(self._process.pid))
+            return self._process.pid

@@ -35,4 +35,4 @@ if __name__ == "__main__":
         common.Log.error("Failed to initialise the controller")
         exit(1)
 
-    controller.start()
+    print("CONTROLLER PROCESS PID IS {}".format(controller.start()))
