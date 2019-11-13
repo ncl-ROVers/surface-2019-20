@@ -126,6 +126,11 @@ class _DataManager:
         return self._control
 
 
+# Create some type hinting variables for PyInspections
+transmission: _Memory
+control: _Memory
+
+
 # Override the module to be the class object instead
 if not isinstance(_sys.modules[__name__], _DataManager):
     _sys.modules[__name__] = _DataManager()

@@ -232,7 +232,7 @@ class Controller:
         TODO: Document
         :return:
         """
-
+        # TODO: Use the actual values
         _dm.control["mode"] = self._mode.value
 
     def _read(self):
