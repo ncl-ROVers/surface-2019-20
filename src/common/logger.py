@@ -7,7 +7,7 @@ Module storing an implementation of a static log class and all values associated
 The `config.json` file stored within the assets folder is used to configure most of the logging functionality.
 """
 
-from .statics import LOG_DIR as _LOG_DIR, COMMON_LOGGER as _COMMON_LOGGER
+from .statics import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
 import logging as _logging
 import logging.config as _config
 import json as _json
@@ -17,6 +17,9 @@ import os as _os
 _DEFAULT_LOG_DIR = _LOG_DIR
 _DEFAULT_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler"}
+
+# Disable filelock's module logging
+_logging.getLogger("filelock").disabled = True
 
 
 class LogError(Exception):
@@ -57,7 +60,8 @@ def _get_logger(config_file_path: str = "", log_directory: str = "") -> _logging
             config = _json.load(f)
 
             # Extract the handlers and update the paths within them to use the correct folder
-            for handler in (handlers := config["handlers"]):
+            handlers = config["handlers"]
+            for handler in (handlers):
                 if handlers[handler]["class"] in _FILE_HANDLERS:
                     handlers[handler]["filename"] = _os.path.join(log_directory, handlers[handler]["filename"])
 

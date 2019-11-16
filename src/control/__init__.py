@@ -10,3 +10,5 @@ Supports manual control, autonomous control and manual control with auto-balanci
     Kacper Florianski <k.florianski@ncl.ac.uk>
 """
 from .manual import *
+from .autonomous import *
+from .model import *

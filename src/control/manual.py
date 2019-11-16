@@ -2,9 +2,10 @@
 TODO: Document
 """
 from ..common import data_manager as _dm, Log as _Log
-from .utils import normalise, DrivingMode
+from .utils import normalise as _normalise, DrivingMode as _DrivingMode
 import multiprocessing as _mp
 import inputs as _inputs
+import time as _time
 
 
 # Initialise the controller, has to be a global variable due to multiprocessing
@@ -53,7 +54,7 @@ def _normalise_axis(value: float) -> float:
     if not (_HARDWARE_AXIS_MAX >= value >= _HARDWARE_AXIS_MIN):
         raise ValueError(f"Value {value} is not be between {_HARDWARE_AXIS_MIN} and {_HARDWARE_AXIS_MAX}")
     else:
-        return normalise(value, _HARDWARE_AXIS_MIN, _HARDWARE_AXIS_MAX, _INTENDED_AXIS_MIN, _INTENDED_AXIS_MAX)
+        return _normalise(value, _HARDWARE_AXIS_MIN, _HARDWARE_AXIS_MAX, _INTENDED_AXIS_MIN, _INTENDED_AXIS_MAX)
 
 
 def _normalise_trigger(value: float) -> float:
@@ -66,8 +67,8 @@ def _normalise_trigger(value: float) -> float:
     if not (_HARDWARE_TRIGGER_MAX >= value >= _HARDWARE_TRIGGER_MIN):
         raise ValueError(f"Value {value} is not be between {_HARDWARE_TRIGGER_MIN} and {_HARDWARE_TRIGGER_MAX}")
     else:
-        return normalise(value, _HARDWARE_TRIGGER_MIN, _HARDWARE_TRIGGER_MAX,
-                         _INTENDED_TRIGGER_MIN, _INTENDED_TRIGGER_MAX)
+        return _normalise(value, _HARDWARE_TRIGGER_MIN, _HARDWARE_TRIGGER_MAX,
+                          _INTENDED_TRIGGER_MIN, _INTENDED_TRIGGER_MAX)
 
 
 class Controller:
@@ -86,7 +87,17 @@ class Controller:
             return
 
         self._process = _mp.Process(target=self._read, name="Controller")
-        self._mode = DrivingMode.MANUAL
+        self._mode = _DrivingMode.MANUAL
+        self._delay = 0.01
+        self._data = {
+            "mode": 0,
+            "yaw": 0,
+            "pitch": 0,
+            "roll": 0,
+            "sway": 0,
+            "surge": 0,
+            "heave": 0,
+        }
 
         # Initialise the axis
         self._left_axis_x = 0
@@ -191,9 +202,9 @@ class Controller:
         if value:
             try:
                 # noinspection PyTypeChecker
-                self._mode = DrivingMode(self._mode.value + 1)
+                self._mode = _DrivingMode(self._mode.value + 1)
             except ValueError:
-                self._mode = DrivingMode(0)
+                self._mode = _DrivingMode(0)
 
     @property
     def button_select(self):
@@ -205,9 +216,52 @@ class Controller:
         if value:
             try:
                 # noinspection PyTypeChecker
-                self._mode = DrivingMode(self._mode.value - 1)
+                self._mode = _DrivingMode(self._mode.value - 1)
             except ValueError:
-                self._mode = DrivingMode(len(DrivingMode.__members__) - 1)
+                self._mode = _DrivingMode(len(_DrivingMode.__members__) - 1)
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @property
+    def yaw(self):
+        if self.right_trigger:
+            return self.right_trigger
+        elif self.left_trigger:
+            return -self.left_trigger
+        else:
+            return 0
+
+    @property
+    def pitch(self):
+        return self.right_axis_y
+
+    @property
+    def roll(self):
+        if self.button_B:
+            return 1
+        elif self.button_X:
+            return -1
+        else:
+            return 0
+
+    @property
+    def sway(self):
+        return self._right_axis_x
+
+    @property
+    def surge(self):
+        return self.left_axis_y
+
+    @property
+    def heave(self):
+        if self.button_RB:
+            return 1
+        elif self.button_LB:
+            return -1
+        else:
+            return 0
 
     def _dispatch_event(self, event: _inputs.InputEvent):
         """
@@ -219,21 +273,36 @@ class Controller:
         if event.code == "SYN_REPORT":
             return
 
-        # If the manual driving mode is on or one of the mode switching buttons was pressed
-        if self._mode == DrivingMode.MANUAL or event.code in {"BTN_START", "BTN_SELECT"}:
-            if event.code in _dispatch_map:
-                self.__setattr__(_dispatch_map[event.code], event.state)
-                self._update()
-            else:
-                _Log.error(f"Event not registered in the dispatch map - {event.code}")
+        if event.code in _dispatch_map:
+            self.__setattr__(_dispatch_map[event.code], event.state)
+            self._update()
+        else:
+            _Log.error(f"Event not registered in the dispatch map - {event.code}")
+
+    def _next_data(self) -> dict:
+        return {k: self.__getattribute__(k) for k in self._data}
 
     def _update(self):
         """
         TODO: Document
         :return:
         """
-        # TODO: Use the actual values
-        _dm.control["mode"] = self._mode.value
+
+        # When entering the autonomous driving mode, reset the manual control values
+        if self._mode == _DrivingMode.AUTONOMOUS:
+            data = {k: (_DrivingMode.AUTONOMOUS if k == "mode" else 0) for k in self._data}
+        else:
+            data = self._next_data()
+
+        # Calculate the data differences and override the data to check for differences next time
+        difference = {k: v for k, v in data.items() if v != self._data[k]}
+        self._data = data
+
+        for k, v in difference.items():
+            if k == "mode":
+                _dm.control["mode"] = v.value
+            else:
+                _dm.control["manual_" + k] = v
 
     def _read(self):
         """
@@ -242,6 +311,7 @@ class Controller:
         """
         while True:
             self._dispatch_event(_controller.read()[0])
+            _time.sleep(self._delay)
 
     def start(self) -> int:
         """

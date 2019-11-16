@@ -11,37 +11,16 @@ instance of the manager on import.
 """
 
 import sys as _sys
-import multiprocessing as _mp
+import os as _os
 from multiprocessing import shared_memory as _shm
-from ..common import Log as _Log
+from .logger import Log as _Log
+from .statics import TRANSMISSION_DICT as _TRANSMISSION_DICT, CONTROL_DICT as _CONTROL_DICT, \
+    COMMON_LOCKS_DIR as _LOCKS_DIR
+from filelock import FileLock as _FileLock
 
-# Declare names and key: default value pairs for different chunks of shared memory
+# Declare shared memory names
 _TRANSMISSION_NAME = "transmission"
-_TRANSMISSION_DICT = {
-    "placeholder": 0
-}
 _CONTROL_NAME = "control"
-_CONTROL_DICT = {
-    "mode": 0,
-    "yaw": 0,
-    "pitch": 0,
-    "roll": 0,
-    "sway": 0,
-    "surge": 0,
-    "heave": 0,
-    "yaw_manual": 0,
-    "pitch_manual": 0,
-    "roll_manual": 0,
-    "sway_manual": 0,
-    "surge_manual": 0,
-    "heave_manual": 0,
-    "yaw_autonomous": 0,
-    "pitch_autonomous": 0,
-    "roll_autonomous": 0,
-    "sway_autonomous": 0,
-    "surge_autonomous": 0,
-    "heave_autonomous": 0
-}
 
 
 class _Memory:
@@ -67,7 +46,7 @@ class _Memory:
         memory_obj["key"] = "value"
     """
 
-    def __init__(self, name: str, data: dict):
+    def __init__(self, name: str, data: dict, lock):
         """
         Standard constructor.
 
@@ -75,10 +54,11 @@ class _Memory:
 
         :param name: Name of the memory object
         :param data: Dictionary of values to store
+        :param lock: Named lock instance
         """
         self._name = name
         self._data = data
-        self._lock = _mp.Lock()
+        self._lock = lock
 
         # Create a mapping dictionary which remembers positions of keys for faster access
         self._lookup = {k: i for i, k in enumerate(data)}
@@ -159,26 +139,33 @@ class _DataManager:
 
     def __init__(self):
         """
-        TODO: Document
+        Standard constructor
+
+        Fetches or creates the locks and the memory segments.
         """
+        # Create or fetch named locks
+        self._transmission_lock = _FileLock(_os.path.join(_LOCKS_DIR, _TRANSMISSION_NAME + ".lock"))
+        self._control_lock = _FileLock(_os.path.join(_LOCKS_DIR, _CONTROL_NAME + ".lock"))
+
         # Create shared memory objects to store the data, these will be read-only exposed via class properties
-        self._transmission = _Memory(_TRANSMISSION_NAME, _TRANSMISSION_DICT)
-        self._control = _Memory(_CONTROL_NAME, _CONTROL_DICT)
+        self._transmission = _Memory(_TRANSMISSION_NAME, _TRANSMISSION_DICT, self._transmission_lock)
+        self._control = _Memory(_CONTROL_NAME, _CONTROL_DICT, self._control_lock)
 
     @property
-    def transmission(self):
+    def transmission(self) -> _Memory:
         """
-        TODO: Document
-        :return:
+        Getter for the transmission memory segment
+
+        :return: Transmission memory segment
         """
         return self._transmission
 
     @property
-    def control(self):
+    def control(self) -> _Memory:
         """
-        TODO: Document
+        Getter for the control memory segment
 
-        :return:
+        :return: Control memory segment
         """
         return self._control
 
