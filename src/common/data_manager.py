@@ -1,6 +1,15 @@
 """
-TODO: Document
+Loading screen
+==============
+
+Module storing an implementation of a data manager, exposing some common values via shared memory. Gets replaced with an
+instance of the manager on import.
+
+.. note::
+
+    Remember to adjust the module constants to register values in shared memory.
 """
+
 import sys as _sys
 import multiprocessing as _mp
 from multiprocessing import shared_memory as _shm
@@ -37,15 +46,35 @@ _CONTROL_DICT = {
 
 class _Memory:
     """
-    TODO: Document
+    Class representing a shared memory segment.
+
+    Provides a getter and a setter methods to modify the data indirectly.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create or fetch the shared memory objects
+        * __getitem___ - a getter controlling access to the shared memory via locks
+        * __getitem___ - a setter controlling access to the shared memory via locks
+
+    Usage
+    -----
+
+    You should access the memory by calling the `__getitem__` and `__setitem__` methods::
+
+        memory_obj["key"] = "value"
     """
 
     def __init__(self, name: str, data: dict):
         """
-        TODO: Document
+        Standard constructor.
 
-        :param name:
-        :param data:
+        Builds a shared memory object or fetches it if it already exists.
+
+        :param name: Name of the memory object
+        :param data: Dictionary of values to store
         """
         self._name = name
         self._data = data
@@ -61,30 +90,34 @@ class _Memory:
         except FileExistsError:
             self._shm = _shm.ShareableList(name=name)
 
-    def __getitem__(self, item: str):
+    def __getitem__(self, key: str):
         """
-        TODO: Document
+        Getter function to retrieve data from shared memory.
 
-        :param item:
+        Uses locks and the original dictionary passed in the constructor to safely access the data.
+
+        :param key: Key to access
         :raises: KeyError
-        :return:
+        :return: Value stored under the key
         """
         # Raise error early if key not registered
-        if item not in self._lookup:
-            raise KeyError(f"{item} not found - remember to add the key to the data manager!")
+        if key not in self._lookup:
+            raise KeyError(f"{key} not found - remember to add the key to the data manager!")
 
         self._lock.acquire()
-        value = self._shm[self._lookup[item]]
+        value = self._shm[self._lookup[key]]
         self._lock.release()
         return value
 
     def __setitem__(self, key: str, value):
         """
-        TODO: Document
+        Setter function to modify the data in shared memory.
 
-        :param key:
-        :param value:
-        :return:
+        Uses locks and the original dictionary passed in the constructor to safely modify the data.
+
+        :param key: Key to access
+        :param value: Value to be inserted
+        :raises: KeyError
         """
         # Raise error early if key not registered
         if key not in self._lookup:
@@ -97,7 +130,31 @@ class _Memory:
 
 class _DataManager:
     """
-    TODO: Document
+    Class representing a data manager which has access to all memory segments.
+
+    Provides getter methods to each memory segment.
+
+    ..warning::
+
+        This module is replaced with an instance of this class on import.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create or fetch the shared memory objects
+        * transmission - a getter controlling access to the transmission data shared memory
+        * control - a setter controlling access to the control data shared memory
+
+    Usage
+    -----
+
+    You should simply import the module and access the memory segments when needed::
+
+        from ..common import data_manager as dm
+        transmission = dm.transmission
+        control = dm.control
     """
 
     def __init__(self):
