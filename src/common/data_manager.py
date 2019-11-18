@@ -37,6 +37,7 @@ class _Memory:
         * __init__ - a constructor to create or fetch the shared memory objects
         * __getitem___ - a getter controlling access to the shared memory via locks
         * __getitem___ - a setter controlling access to the shared memory via locks
+        * update - a setter controlling access to multiple items at once, using a dictionary
 
     Usage
     -----
@@ -105,6 +106,22 @@ class _Memory:
 
         self._lock.acquire()
         self._shm[self._lookup[key]] = value
+        self._lock.release()
+
+    def update(self, data: dict):
+        """
+        Function used to modify multiple data entries in shared memory, using a dictionary
+
+        :param data: Data to update
+        :raises: KeyError
+        """
+        # Raise error early if any keys are not registered
+        if not set(data.keys()).issubset(set(self._data.keys())):
+            raise KeyError(f"{set(data.keys())} is not a subset of {set(self._data.keys())}")
+
+        self._lock.acquire()
+        for key, value in data.items():
+            self._shm[self._lookup[key]] = value
         self._lock.release()
 
 

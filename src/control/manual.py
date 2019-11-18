@@ -1,18 +1,25 @@
 """
-TODO: Document
+Manual Control
+==============
+
+Module storing an implementation of a controller and values associated with it.
+
+The `Controller` class is the implementation of a closed loop control system for the ROV, with the hardware readings
+executed in separate process. The readings are forwarded to the shared memory in a previously agreed format.
 """
 from ..common import data_manager as _dm, Log as _Log
-from .utils import normalise as _normalise, DrivingMode as _DrivingMode
+from .utils import normalise as _normalise
+from .statics import DrivingMode as _DrivingMode
 import multiprocessing as _mp
 import inputs as _inputs
 import time as _time
 
 
 # Initialise the controller, has to be a global variable due to multiprocessing
-_controller = _inputs.devices.gamepads[0] if _inputs.devices.gamepads else None
+_CONTROLLER = _inputs.devices.gamepads[0] if _inputs.devices.gamepads else None
 
 # Create the hardware to class value dispatcher
-_dispatch_map = {
+_DISPATCH_MAP = {
     "ABS_X": "left_axis_x",
     "ABS_Y": "left_axis_y",
     "ABS_RX": "right_axis_x",
@@ -46,10 +53,11 @@ _INTENDED_TRIGGER_MIN = 0
 
 def _normalise_axis(value: float) -> float:
     """
-    TODO: Document, helper function
-    :param value:
+    Helper function used to normalise the controller axis values into a common range.
+
+    :param value: Value to be normalised
     :raises: ValueError
-    :return:
+    :return: Normalised value
     """
     if not (_HARDWARE_AXIS_MAX >= value >= _HARDWARE_AXIS_MIN):
         raise ValueError(f"Value {value} is not be between {_HARDWARE_AXIS_MIN} and {_HARDWARE_AXIS_MAX}")
@@ -59,10 +67,11 @@ def _normalise_axis(value: float) -> float:
 
 def _normalise_trigger(value: float) -> float:
     """
-    TODO: Document, helper function
-    :param value:
+    Helper function used to normalise the controller trigger values into a common range.
+
+    :param value: Value to be normalised
     :raises: ValueError
-    :return:
+    :return: Normalised value
     """
     if not (_HARDWARE_TRIGGER_MAX >= value >= _HARDWARE_TRIGGER_MIN):
         raise ValueError(f"Value {value} is not be between {_HARDWARE_TRIGGER_MIN} and {_HARDWARE_TRIGGER_MAX}")
@@ -73,16 +82,85 @@ def _normalise_trigger(value: float) -> float:
 
 class Controller:
     """
-    TODO: Document
+    Controller used to handle manual control systems.
+
+    Uses the global `_CONTROLLER` reference to interact with hardware.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - standard constructor, returns early if the global `_CONTROLLER` reference is invalid
+        * __bool__ - standard thruthness method, returns state of the global `_CONTROLLER` reference
+        * _dispatch_event - a method to update the controller's state using hardware readings
+        * state - a getter to get the current state of the controller
+        * _update - a method to update the shared memory
+        * _read - a wrapper method to execute everything in a separate process
+        * start - a method to start the controller readings
+
+    Controller mappings
+    -------------------
+
+    The following list shortly summarises each property (apart from state) within the class:
+
+    Axis
+    ++++
+        - left_axis_x
+        - left_axis_y
+        - right_axis_x
+        - right_axis_y
+
+    Triggers
+    ++++++++
+        - left_trigger
+        - right_trigger
+
+    Hat
+    +++
+        - hat_y
+        - hat_x
+
+    Buttons
+    +++++++
+        - button_A
+        - button_B
+        - button_X
+        - button_Y
+        - button_LB
+        - button_RB
+        - button_left_stick
+        - button_right_stick
+        - button_select
+        - button_start
+
+    Model values
+    ++++++++++++
+        - mode
+        - yaw
+        - pitch
+        - roll
+        - sway
+        - surge
+        - heave
+
+    Usage
+    -----
+
+    After creating an instance of the class, `start` method will either return a process ID of the started process, or
+    -1 if the controller wasn't initialised correctly.
     """
 
     def __init__(self):
         """
-        TODO: Document
+        Constructor method used to initialise all fields or return early if no controller devices were detected.
+
+        Most fields are internal values used by the class, however the `_delay` should be adjusted to modify
+        the frequency of hardware readings.
         """
 
         # Stop the initialisation early if failed to recognise the controller
-        if not _controller:
+        if not _CONTROLLER:
             _Log.error("No game controllers detected")
             return
 
@@ -126,7 +204,16 @@ class Controller:
         self._button_start = False
 
     def __bool__(self):
-        return _controller is not None
+        return _CONTROLLER is not None
+
+    @property
+    def state(self) -> dict:
+        """
+        Getter function used to fetch all (normalised) degrees of freedom in a dictionary format.
+
+        :return: Dictionary with normalised degrees of freedom
+        """
+        return {k: self.__getattribute__(k) for k in self._data}
 
     @property
     def left_axis_x(self):
@@ -198,6 +285,11 @@ class Controller:
 
     @button_start.setter
     def button_start(self, value):
+        """
+        Setter which selects next driving mode (wrapping)
+
+        :param value: State of the button
+        """
         self._button_start = bool(value)
         if value:
             try:
@@ -212,6 +304,11 @@ class Controller:
 
     @button_select.setter
     def button_select(self, value):
+        """
+        Setter which selects next previous mode (wrapping)
+
+        :param value: State of the button
+        """
         self._button_select = bool(value)
         if value:
             try:
@@ -221,11 +318,21 @@ class Controller:
                 self._mode = _DrivingMode(len(_DrivingMode.__members__) - 1)
 
     @property
-    def mode(self):
+    def mode(self) -> _DrivingMode:
+        """
+        Getter for the driving mode. Must be one of the `DrivingMode`-s defined in the statics module.
+
+        :return: Current driving mode
+        """
         return self._mode
 
     @property
-    def yaw(self):
+    def yaw(self) -> float:
+        """
+        Yaw is determined by both triggers.
+
+        :return: -1.0 for full port turn, 1.0 for full starboard turn
+        """
         if self.right_trigger:
             return self.right_trigger
         elif self.left_trigger:
@@ -234,92 +341,113 @@ class Controller:
             return 0
 
     @property
-    def pitch(self):
+    def pitch(self) -> float:
+        """
+        Pitch is determined by the vertical right axis.
+
+        :return: 1.0 for full bow pitch, -1.0 for full stern pitch
+        """
         return self.right_axis_y
 
     @property
-    def roll(self):
+    def roll(self) -> float:
+        """
+        Roll is determined by the buttons X and B.
+
+        :return: -1.0 for full port roll, 1.0 for full starboard roll, 0 otherwise
+        """
         if self.button_B:
-            return 1
+            return 1.0
         elif self.button_X:
-            return -1
+            return -1.0
         else:
             return 0
 
     @property
-    def sway(self):
+    def sway(self) -> float:
+        """
+        Sway is determined by the horizontal right axis.
+
+        :return: -1.0 for full port sway, 1.0 for full starboard sway
+        """
         return self._right_axis_x
 
     @property
-    def surge(self):
+    def surge(self) -> float:
+        """
+        Surge is determined by the vertical left axis.
+
+        :return: 1.0 for full foreward surge, -1.0 for full aft surge
+        """
         return self.left_axis_y
 
     @property
-    def heave(self):
+    def heave(self) -> float:
+        """
+        Heave is determined by the buttons RB and LB.
+
+        :return: 1.0 for full up heave, -1.0 for full down heave, 0 otherwise
+        """
         if self.button_RB:
-            return 1
+            return 1.0
         elif self.button_LB:
-            return -1
+            return -1.0
         else:
             return 0
 
     def _dispatch_event(self, event: _inputs.InputEvent):
         """
-        TODO: Document
-        :param event:
-        :return:
+        Dispatcher method used to update the controller's state with the hardware readings.
+
+        :param event: Hardware reading event
         """
         # Ignore syncing events
         if event.code == "SYN_REPORT":
             return
 
-        if event.code in _dispatch_map:
-            self.__setattr__(_dispatch_map[event.code], event.state)
+        if event.code in _DISPATCH_MAP:
+            self.__setattr__(_DISPATCH_MAP[event.code], event.state)
             self._update()
         else:
             _Log.error(f"Event not registered in the dispatch map - {event.code}")
 
-    def _next_data(self) -> dict:
-        return {k: self.__getattribute__(k) for k in self._data}
-
     def _update(self):
         """
-        TODO: Document
-        :return:
+        Method used to update the shared memory controller data using the current controller's state.
         """
 
         # When entering the autonomous driving mode, reset the manual control values
         if self._mode == _DrivingMode.AUTONOMOUS:
             data = {k: (_DrivingMode.AUTONOMOUS if k == "mode" else 0) for k in self._data}
         else:
-            data = self._next_data()
+            data = self.state
 
         # Calculate the data differences and override the data to check for differences next time
-        difference = {k: v for k, v in data.items() if v != self._data[k]}
+        difference = {"manual_" + k: v for k, v in data.items() if v != self._data[k]}
         self._data = data
 
-        for k, v in difference.items():
-            if k == "mode":
-                _dm.control["mode"] = v.value
-            else:
-                _dm.control["manual_" + k] = v
+        # Make sure the mode is using a correct key and a correct value
+        if "manual_mode" in difference:
+            difference["mode"] = difference.pop("manual_mode").value
+
+        # Finally update the data manager with a collection of values
+        _dm.control.update(difference)
 
     def _read(self):
         """
-        TODO: Document
-        :return:
+        Wrapper method used as a target for the process spawning.
         """
         while True:
-            self._dispatch_event(_controller.read()[0])
+            self._dispatch_event(_CONTROLLER.read()[0])
             _time.sleep(self._delay)
 
     def start(self) -> int:
         """
-        TODO: Document
-        :return:
-        """
+        Method used to start the hardware readings in a separate process.
 
-        if not _controller:
+        :return: -1 on errors or process id
+        """
+        if not _CONTROLLER:
             _Log.error("Can not start - no game controllers detected")
             return -1
         else:

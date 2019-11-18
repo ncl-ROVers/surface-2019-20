@@ -1,10 +1,16 @@
-from .utils import DrivingMode as _DrivingMode
+"""
+TODO: Mention that degrees of freedom are expected to be in ranges - 0to1, -1to1 etc.
+"""
+from .statics import DrivingMode as _DrivingMode
 from ..common import data_manager as _dm, CONTROL_DICT as _CONTROL_DICT, Log as _Log
 import multiprocessing as _mp
 import time as _time
 
 
 class ControlManager:
+    """
+    TODO: Document
+    """
 
     def __init__(self):
         self._process = _mp.Process(target=self._update)
