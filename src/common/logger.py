@@ -16,7 +16,8 @@ import os as _os
 
 _DEFAULT_LOG_DIR = _LOG_DIR
 _DEFAULT_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config.json")
-_FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler"}
+_FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
+                  "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
 
 # Disable filelock's module logging
 _logging.getLogger("filelock").disabled = True
