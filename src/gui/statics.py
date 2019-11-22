@@ -1,12 +1,22 @@
+"""
+GUI Statics
+===========
+
+Standard statics module storing all constants, classes and other objects which do not change throughout the execution
+of the program.
+"""
+
 import enum
 
-SCREEN_HEIGHT = 900
-SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 1080
+SCREEN_WIDTH = 1920
 
 
 class Colour(enum.Enum):
     """
-    TODO: Document (RGBA 0 - 255)
+    Colour enumeration storing different colour values for the GUI style.
+
+    Each colour is in the RGBA format.
     """
 
     MAJOR = 34, 51, 54, 255

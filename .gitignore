@@ -105,10 +105,6 @@ venv.bak/
 
 # PyCharm
 .idea
-/src/gui/sample.ui
-/GUI design
-/.vs/surface/v16
-/.vs/ProjectSettings.json
-/.vs/slnx.sqlite
-/.vs/VSWorkspaceState.json
-/src/gui/res/background.png
+
+# Log files
+*/log/*.log

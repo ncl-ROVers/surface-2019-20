@@ -10,8 +10,10 @@ from PySide2.QtMultimediaWidgets import *
 from .component.cameras import Camera
 from .component.indicator import *
 from .utils import Screen as Screen
-from .. import common
-import os
+from PySide2.QtGui import QBrush, QColor
+from PySide2.QtCore import Qt
+from .component.indicator import Leak_Sensor, Temperature, Depth, Acceleration, Rotation
+from src.gui.gui_process.process_management import Process_On
 
 
 class Sample(Screen):
@@ -34,6 +36,20 @@ class Sample(Screen):
         self.layout_bottom_left = QHBoxLayout()
         self.layout_left = QVBoxLayout()
         self.layout_right = QVBoxLayout()
+
+        self.number_leak = 0
+        self.number_temperature = 0
+        self.number_depth = 0
+        self.number_acceleration = 0
+        self.number_rotation_x = 0
+        self.number_rotation_y = 0
+        self.number_rotation_z = 0
+
+        self.scene_leak = Leak_Sensor()
+        self.scene_temperature = Temperature()
+        self.scene_depth = Depth()
+        self.scene_acceleration = Acceleration()
+        self.scene_rotation = Rotation()
 
         self.box_leak = QGraphicsView()
         self.box_temperature = QGraphicsView()
@@ -58,6 +74,8 @@ class Sample(Screen):
 
         self._config()
         self.setLayout(self._layout)
+        self.process = Process_On(self)
+        self.process.start()
 
     def _config(self):
         """
@@ -100,17 +118,32 @@ class Sample(Screen):
         self.box_leak.setScene(Leak_Sensor())
         self.box_temperature.setScene(Temperature())
         self.box_depth.setScene(Depth())
-        self.box_rotation.setScene(Rotation())
         self.box_acceleration.setScene(Acceleration())
+        self.box_rotation.setScene(Rotation())
+
+        self.brush = QBrush()
+        self.brush.setColor(QColor(8, 64, 67))
+        self.brush.setStyle(Qt.SolidPattern)
+
+        self.box_leak.setBackgroundBrush(self.brush)
+        self.box_temperature.setBackgroundBrush(self.brush)
+        self.box_depth.setBackgroundBrush(self.brush)
+        self.box_acceleration.setBackgroundBrush(self.brush)
+        self.box_rotation.setBackgroundBrush(self.brush)
 
     def _set_size(self):
-        self.box_leak.setMaximumSize(90, 100)
-        self.box_temperature.setMaximumSize(90, 100)
-        self.box_depth.setMaximumSize(90, 100)
-        self.box_acceleration.setMaximumSize(90, 100)
-        self.box_rotation.setMaximumSize(90, 100)
-        self.box_team_name.setMaximumSize(200, 100)
+        self.box_leak.setMaximumSize(200, 200)
+        self.box_temperature.setMaximumSize(200, 200)
+        self.box_depth.setMaximumSize(200, 200)
+        self.box_acceleration.setMaximumSize(200, 200)
+        self.box_rotation.setMaximumSize(200, 200)
+        self.box_team_name.setMaximumSize(200, 200)
         self.box_title.setMaximumSize(200, 100)
+        self.box_leak.setStyleSheet("border: 0px")
+        self.box_temperature.setStyleSheet("border: 0px")
+        self.box_depth.setStyleSheet("border: 0px")
+        self.box_acceleration.setStyleSheet("border: 0px")
+        self.box_rotation.setStyleSheet("border: 0px")
 
     def _set_scene(self):
         pass
@@ -145,30 +178,29 @@ class Sample(Screen):
         self.layout_right.addWidget(self.box_links)
 
     def _set_style(self):
-        x = os.path.join(common.GUI_LOADING, "download.jpg").replace("\\", "/")  # TODO: Error, can't load it :(
-        self._get_manager().setStyleSheet(f"background-image: url({x});")
+        super()._set_style()
 
-    # def _set_geometry(self):
+    def update_date(self, leak, temperature, depth, acceleration, x, y, z):
+        self.number_leak = leak
+        self.number_temperature = temperature
+        self.number_depth = depth
+        self.number_acceleration = acceleration
+        self.number_rotation_x = x
+        self.number_rotation_y = y
+        self.number_rotation_z = z
+        self._update()
 
-    #    self.button_home.setGeometry(QtCore.QRect(20, 30, 75, 23))
-    #    self.button_info.setGeometry(QtCore.QRect(110, 30, 75, 23))
-    #    self.button_help.setGeometry(QtCore.QRect(200, 30, 75, 23))
-    #    self.button_motor_front.setGeometry(QtCore.QRect(130, 190, 75, 23))
-    #    self.button_motor_left.setGeometry(QtCore.QRect(30, 240, 75, 23))
-    #    self.button_motor_right.setGeometry(QtCore.QRect(220, 240, 75, 23))
-    #    self.button_motor_back.setGeometry(QtCore.QRect(130, 300, 75, 23))
-    #    self.box_leak.setGeometry(QtCore.QRect(20, 650, 121, 131))
-    #    self.box_temperature.setGeometry(QtCore.QRect(170, 650, 121, 131))
-    #    self.box_depth.setGeometry(QtCore.QRect(310, 650, 121, 131))
-    #    self.box_acceleration.setGeometry(QtCore.QRect(450, 650, 121, 131))
-    #    self.box_rotation.setGeometry(QtCore.QRect(590, 650, 121, 131))
-    #    self.box_horizon.setGeometry(QtCore.QRect(520, 20, 211, 141))
-    #    self.box_camera_2.setGeometry(QtCore.QRect(750, 20, 211, 141))
-    #    self.box_camera_3.setGeometry(QtCore.QRect(980, 20, 211, 141))
-    #    self.box_camera_1.setGeometry(QtCore.QRect(670, 220, 461, 271))
-    #    self.box_links.setGeometry(QtCore.QRect(760, 630, 411, 151))
-    #    self.box_title.setGeometry(QtCore.QRect(330, 20, 120, 80))
-    #    self.box_team_name.setGeometry(QtCore.QRect(330, 140, 120, 80))
+    def _update(self):
+        self.scene_leak._update(self.number_leak)
+        self.scene_temperature._update(self.number_temperature)
+        self.scene_depth._update(self.number_depth)
+        self.scene_acceleration._update(self.number_acceleration)
+        self.scene_rotation._update(self.number_rotation_x, self.number_rotation_y, self.number_rotation_z)
+        self.box_leak.setScene(self.scene_leak)
+        self.box_temperature.setScene(self.scene_temperature)
+        self.box_depth.setScene(self.scene_depth)
+        self.box_acceleration.setScene(self.scene_acceleration)
+        self.box_rotation.setScene(self.scene_rotation)
 
     def post_init(self):
         """

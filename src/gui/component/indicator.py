@@ -1,7 +1,5 @@
-# Push test
-
-from PySide2.QtGui import QColor
 from PySide2.QtWidgets import *
+from PySide2.QtGui import QTransform
 
 _NORMAL_LEAK = 20
 _NORMAL_TEMPERATURE = 30
@@ -21,47 +19,64 @@ class Indicator(QGraphicsScene):
         self.name = name
         self.unit = unit
         self.number = number
-        self.indicator = ("Normal", "Attention", "Critical")
-        self.color = (QColor(157, 206, 209), QColor(255, 150, 0), QColor(255, 0, 0))
+        self.indicator = ('''Normal''', '''Attention''', '''Critical''')
+        self.color = ('''157, 206, 209''', '''255, 150, 0''', '''255, 0, 0''')
         self.color_indicator = self.color[0]
 
         self._config()
 
-    def _config(self) :
+    def _config(self):
         self._set_indicator()
 
     def _set_indicator(self):
+        self._set_statue()
+        self._set_html(self._color)
         self.text_name = QGraphicsTextItem()
         self.text_number = QGraphicsTextItem()
         self.text_indicator = QGraphicsTextItem()
         self.addItem(self.text_name)
         self.addItem(self.text_number)
         self.addItem(self.text_indicator)
-        self.text_name.setHtml(self.name)
-        self.text_number.setHtml(str(self.number) + self.unit)
-        self.text_indicator.setHtml(self._indicator())
+        self.text_name.setHtml(self.html_name)
+        self.text_number.setHtml(self.html_number)
+        self.text_indicator.setHtml(self.html_indicator)
         self.text_name.setPos(45, 25)
         self.text_number.setPos(45, 50)
-        self.text_indicator.setPos(45, 75)
+        self.text_indicator.setPos(45, 100)
 
-    def _color(self, color):
-        self.text_indicator.setDefaultTextColor(color)
-        self.text_number.setDefaultTextColor(color)
-        self.text_name.setDefaultTextColor(color)
+    def _set_html(self, color):
+        self.html_name = r'''
+                         <p>
+                            <span style="font-size: 24px; color: rgb(''' + color + ''');">''' + self.name + '''</span><br/>
+                        </p>
+                        '''
+        self.html_number = r'''
+                         <p>
+                            <span style="font-size: 45px; color: rgb(''' + color + ''');">''' + str(
+            self.number) + self.unit + '''</span><br/>
+                        </p>
+                        '''
+        self.html_indicator = r'''
+                            <p>
+                            <span style="font-size: 20px; color: rgb(''' + color + ''');">''' + self._indicator + '''</span><br/>
+                            </p>
+                            '''
 
-    def _indicator(self):
+    def _set_statue(self):
         if self.number < self.normal:
-            self._color(self.color[0])
-            return self.indicator[0]
+            self._color = self.color[0]
+            self._indicator = self.indicator[0]
         elif (self.number >= self.normal) & (self.number < self.critical):
-            self._color(self.color[1])
-            return self.indicator[1]
+            self._color = self.color[1]
+            self._indicator = self.indicator[1]
         elif self.number >= self.critical:
-            self._color(self.color[2])
-            return self.indicator[2]
+            self._color = self.color[2]
+            self._indicator = self.indicator[2]
 
-    def _get_scene(self):
-        return self.scene_indicator
+    def _update(self, number):
+        self.number = number
+        self.clear()
+        self._set_indicator()
 
 
 class Leak_Sensor(Indicator):
@@ -85,7 +100,7 @@ class Depth(Indicator):
 class Acceleration(Indicator):
 
     def __init__(self):
-        super().__init__(_NORMAL_ACCELERATION, _CRITICAL_ACCELERATION, "Acceleration", "m", 4.5)
+        super().__init__(_NORMAL_ACCELERATION, _CRITICAL_ACCELERATION, "Acceleration", "m/s2", 4.5)
 
 
 class Rotation(QGraphicsScene):
@@ -98,23 +113,53 @@ class Rotation(QGraphicsScene):
         self._set_rotation()
 
     def _set_rotation(self):
+        self._set_html()
         self.text_name = QGraphicsTextItem()
         self.text_x = QGraphicsTextItem()
         self.text_y = QGraphicsTextItem()
         self.text_z = QGraphicsTextItem()
-        self.text_name.setDefaultTextColor(QColor(157, 206, 209))
-        self.text_x.setDefaultTextColor(QColor(157, 206, 209))
-        self.text_y.setDefaultTextColor(QColor(157, 206, 209))
-        self.text_z.setDefaultTextColor(QColor(157, 206, 209))
         self.addItem(self.text_name)
         self.addItem(self.text_x)
         self.addItem(self.text_y)
         self.addItem(self.text_z)
-        self.text_name.setHtml("Rotation")
-        self.text_x.setHtml("x: " + str(self.number_rotation_x) + "°")
-        self.text_y.setHtml("y: " + str(self.number_rotation_y) + "°")
-        self.text_z.setHtml("z: " + str(self.number_rotation_z) + "°")
-        self.text_name.setPos(45, 25)
-        self.text_x.setPos(27, 50)
-        self.text_y.setPos(63, 50)
-        self.text_z.setPos(45, 75)
+        self.text_name.setHtml(self.html_name)
+        self.text_x.setHtml(self.html_x)
+        self.text_y.setHtml(self.html_y)
+        self.text_z.setHtml(self.html_z)
+        self.text_name.setPos(90, 30)
+        self.text_x.setPos(50, 70)
+        self.text_y.setPos(120, 70)
+        self.text_z.setPos(70, 100)
+
+    def _set_html(self):
+        self.html_name = r'''
+                         <p>
+                            <span style="font-size: 24px; color: rgb(157, 206, 209);">Rotation</span><br/>
+                        </p>
+                        '''
+        self.html_x = r'''
+                         <p>
+                            <span style="font-size: 24px; color: rgb(157, 206, 209);">X: ''' + str(
+            self.number_rotation_x) + '''°</span><br/>
+                        </p>
+                        '''
+        self.html_y = r'''
+                         <p>
+                            <span style="font-size: 24px; color: rgb(157, 206, 209);">Y: ''' + str(
+            self.number_rotation_y) + '''°</span><br/>
+                        </p>
+                        '''
+        self.html_z = r'''
+                         <p>
+                            <span style="font-size: 24px; color: rgb(157, 206, 209);">Z: ''' + str(
+            self.number_rotation_z) + '''°</span><br/>
+                        </p>
+                        '''
+
+    def _update(self, x, y, z):
+        self.number_rotation_x = x
+        self.number_rotation_y = y
+        self.number_rotation_z = z
+        self.clear()
+        self._set_rotation()
+        self.update()
