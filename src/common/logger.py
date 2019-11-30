@@ -4,7 +4,7 @@ Logger
 
 Module storing an implementation of a static log class and all values associated with it.
 
-The `config.json` file stored within the assets folder is used to configure most of the logging functionality.
+The config.json files stored within the assets folder are used to configure most of the logging functionality.
 """
 
 from .utils import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
@@ -15,7 +15,8 @@ import subprocess as _subprocess
 import os as _os
 
 _DEFAULT_LOG_DIR = _LOG_DIR
-_DEFAULT_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config.json")
+_MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
+_HARDWARE_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
                   "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
 
@@ -30,21 +31,17 @@ class LogError(Exception):
     pass
 
 
-def _get_logger(config_file_path: str = "", log_directory: str = "") -> _logging.Logger:
+def _get_logger(config_file_path: str, *, log_directory: str = "") -> _logging.Logger:
     """
     Helper function to configure the built-in logging module and retrieve a logger object.
 
-    Uses (and modifies when needed) the a JSON configuration file, which by default is `config.json`.
+    Uses (and modifies when needed) the a JSON configuration file.
 
     :param config_file_path: Path to the JSON configuration file
     :param log_directory: Path to where the logs should be stored
     :raises: LogError
     :return: Python's built-in logger object
     """
-
-    # Use the default config file path if it's not set
-    if not config_file_path:
-        config_file_path = _DEFAULT_CONFIG_FILE_PATH
 
     # Use the default log directory if it's not set
     if not log_directory:
@@ -97,18 +94,30 @@ class Log:
     This screen should only be switched to once, and its func:`load` method called.
     """
 
-    # Initialise the logger
-    _logger = _get_logger()
+    # Initialise the loggers
+    _main_logger = _get_logger(_MAIN_CONFIG_FILE_PATH)
+    _hardware_logger = _get_logger(_HARDWARE_CONFIG_FILE_PATH)
+
+    _loggers = {
+        "main": "_main_logger",
+        "hardware": "_hardware_logger"
+    }
 
     @classmethod
-    def reconfigure(cls, *, config_file_path: str = "", log_directory: str = ""):
+    def reconfigure(cls, logger: str, config_file_path: str, *, log_directory: str = ""):
         """
+        Helper function to reconfigure a logger
 
+        :param logger: Name of the logger to reconfigure
         :param config_file_path: Path to the JSON configuration file
         :param log_directory:  Path to where the log files should be stored
         """
+        if logger not in cls._loggers.keys():
+            raise LogError(f"Attempted to reconfigure an invalid logger {logger}"
+                           f"\nAvailable loggers are: {cls._loggers.keys()}")
+
         # Update the logger with both new values (or use the empty strings as default to use the default paths)
-        cls._logger = _get_logger(config_file_path, log_directory)
+        setattr(cls, cls._loggers[logger], _get_logger(config_file_path, log_directory=log_directory))
 
     @classmethod
     def debug(cls, message: str, *args, **kwargs):
@@ -119,7 +128,7 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._logger.debug(message, *args, **kwargs)
+        cls._main_logger.debug(message, *args, **kwargs)
 
     @classmethod
     def info(cls, message: str, *args, **kwargs):
@@ -130,7 +139,7 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._logger.info(message, *args, **kwargs)
+        cls._main_logger.info(message, *args, **kwargs)
 
     @classmethod
     def warning(cls, message: str, *args, **kwargs):
@@ -141,7 +150,7 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._logger.warning(message, *args, **kwargs)
+        cls._main_logger.warning(message, *args, **kwargs)
 
     @classmethod
     def error(cls, message: str, *args, **kwargs):
@@ -152,7 +161,7 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._logger.error(message, *args, **kwargs)
+        cls._main_logger.error(message, *args, **kwargs)
 
     @classmethod
     def command_result(cls, command_result: _subprocess.CompletedProcess):
@@ -166,8 +175,8 @@ class Log:
 
         # Log stdout as info
         if command_result.stdout:
-            cls._logger.debug(command_result.stdout.decode("ascii"))
+            cls._main_logger.debug(command_result.stdout.decode("ascii"))
 
         # Log stderr as error
         if command_result.stderr:
-            cls._logger.error(command_result.stderr.decode("ascii"))
+            cls._main_logger.error(command_result.stderr.decode("ascii"))
