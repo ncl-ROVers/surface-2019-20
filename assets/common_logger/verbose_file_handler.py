@@ -5,6 +5,7 @@ import logging as _logging
 import inspect as _inspect
 import os as _os
 
+_ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
 
 def _get_frame():
     """
@@ -42,8 +43,8 @@ class _VerboseFileHandler(_logging.FileHandler):
         """
         caller = _inspect.getframeinfo(_get_frame())
 
-        # TODO: `filename' needs to give more of the path; treat `surface' directory as root?
-        record.v_filename = _os.path.basename(caller.filename)
+        # give the path relative to the root `surface' directory
+        record.v_filename = _os.path.relpath(caller.filename, _ROOT_DIR)
         # TODO should have the parent function/class
         record.v_function = caller.function
         record.v_lineno = caller.lineno
