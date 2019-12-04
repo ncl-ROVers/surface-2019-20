@@ -14,6 +14,8 @@ OpenGL.ERROR_LOGGING = True
 from OpenGL.arrays import ArrayDatatype
 from OpenGL.GL import *
 
+import numpy as np
+
 class Shader:
 	def __init__(self):
 		self.__program = 0
@@ -74,3 +76,56 @@ class Shader:
 		Destroy the shader program.
 		"""
 		glDeleteProgram(self.__program)
+
+
+class VertexArray:
+	def __init__(self):
+		self.__vao = 0
+		self.__vbo_list = []
+
+	def init(self):
+		self.__vao = glGenVertexArrays(1)
+		glBindVertexArray(self.__vao)
+
+	def create_buffer(self, size, data) -> int:
+		vbo = glGenBuffers(1)
+		glBindBuffer(GL_ARRAY_BUFFER, vbo)
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW)
+
+		vbo_index = len(self.__vbo_list)
+		self.__vbo_list.append(vbo)
+
+		return vbo_index
+
+	def bind_attribute(self, buffer_index, attrib_index, component_count, type, normalized, stride, offset):
+		vbo = self.get_buffer(buffer_index)
+		if vbo == 0:
+			return
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo)
+
+		glEnableVertexAttribArray(attrib_index)
+		glVertexAttribPointer(attrib_index, component_count, type, GL_TRUE if normalized else GL_FALSE, stride, ctypes.c_void_p(offset))
+
+	def get_buffer(self, index) -> int:
+		if index < 0 or index >= len(self.__vbo_list):
+			return 0
+		return self.__vbo_list[index]
+
+	def bind(self):
+		glBindVertexArray(self.__vao)
+
+	def bind_buffer(self, index):
+		glBindBuffer(GL_ARRAY_BUFFER, self.get_buffer(index))
+
+	def unbind_buffers(self):
+		glBindBuffer(GL_ARRAY_BUFFER, 0)
+
+	def unbind(self):
+		self.unbind_buffers()
+
+		glBindVertexArray(0)
+
+	def destroy(self):
+		glDeleteBuffers(len(self.__vbo_list), np.array(self.__vbo_list))
+		glDeleteVertexArrays(1, np.array([self.__vao]))

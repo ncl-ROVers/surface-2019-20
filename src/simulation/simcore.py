@@ -27,11 +27,12 @@ vertex_shader_code = """
 #version 430 core
 
 layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 texCoords;
 
-layout(location = 0) out vec2 texCoords;
+layout(location = 0) out vec2 outTexCoords;
 
 void main() {
-	texCoords = 0.5 * position + 0.5;
+	outTexCoords = texCoords;
 	gl_Position = vec4(position, 0.0, 1.0);
 }
 """
@@ -41,10 +42,10 @@ fragment_shader_code = """
 
 layout(location = 0) out vec4 outColor;
 
-layout(location = 0) in vec2 texCoords;
+layout(location = 0) in vec2 inTexCoords;
 
 void main() {
-	outColor = vec4(texCoords, 0.5, 1.0);
+	outColor = vec4(inTexCoords, 0.5, 1.0);
 }
 """
 
@@ -55,8 +56,7 @@ class SimEngine:
 
 		self.__test_mouse = (0, 0)
 
-		self.__test_vertex_array = 0
-		self.__test_vertex_buffer = 0
+		self.__vao = 0
 		self.__shader = None
 
 	@classmethod
@@ -105,26 +105,20 @@ class SimEngine:
 		self.__shader = shader
 
 		# Buffer setup
-		vertices = np.array([-0.7, 0.7,
-							-0.7, -0.7,
-							0.7, 0.7,
-							-0.7, -0.7,
-							0.7, -0.7,
-							0.7, 0.7], dtype=np.float32)
+		vertices = np.array([-0.7, 0.7, 0.0, 1.0,
+							 -0.7, -0.7, 0.0, 0.0,
+							 0.7, 0.7, 1.0, 1.0,
+							 -0.7, -0.7, 0.0, 0.0,
+							 0.7, -0.7, 1.0, 0.0,
+							 0.7, 0.7, 1.0, 1.0], dtype=np.float32)
 
-		self.__test_vertex_array = glGenVertexArrays(1)
-		glBindVertexArray(self.__test_vertex_array)
+		vao = VertexArray()
+		vao.init()
+		vao.create_buffer(6 * 4 * 4, vertices)
+		vao.bind_attribute(0, 0, 2, GL_FLOAT, False, 4 * 4, 0)
+		vao.bind_attribute(0, 1, 2, GL_FLOAT, False, 4 * 4, 2 * 4)
 
-		self.__test_vertex_buffer = glGenBuffers(1)
-		glBindBuffer(GL_ARRAY_BUFFER, self.__test_vertex_buffer)
-
-		glBufferData(GL_ARRAY_BUFFER, 12 * 4, vertices, GL_STATIC_DRAW)
-
-		glEnableVertexAttribArray(0)
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * 4, None)
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0)
-		glBindVertexArray(0)
+		self.__vao = vao
 
 	@classmethod
 	def __update(self, delta):
@@ -132,7 +126,6 @@ class SimEngine:
 		Update the state of the engine.
 		:param delta: The time in seconds since the last update occurred
 		"""
-
 		pass
 
 	@classmethod
@@ -145,7 +138,7 @@ class SimEngine:
 
 		# Test rendering code
 		self.__shader.bind()
-		glBindVertexArray(self.__test_vertex_array)
+		self.__vao.bind()
 		glDrawArrays(GL_TRIANGLES, 0, 6)
 
 		# Present
@@ -157,12 +150,7 @@ class SimEngine:
 		Handle events sent by the window.
 		:param event: The event to be processed
 		"""
-		if event.type == pygame.QUIT:
-			self.__running = False
-		elif event.type == pygame.VIDEORESIZE:
-			self.__screen = pygame.display.set_mode(event.dict['size'], DOUBLEBUF | OPENGL | RESIZABLE)
-		elif event.type == pygame.MOUSEBUTTONDOWN:
-			Log.debug("Mouse pressed at {}".format(pygame.mouse.get_pos()))
+		pass
 
 	@classmethod
 	def __exit(self):
@@ -171,7 +159,7 @@ class SimEngine:
 		"""
 		Log.debug("Exiting simulation");
 
-		glDeleteBuffers(1, np.array([self.__test_vertex_buffer]))
+		self.__vao.destroy()
 		self.__shader.destroy()
 
 		glfw.destroy_window(self.__window)
