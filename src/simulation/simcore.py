@@ -114,7 +114,7 @@ class SimEngine:
 
 		vao = VertexArray()
 		vao.init()
-		vao.create_buffer(6 * 4 * 4, vertices)
+		vao.create_buffer(vertices, 6 * 4 * 4)
 		vao.bind_attribute(0, 0, 2, GL_FLOAT, False, 4 * 4, 0)
 		vao.bind_attribute(0, 1, 2, GL_FLOAT, False, 4 * 4, 2 * 4)
 
