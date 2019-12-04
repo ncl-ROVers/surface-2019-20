@@ -6,6 +6,7 @@ TODO: Add documentation
 """
 
 from ..common import Log
+from .glwrappers import *
 
 # Import PyOpenGL
 import OpenGL
@@ -56,6 +57,7 @@ class SimEngine:
 
 		self.__test_vertex_array = 0
 		self.__test_vertex_buffer = 0
+		self.__shader = None
 
 	@classmethod
 	def __start(self, title, width, height):
@@ -93,46 +95,14 @@ class SimEngine:
 		glViewport(0, 0, width, height)
 
 		# Shader setup
-		program = glCreateProgram()
+		shader = Shader()
 
-		vertex_shader = -1
-		fragment_shader = -1
+		shader.init()
+		shader.add_shader(vertex_shader_code, GL_VERTEX_SHADER)
+		shader.add_shader(fragment_shader_code, GL_FRAGMENT_SHADER)
+		shader.compile()
 
-		if True:
-			vertex_shader = glCreateShader(GL_VERTEX_SHADER)
-			
-			glShaderSource(vertex_shader, vertex_shader_code)
-			glCompileShader(vertex_shader)
-
-			result = glGetShaderiv(vertex_shader, GL_COMPILE_STATUS)
-			if not glGetShaderiv(vertex_shader, GL_COMPILE_STATUS) == GL_TRUE:
-				raise RuntimeError(glGetShaderInfoLog(vertex_shader))
-				vertex_shader = -1
-
-		if True:
-			fragment_shader = glCreateShader(GL_FRAGMENT_SHADER)
-			
-			glShaderSource(fragment_shader, fragment_shader_code)
-			glCompileShader(fragment_shader)
-
-			result = glGetShaderiv(fragment_shader, GL_COMPILE_STATUS)
-			if not glGetShaderiv(fragment_shader, GL_COMPILE_STATUS) == GL_TRUE:
-				raise RuntimeError(glGetShaderInfoLog(fragment_shader))
-				fragment_shader = -1
-
-		glAttachShader(program, vertex_shader)
-		glAttachShader(program, fragment_shader)
-
-		glLinkProgram(program)
-		glValidateProgram(program)
-
-		if not glGetProgramiv(program, GL_LINK_STATUS) == GL_TRUE:
-			raise RuntimeError(glGetProgramInfoLog(program))
-
-		glDeleteShader(vertex_shader)
-		glDeleteShader(fragment_shader)
-
-		self.__test_shader_data = program
+		self.__shader = shader
 
 		# Buffer setup
 		vertices = np.array([-0.7, 0.7,
@@ -174,7 +144,7 @@ class SimEngine:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 		# Test rendering code
-		glUseProgram(self.__test_shader_data)
+		self.__shader.bind()
 		glBindVertexArray(self.__test_vertex_array)
 		glDrawArrays(GL_TRIANGLES, 0, 6)
 
@@ -202,7 +172,7 @@ class SimEngine:
 		Log.debug("Exiting simulation");
 
 		glDeleteBuffers(1, np.array([self.__test_vertex_buffer]))
-		glDeleteProgram(self.__test_shader_data)
+		self.__shader.destroy()
 
 		glfw.destroy_window(self.__window)
 		glfw.terminate()
