@@ -22,6 +22,7 @@ import glfw
 import threading
 import time
 import numpy as np
+import math
 
 vertex_shader_code = """
 #version 430 core
@@ -44,8 +45,10 @@ layout(location = 0) out vec4 outColor;
 
 layout(location = 0) in vec2 inTexCoords;
 
+uniform float time;
+
 void main() {
-	outColor = vec4(inTexCoords, 0.5, 1.0);
+	outColor = vec4(inTexCoords * time, 0.5, 1.0);
 }
 """
 
@@ -138,6 +141,8 @@ class SimEngine:
 
 		# Test rendering code
 		self.__shader.bind()
+		self.__shader.set_uniform_1f("time", 0.5 * math.sin(time.time()) + 0.5)
+
 		self.__vao.bind()
 		glDrawArrays(GL_TRIANGLES, 0, 6)
 

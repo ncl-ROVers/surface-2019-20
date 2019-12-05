@@ -20,6 +20,7 @@ class Shader:
 	def __init__(self):
 		self.__program = 0
 		self.__shaders = []
+		self.__uniforms = {}
 
 	def init(self):
 		"""
@@ -70,6 +71,92 @@ class Shader:
 		Unbind the shader.
 		"""
 		glUseProgram(0)
+
+	def get_uniform_location(self, uniform_name) -> int:
+		"""
+		Get the location of the uniform with the given name.
+		:param uniform_name: The name of the uniform
+		:return: The location of the uniform
+		"""
+		location = self.__uniforms.get(uniform_name, -1)
+
+		if location == -1:
+			location = glGetUniformLocation(self.__program, uniform_name)
+			self.__uniforms[uniform_name] = location
+
+		return location
+
+	def set_uniform_1f(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform1f(location, value)
+
+	def set_uniform_2f(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform2f(location, value[0], value[1])
+
+	def set_uniform_3f(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform3f(location, value[0], value[1], value[2])
+
+	def set_uniform_4f(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform4f(location, value[0], value[1], value[2], value[3])
+
+	def set_uniform_1i(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform1i(location, value)
+
+	def set_uniform_2i(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform2i(location, value[0], value[1])
+
+	def set_uniform_3i(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform3i(location, value[0], value[1], value[2])
+
+	def set_uniform_4i(self, name, value):
+		"""
+		Set uniform value.
+		:param name: The name of the uniform
+		:param value: The value to be assigned to the uniform
+		"""
+		location = self.get_uniform_location(name)
+		glUniform4i(location, value[0], value[1], value[2], value[3])
 
 	def destroy(self):
 		"""
