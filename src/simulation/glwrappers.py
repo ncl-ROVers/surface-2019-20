@@ -158,6 +158,15 @@ class Shader:
         location = self.get_uniform_location(name)
         glUniform4i(location, value[0], value[1], value[2], value[3])
 
+    def set_uniform_mat4f(self, name, value, transpose=True):
+        """
+        Set uniform value.
+        :param name: The name of the uniform
+        :param value: The value to be assigned to the uniform
+        """
+        location = self.get_uniform_location(name)
+        glUniformMatrix4fv(location, 1, GL_TRUE if transpose else GL_FALSE, value)
+
     def destroy(self):
         """
         Destroy the shader program.

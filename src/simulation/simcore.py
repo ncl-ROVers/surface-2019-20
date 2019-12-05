@@ -6,6 +6,7 @@ TODO: Add documentation
 """
 from ..common import Log
 from .glwrappers import *
+from .matutils import *
 
 import glfw
 
@@ -31,9 +32,11 @@ layout(location = 1) in vec2 texCoords;
 
 layout(location = 0) out vec2 outTexCoords;
 
+uniform mat4 transform;
+
 void main() {
     outTexCoords = texCoords;
-    gl_Position = vec4(position, 0.0, 1.0);
+    gl_Position = transform * vec4(position, -2.0, 1.0);
 }
 """
 
@@ -44,10 +47,8 @@ layout(location = 0) out vec4 outColor;
 
 layout(location = 0) in vec2 inTexCoords;
 
-uniform float time;
-
 void main() {
-    outColor = vec4(inTexCoords * time, 0.5, 1.0);
+    outColor = vec4(inTexCoords, 0.5, 1.0);
 }
 """
 
@@ -137,8 +138,11 @@ class SimEngine:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         # Test rendering code
+        # t = translate3(0.0, 1.0, 0.0).dot(scale3(1.0, 1.0, 1.0))
+        t = matrix_perspective(70.0, 1280 / 720, -0.0001, -10000)
+
         self.__shader.bind()
-        self.__shader.set_uniform_1f("time", 0.5 * math.sin(time.time()) + 0.5)
+        self.__shader.set_uniform_mat4f("transform", t)
 
         self.__vao.bind()
         glDrawArrays(GL_TRIANGLES, 0, 6)
