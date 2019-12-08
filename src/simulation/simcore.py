@@ -7,6 +7,7 @@ TODO: Add documentation
 from ..common import Log
 from .glwrappers import *
 from .matutils import *
+from .window import *
 
 import glfw
 
@@ -63,6 +64,8 @@ class SimEngine:
         self.__vao = 0
         self.__shader = None
 
+        self.__window = Window()
+
     def __init_resources(self, title, width, height):
         """
         Create window, initialize simulation and load resources.
@@ -73,24 +76,7 @@ class SimEngine:
         Log.debug("Intializing simulation")
 
         # Window creation
-        if not glfw.init():
-            Log.error("Failed to intialize GLFW!");
-            quit()
-
-        glfw.window_hint(glfw.VISIBLE, glfw.TRUE)
-        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
-        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
-        glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
-        glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
-
-        self.__window = glfw.create_window(width, height, title, None, None)
-        if not self.__window:
-            Log.error("GLFW window creation failed")
-            glfw.terminate()
-            quit()
-
-        glfw.make_context_current(self.__window)
-        glfw.swap_interval(1)
+        self.__window.init("ROV Simulation", 1280, 720)
 
         # Resource initialiation
         Log.debug("OpenGL Version: {}".format(glGetString(GL_VERSION)))
@@ -137,6 +123,11 @@ class SimEngine:
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
+        glViewport(0, 0, self.__window.get_width(), self.__window.get_height())
+
+        if self.__window.get_key_state(glfw.KEY_SPACE) == KeyState.PRESSED:
+            Log.info("Pressed space")
+
         # Test rendering code
         # t = translate3(0.0, 1.0, 0.0).dot(scale3(1.0, 1.0, 1.0))
         t = matrix_perspective(70.0, 1280 / 720, -0.0001, -10000)
@@ -148,7 +139,7 @@ class SimEngine:
         glDrawArrays(GL_TRIANGLES, 0, 6)
 
         # Present
-        glfw.swap_buffers(self.__window)
+        self.__window.present()
 
     def __handle_event(self, event):
         """
@@ -166,8 +157,7 @@ class SimEngine:
         self.__vao.destroy()
         self.__shader.destroy()
 
-        glfw.destroy_window(self.__window)
-        glfw.terminate()
+        self.__window.destroy()
 
     def run(self, title, width, height, framerate):
         """
@@ -190,9 +180,8 @@ class SimEngine:
 
         self.__running = True
         while self.__running:
-            # Handle events
-            glfw.poll_events()
-            self.__running = not glfw.window_should_close(self.__window)
+            self.__window.update()
+            self.__running = not self.__window.is_close_requested()
             # self.__handle_event(event)
 
             elapsed_time = time_millis() - last_time
