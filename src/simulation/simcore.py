@@ -28,16 +28,20 @@ from OpenGL.GL import *
 vertex_shader_code = """
 #version 430 core
 
-layout(location = 0) in vec2 position;
+layout(location = 0) in vec3 position;
 layout(location = 1) in vec2 texCoords;
 
 layout(location = 0) out vec2 outTexCoords;
+layout(location = 1) out vec3 outWorldPos;
 
 uniform mat4 transform;
+uniform mat4 model;
 
 void main() {
     outTexCoords = texCoords;
-    gl_Position = transform * vec4(position, -2.0, 1.0);
+
+    outWorldPos = (model * vec4(position, 1.0)).xyz;
+    gl_Position = transform * vec4(position, 1.0);
 }
 """
 
@@ -47,19 +51,49 @@ fragment_shader_code = """
 layout(location = 0) out vec4 outColor;
 
 layout(location = 0) in vec2 inTexCoords;
+layout(location = 1) in vec3 inWorldPos;
 
 void main() {
-    outColor = vec4(inTexCoords, 0.5, 1.0);
+    vec3 lightPos = vec3(0.0, 0.4, 0.0);
+    vec3 normal = vec3(0.0, 1.0, 0.0);
+
+    vec3 toLight = lightPos - inWorldPos;
+    float lightDistance = length(toLight);
+    toLight = normalize(toLight);
+
+    float diffuse = max(dot(normal, toLight), 0) * (1.0 / (lightDistance * lightDistance));
+    outColor = diffuse * vec4(1.0);
 }
 """
 
+
+class Camera:
+    def __init__(self):
+        self.position = [ 0, 0, 0 ]
+        self.rotation = [ 0, 0, 0 ]
+
+    def move(self, translation):
+        self.position[0] += translation[0]
+        self.position[1] += translation[1]
+        self.position[2] += translation[2]
+
+    def get_forward(self):
+        return angles_to_vector(self.rotation[0], self.rotation[1])
+
+    def get_right(self):
+        return angles_to_vector(self.rotation[0], self.rotation[1] - 90)
+
+    def calc_view_matrix(self):
+        t_mat = matrix_translate(-self.position[0], -self.position[1], -self.position[2])
+        r_mat = np.linalg.inv(matrix_rotate(self.rotation[0], self.rotation[1], self.rotation[2]))
+        return r_mat.dot(t_mat)
 
 class SimEngine:
     def __init__(self):
         self.__running = True
         self.__window = None
 
-        self.__test_mouse = (0, 0)
+        self.__camera = Camera()
 
         self.__vao = 0
         self.__shader = None
@@ -94,18 +128,18 @@ class SimEngine:
         self.__shader = shader
 
         # Buffer setup
-        vertices = np.array([-0.7, 0.7, 0.0, 1.0,
-                             -0.7, -0.7, 0.0, 0.0,
-                             0.7, 0.7, 1.0, 1.0,
-                             -0.7, -0.7, 0.0, 0.0,
-                             0.7, -0.7, 1.0, 0.0,
-                             0.7, 0.7, 1.0, 1.0], dtype=np.float32)
+        vertices = np.array([-1.0, 1.0, 0.0, 0.0, 1.0,
+                             -1.0, -1.0, 0.0, 0.0, 0.0,
+                             1.0, 1.0, 0.0, 1.0, 1.0,
+                             -1.0, -1.0, 0.0, 0.0, 0.0,
+                             1.0, -1.0, 0.0, 1.0, 0.0,
+                             1.0, 1.0, 0.0, 1.0, 1.0], dtype=np.float32)
 
         vao = VertexArray()
         vao.init()
-        vao.create_buffer(vertices, 6 * 4 * 4)
-        vao.bind_attribute(0, 0, 2, GL_FLOAT, False, 4 * 4, 0)
-        vao.bind_attribute(0, 1, 2, GL_FLOAT, False, 4 * 4, 2 * 4)
+        vao.create_buffer(vertices, 6 * 5 * 4)
+        vao.bind_attribute(0, 0, 3, GL_FLOAT, False, 5 * 4, 0)
+        vao.bind_attribute(0, 1, 2, GL_FLOAT, False, 5 * 4, 3 * 4)
 
         self.__vao = vao
 
@@ -114,7 +148,38 @@ class SimEngine:
         Update the state of the engine.
         :param delta: The time in seconds since the last update occurred
         """
-        pass
+        speed = 10
+        rotation_speed = 65
+
+        # Move along global y axis
+        if self.__window.is_key_pressed(glfw.KEY_SPACE):
+            self.__camera.move([ 0, delta * speed, 0 ])
+        if self.__window.is_key_pressed(glfw.KEY_LEFT_SHIFT):
+            self.__camera.move([ 0, -delta * speed, 0 ])
+
+        # Move along local z axis
+        if self.__window.is_key_pressed(glfw.KEY_W):
+            self.__camera.move(self.__camera.get_forward() * (delta * speed))
+        if self.__window.is_key_pressed(glfw.KEY_S):
+            self.__camera.move(self.__camera.get_forward() * (-delta * speed))
+
+        # move along local x axis
+        if self.__window.is_key_pressed(glfw.KEY_D):
+            self.__camera.move(self.__camera.get_right() * (delta * speed))
+        if self.__window.is_key_pressed(glfw.KEY_A):
+            self.__camera.move(self.__camera.get_right() * (-delta * speed))
+
+        # Control pitch
+        if self.__window.is_key_pressed(glfw.KEY_UP):
+            self.__camera.rotation[0] += delta * rotation_speed
+        if self.__window.is_key_pressed(glfw.KEY_DOWN):
+            self.__camera.rotation[0] -= delta * rotation_speed
+
+        # Control yaw
+        if self.__window.is_key_pressed(glfw.KEY_LEFT):
+            self.__camera.rotation[1] += delta * rotation_speed
+        if self.__window.is_key_pressed(glfw.KEY_RIGHT):
+            self.__camera.rotation[1] -= delta * rotation_speed
 
     def __render(self):
         """
@@ -125,15 +190,16 @@ class SimEngine:
 
         glViewport(0, 0, self.__window.get_width(), self.__window.get_height())
 
-        if self.__window.get_key_state(glfw.KEY_SPACE) == KeyState.PRESSED:
-            Log.info("Pressed space")
-
         # Test rendering code
-        # t = translate3(0.0, 1.0, 0.0).dot(scale3(1.0, 1.0, 1.0))
-        t = matrix_perspective(70.0, 1280 / 720, -0.0001, -10000)
+        model = matrix_translate(0, -1, 0).dot(matrix_rotate(90, 0, 0)).dot(matrix_scale(10.0, 10.0, 10.0))
+        view = self.__camera.calc_view_matrix()
+        projection = matrix_perspective(70.0, self.__window.get_width() / self.__window.get_height(), -0.0001, -10000)
+
+        t = projection.dot(view.dot(model))
 
         self.__shader.bind()
         self.__shader.set_uniform_mat4f("transform", t)
+        self.__shader.set_uniform_mat4f("model", model)
 
         self.__vao.bind()
         glDrawArrays(GL_TRIANGLES, 0, 6)

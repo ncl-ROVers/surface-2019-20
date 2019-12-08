@@ -44,14 +44,13 @@ class Window:
         glfw.swap_interval(1)
 
         def key_callback(window, key, scandone, action, mods):
-            self.__key_states[key] = KeyState.PRESSED if action == glfw.PRESS else KeyState.RELEASED
+            self.__key_states[key] = KeyState.PRESSED if action == glfw.PRESS or action == glfw.REPEAT else KeyState.RELEASED
         glfw.set_key_callback(self.__window, key_callback)
 
         def size_callback(window, width, height):
             self.__width = width
             self.__height = height
         glfw.set_window_size_callback(self.__window, size_callback)
-
 
     def update(self):
         glfw.poll_events()
@@ -70,6 +69,9 @@ class Window:
 
     def get_key_state(self, key):
         return self.__key_states.get(key, KeyState.RELEASED)
+
+    def is_key_pressed(self, key):
+        return self.get_key_state(key) == KeyState.PRESSED
 
     def destroy(self):
         glfw.destroy_window(self.__window)
