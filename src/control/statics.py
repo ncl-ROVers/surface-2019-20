@@ -1,3 +1,10 @@
+"""
+Control Statics
+===============
+
+Standard statics module storing all constants, classes and other objects which do not change throughout the execution
+of the program.
+"""
 import enum as _enum
 
 

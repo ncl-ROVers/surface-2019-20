@@ -1,3 +1,12 @@
+"""
+Control Utils
+=============
+
+Standard utils module storing all values, classes and other objects which may change throughout the execution of the
+program, or are modifying their contents. Includes common to the package functions.
+"""
+
+
 def normalise(value: float, current_min: float, current_max: float, intended_min: float, intended_max: float) -> float:
     """
     Function used to normalise a value to fit within a given range, knowing its actual range.
