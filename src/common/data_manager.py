@@ -108,6 +108,17 @@ class _Memory:
         self._shm[self._lookup[key]] = value
         self._lock.release()
 
+    def get_all(self) -> dict:
+        """
+        Function used to read multiple data entries in shared memory, and return them as a dictionary.
+
+        :return: Dictionary of stored values
+        """
+        self._lock.acquire()
+        data = {key: self._shm[self._lookup[key]] for key in self._data}
+        self._lock.release()
+        return data
+
     def update(self, data: dict):
         """
         Function used to modify multiple data entries in shared memory, using a dictionary

@@ -31,12 +31,6 @@ TRANSMISSION_DICT = {
 }
 CONTROL_DICT = {
     "mode": 0,
-    "yaw": 0,
-    "pitch": 0,
-    "roll": 0,
-    "sway": 0,
-    "surge": 0,
-    "heave": 0,
     "manual_yaw": 0,
     "manual_pitch": 0,
     "manual_roll": 0,
