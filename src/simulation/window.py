@@ -8,9 +8,11 @@ import glfw
 from ..common import Log
 from enum import Enum
 
+
 class KeyState(Enum):
     RELEASED = 0
     PRESSED = 1
+
 
 class Window:
     def __init__(self):
@@ -22,7 +24,7 @@ class Window:
 
     def init(self, title, width, height):
         if not glfw.init():
-            Log.error("Failed to intialize GLFW!");
+            Log.error("Failed to initialize GLFW!");
             quit()
 
         self.__width = width

@@ -8,6 +8,7 @@ from ..common import Log
 from .glwrappers import *
 from .matutils import *
 from .window import *
+from .entityobjects import *
 
 import glfw
 
@@ -67,35 +68,14 @@ void main() {
 """
 
 
-class Camera:
-    def __init__(self):
-        self.position = [ 0, 0, 0 ]
-        self.rotation = [ 0, 0, 0 ]
-
-    def move(self, translation):
-        self.position[0] += translation[0]
-        self.position[1] += translation[1]
-        self.position[2] += translation[2]
-
-    def get_forward(self):
-        return angles_to_vector(self.rotation[0], self.rotation[1])
-
-    def get_right(self):
-        return angles_to_vector(self.rotation[0], self.rotation[1] - 90)
-
-    def calc_view_matrix(self):
-        t_mat = matrix_translate(-self.position[0], -self.position[1], -self.position[2])
-        r_mat = np.linalg.inv(matrix_rotate(self.rotation[0], self.rotation[1], self.rotation[2]))
-        return r_mat.dot(t_mat)
-
 class SimEngine:
     def __init__(self):
         self.__running = True
         self.__window = None
 
-        self.__camera = Camera()
+        self.__camera = NavigatorCamera()
 
-        self.__vao = 0
+        self.__vao = None
         self.__shader = None
 
         self.__window = Window()
@@ -107,12 +87,12 @@ class SimEngine:
         :param width: The width that the window will have when created
         :param height: The height that the window will have when created
         """
-        Log.debug("Intializing simulation")
+        Log.debug("Initializing simulation")
 
         # Window creation
         self.__window.init("ROV Simulation", 1280, 720)
 
-        # Resource initialiation
+        # Resource initialization
         Log.debug("OpenGL Version: {}".format(glGetString(GL_VERSION)))
 
         glViewport(0, 0, width, height)
@@ -148,38 +128,7 @@ class SimEngine:
         Update the state of the engine.
         :param delta: The time in seconds since the last update occurred
         """
-        speed = 10
-        rotation_speed = 65
-
-        # Move along global y axis
-        if self.__window.is_key_pressed(glfw.KEY_SPACE):
-            self.__camera.move([ 0, delta * speed, 0 ])
-        if self.__window.is_key_pressed(glfw.KEY_LEFT_SHIFT):
-            self.__camera.move([ 0, -delta * speed, 0 ])
-
-        # Move along local z axis
-        if self.__window.is_key_pressed(glfw.KEY_W):
-            self.__camera.move(self.__camera.get_forward() * (delta * speed))
-        if self.__window.is_key_pressed(glfw.KEY_S):
-            self.__camera.move(self.__camera.get_forward() * (-delta * speed))
-
-        # move along local x axis
-        if self.__window.is_key_pressed(glfw.KEY_D):
-            self.__camera.move(self.__camera.get_right() * (delta * speed))
-        if self.__window.is_key_pressed(glfw.KEY_A):
-            self.__camera.move(self.__camera.get_right() * (-delta * speed))
-
-        # Control pitch
-        if self.__window.is_key_pressed(glfw.KEY_UP):
-            self.__camera.rotation[0] += delta * rotation_speed
-        if self.__window.is_key_pressed(glfw.KEY_DOWN):
-            self.__camera.rotation[0] -= delta * rotation_speed
-
-        # Control yaw
-        if self.__window.is_key_pressed(glfw.KEY_LEFT):
-            self.__camera.rotation[1] += delta * rotation_speed
-        if self.__window.is_key_pressed(glfw.KEY_RIGHT):
-            self.__camera.rotation[1] -= delta * rotation_speed
+        self.__camera.update(delta, self.__window)
 
     def __render(self):
         """
@@ -218,7 +167,7 @@ class SimEngine:
         """
         Perform all necessary cleanup before terminating the simulation.
         """
-        Log.debug("Exiting simulation");
+        Log.debug("Exiting simulation")
 
         self.__vao.destroy()
         self.__shader.destroy()
@@ -232,11 +181,13 @@ class SimEngine:
         :param title: The title to be displayed on the window border
         :param width: The width that the window will have when created
         :param height: The height that the window will have when created
-        "param framerate: The maximum number of frames per second allowed
+        :param framerate: The maximum number of frames per second allowed
         """
         self.__init_resources(title, width, height)
 
-        time_millis = lambda: int(round(time.time() * 1000))
+        def time_millis():
+            return int(round(time.time() * 1000))
+
         frame_time = 1.0 / framerate * 1000.0
         frame_count = 0
 

@@ -12,7 +12,6 @@ import OpenGL
 OpenGL.ERROR_CHECKING = True
 OpenGL.ERROR_LOGGING = True
 
-from OpenGL.arrays import ArrayDatatype
 from OpenGL.GL import *
 
 
@@ -24,22 +23,21 @@ class Shader:
 
     def init(self):
         """
-        Intialize shader program.
+        Initialize shader program.
         """
-        self.__program = glCreateProgram();
+        self.__program = glCreateProgram()
 
-    def add_shader(self, source, type):
+    def add_shader(self, source, shader_type):
         """
         Compile the provided source and attach the result to the shader.
         :param source: The shader source
-        :param type: The type of the shader (Vertex Shader, Fragment Shader, etc.)
+        :param shader_type: The type of the shader (Vertex Shader, Fragment Shader, etc.)
         """
-        shader = glCreateShader(type)
+        shader = glCreateShader(shader_type)
             
         glShaderSource(shader, source)
         glCompileShader(shader)
 
-        result = glGetShaderiv(shader, GL_COMPILE_STATUS)
         if not glGetShaderiv(shader, GL_COMPILE_STATUS) == GL_TRUE:
             raise RuntimeError(glGetShaderInfoLog(shader))
 
@@ -86,85 +84,86 @@ class Shader:
 
         return location
 
-    def set_uniform_1f(self, name, value):
+    def set_uniform_1f(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform1f(location, value)
 
-    def set_uniform_2f(self, name, value):
+    def set_uniform_2f(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform2f(location, value[0], value[1])
 
-    def set_uniform_3f(self, name, value):
+    def set_uniform_3f(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform3f(location, value[0], value[1], value[2])
 
-    def set_uniform_4f(self, name, value):
+    def set_uniform_4f(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform4f(location, value[0], value[1], value[2], value[3])
 
-    def set_uniform_1i(self, name, value):
+    def set_uniform_1i(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform1i(location, value)
 
-    def set_uniform_2i(self, name, value):
+    def set_uniform_2i(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform2i(location, value[0], value[1])
 
-    def set_uniform_3i(self, name, value):
+    def set_uniform_3i(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform3i(location, value[0], value[1], value[2])
 
-    def set_uniform_4i(self, name, value):
+    def set_uniform_4i(self, shader_name, value):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniform4i(location, value[0], value[1], value[2], value[3])
 
-    def set_uniform_mat4f(self, name, value, transpose=True):
+    def set_uniform_mat4f(self, shader_name, value, transpose=True):
         """
         Set uniform value.
-        :param name: The name of the uniform
+        :param shader_name: The name of the uniform
         :param value: The value to be assigned to the uniform
+        :param transpose: Should the provided matrix be transposed before being passed to the shader
         """
-        location = self.get_uniform_location(name)
+        location = self.get_uniform_location(shader_name)
         glUniformMatrix4fv(location, 1, GL_TRUE if transpose else GL_FALSE, value)
 
     def destroy(self):
@@ -202,13 +201,13 @@ class VertexArray:
 
         return vbo_index
 
-    def bind_attribute(self, buffer_index, attrib_index, component_count, type, normalized, stride, offset):
+    def bind_attribute(self, buffer_index, attrib_index, component_count, attrib_type, normalized, stride, offset):
         """
         Add a vertex attribute to the specified buffer.
         :param buffer_index: The index of the buffer to add the attribute to
         :param attrib_index: The index of the attribute
-        :param component_type: The number of components of the attribute
-        :param type: The type of the attribute (float, int, etc.)
+        :param component_count: The number of components of the attribute
+        :param attrib_type: The type of the attribute (float, int, etc.)
         :param normalized: Should the provided data be normalized.
         :param stride: The number of bytes between consecutive attribute values
         :param offset: The offset into the buffer of the first element.
@@ -220,12 +219,13 @@ class VertexArray:
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
 
         glEnableVertexAttribArray(attrib_index)
-        glVertexAttribPointer(attrib_index, component_count, type, GL_TRUE if normalized else GL_FALSE, stride, ctypes.c_void_p(offset))
+        glVertexAttribPointer(attrib_index, component_count, attrib_type, GL_TRUE if normalized else GL_FALSE, stride,
+                              ctypes.c_void_p(offset))
 
     def get_buffer(self, index) -> int:
         """
         Get a buffer attached to this vertex array.
-        :param index: The index of the buffer to be retreived
+        :param index: The index of the buffer to be retrieved
         :return: The OpenGL handle of the buffer at the specified index
         """
         if index < 0 or index >= len(self.__vbo_list):
