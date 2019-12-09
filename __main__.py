@@ -28,22 +28,14 @@ from src import *
 
 
 if __name__ == "__main__":
-    #gui.start()
-    controller = control.Controller()
-    manager = control.ControlManager()
-
-    if not controller:
-        common.Log.error("Failed to initialise the controller")
-        exit(1)
-
-    controller_pid = controller.start()
-    manager_pid = manager.start()
-
-    # TODO: Remove later
-    import time
-    while True:
-        for k in common.CONTROL_DICT:
-            print(k, common.dm.control[k], end=" | ")
-            pass
-        print()
-        time.sleep(0.5)
+    # TODO: Enable once PySide2 supported in Python 3.8
+    # controller = control.Controller()
+    # manager = control.ControlManager()
+    #
+    # if not controller:
+    #     common.Log.error("Failed to initialise the controller")
+    #     exit(1)
+    #
+    # controller_pid = controller.start()
+    # manager_pid = manager.start()
+    gui.start()
