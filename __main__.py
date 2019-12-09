@@ -11,22 +11,20 @@ where `python` is Python3.8 version and `surface` is relative or absolute path t
 
 .. warning::
 
-    Currently you can only run the code with Python3.7, because PySide2 has not yet been released for 3.8.
-
-    To run the code, change::
-
-        `for handler in (handlers := config["handlers"]):`
-            #(...)
-
-    to::
-
-        handler = config["handlers"]
-        for handler in handlers:
-            #(...)
+    Currently you can only run the code with Python3.7, because PySide2 has not yet been released for 3.8. Disable all
+    Python 3.8 related code before running this module with Python3.7.
 """
-
 from src import *
 
 
 if __name__ == "__main__":
+    controller = control.Controller()
+    manager = control.ControlManager()
+
+    if not controller:
+        common.Log.error("Failed to initialise the controller")
+        exit(1)
+
+    controller_pid = controller.start()
+    manager_pid = manager.start()
     gui.start()
