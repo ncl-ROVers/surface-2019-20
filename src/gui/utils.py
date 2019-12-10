@@ -172,6 +172,8 @@ class ScreenManager(QMainWindow):
         """
         super(ScreenManager, self).__init__()
 
+        self._flag_setting(indicator=WINDOW_INDICATOR)
+
         # Declare the screen structure - a box layout with a stacked widget holding the screens
         self._base = QHBoxLayout()
         self._screens_stacked = QStackedWidget()
@@ -227,3 +229,30 @@ class ScreenManager(QMainWindow):
         """
         for scr in self._screens.values():
             scr.post_init()
+
+    def _flag_setting(self, indicator='borders'):
+        """
+        Set display mode for the window
+
+        :param indicator:
+        'borders':      Setting the window with borders
+        'full_screen':  Set full screen
+        'border_less':  Setting the window without borders
+        """
+        self.setGeometry(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+        if indicator.__eq__('borders'):
+            pass
+        elif indicator.__eq__('full_screen'):
+            self.showFullScreen()
+        elif indicator.__eq__('border_less'):
+            self.setWindowFlags(Qt.FramelessWindowHint)
+
+    def keyPressEvent(self, event: QKeyEvent):
+        """
+        This is the overridden of  QMainWindow.keyPressEvent
+
+        Press 'ESC' to close the window
+        """
+        if event.key().__eq__(Qt.Key_Escape):
+            exit()
+            event.accept()

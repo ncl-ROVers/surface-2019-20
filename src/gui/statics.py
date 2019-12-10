@@ -10,6 +10,7 @@ import enum
 
 SCREEN_HEIGHT = 1080
 SCREEN_WIDTH = 1920
+WINDOW_INDICATOR = 'borders'
 
 
 class Colour(enum.Enum):
