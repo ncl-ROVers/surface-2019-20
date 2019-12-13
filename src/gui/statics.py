@@ -8,9 +8,9 @@ of the program.
 
 import enum
 
-SCREEN_HEIGHT = 1080
-SCREEN_WIDTH = 1920
-WINDOW_INDICATOR = 'borders'
+SCREEN_HEIGHT = 520
+SCREEN_WIDTH = 960
+WINDOW_INDICATOR = 'full_screen'
 
 
 class Colour(enum.Enum):

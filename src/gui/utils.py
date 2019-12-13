@@ -179,9 +179,6 @@ class ScreenManager(QMainWindow):
         self._screens_stacked = QStackedWidget()
         self._screens = dict()
 
-        # Set some basic window properties
-        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-
         # Add all screens
         for screen in args:
             self._screens_stacked.addWidget(screen)
