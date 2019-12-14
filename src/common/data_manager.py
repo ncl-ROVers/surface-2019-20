@@ -14,7 +14,7 @@ import sys as _sys
 import os as _os
 from multiprocessing import shared_memory as _shm
 from .logger import Log as _Log
-from .statics import TRANSMISSION_DICT as _TRANSMISSION_DICT, CONTROL_DICT as _CONTROL_DICT, \
+from .utils import TRANSMISSION_DICT as _TRANSMISSION_DICT, CONTROL_DICT as _CONTROL_DICT, \
     COMMON_LOCKS_DIR as _LOCKS_DIR
 from filelock import FileLock as _FileLock
 

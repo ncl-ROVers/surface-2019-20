@@ -9,7 +9,7 @@ executed in separate process. The readings are forwarded to the shared memory in
 """
 from ..common import data_manager as _dm, Log as _Log
 from .utils import normalise as _normalise
-from .statics import DrivingMode as _DrivingMode
+from .utils import DrivingMode as _DrivingMode
 import multiprocessing as _mp
 import inputs as _inputs
 import time as _time

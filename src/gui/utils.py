@@ -2,16 +2,28 @@
 GUI Utils
 =========
 
-Standard utils module storing all values, classes and other objects which may change throughout the execution of the
-program, or are modifying their contents. Includes common to the package functions.
+Standard utils module storing common to the package classes, functions, constants, and other objects.
 """
 
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-from .statics import *
 from ..common import Log
 import typing
 import abc
+import enum
+
+SCREEN_HEIGHT = 1080
+SCREEN_WIDTH = 1920
+
+
+class Colour(enum.Enum):
+    """
+    Colour enumeration storing different colour values for the GUI style.
+
+    Each colour is in the RGBA format.
+    """
+
+    MAJOR = 34, 51, 54, 255
 
 
 class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):

@@ -7,7 +7,7 @@ Module storing an implementation of a static log class and all values associated
 The `config.json` file stored within the assets folder is used to configure most of the logging functionality.
 """
 
-from .statics import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
+from .utils import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
 import logging as _logging
 import logging.config as _config
 import json as _json

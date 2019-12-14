@@ -2,9 +2,18 @@
 Control Utils
 =============
 
-Standard utils module storing all values, classes and other objects which may change throughout the execution of the
-program, or are modifying their contents. Includes common to the package functions.
+Standard utils module storing common to the package classes, functions, constants, and other objects.
 """
+import enum as _enum
+
+
+class DrivingMode(_enum.Enum):
+    """
+    Enumeration for allowed driving modes.
+    """
+    MANUAL = 0
+    BALANCING = 1
+    AUTONOMOUS = 2
 
 
 def normalise(value: float, current_min: float, current_max: float, intended_min: float, intended_max: float) -> float:

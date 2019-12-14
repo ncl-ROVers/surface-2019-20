@@ -8,7 +8,7 @@ The `ControlManager` class is the implementation of a closed loop control system
 from both the manual and the autonomous modes.
 TODO: Conversion from normalised ranges to expected hardware values is needed (and associated code).
 """
-from .statics import DrivingMode as _DrivingMode
+from .utils import DrivingMode as _DrivingMode
 from ..common import data_manager as _dm, CONTROL_DICT as _CONTROL_DICT, Log as _Log
 import multiprocessing as _mp
 import time as _time
