@@ -1,7 +1,6 @@
 import inspect
 import sys
 
-
 def get_tests(module_name: str) -> dict:
     """
     TODO: Document

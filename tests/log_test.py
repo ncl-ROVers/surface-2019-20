@@ -2,7 +2,6 @@ from .utils import get_tests
 from src.common import LOG_DIR, Log
 import os
 
-
 def main():
     """
     TODO: Document
@@ -26,7 +25,6 @@ def get_log_files():
         if file.endswith(".log"):
             files.add(os.path.join(LOG_DIR, file))
     return files
-
 
 def test_create_logs():
     """
