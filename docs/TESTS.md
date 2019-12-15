@@ -3,7 +3,9 @@
 ## Install Pytest
 
 Run the following command from the command line:
-'''pip install -U pytest'''
+'''
+pip install -U pytest
+'''
 
 ## Using Pytest
 
@@ -12,5 +14,7 @@ Run the following command from the command line:
 so that Pytest can automatically detect the tests
 
 -You can then run pytest from the command line using:
-  '''pytest *directory*'''
+  '''
+  pytest *directory*
+  '''
 
