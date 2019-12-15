@@ -6,6 +6,11 @@ Standard utils module storing common to the package classes, functions, constant
 """
 import enum as _enum
 
+# Declare the expected normalised values
+NORM_MAX = 1
+NORM_IDLE = 0
+NORM_MIN = -NORM_MAX
+
 
 class DrivingMode(_enum.Enum):
     """
@@ -32,5 +37,7 @@ def normalise(value: float, current_min: float, current_max: float, intended_min
     """
     if current_min == current_max or intended_min == intended_max:
         raise ValueError("Current or intended minimum and maximum can not be equal")
+    elif not (current_max >= value >= current_min):
+        raise ValueError(f"Value {value} is not be between {current_min} and {current_max}")
 
     return intended_min + (value - current_min) * (intended_max - intended_min) / (current_max - current_min)

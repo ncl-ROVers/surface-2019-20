@@ -26,7 +26,14 @@ COMMON_LOCKS_DIR = _os.path.join(ASSETS_DIR, "common_locks")
 
 # Declare shared memory data mappings
 TRANSMISSION_DICT = {
-    "placeholder": 0
+    "T_HFP": 0,
+    "T_HFS": 0,
+    "T_HAP": 0,
+    "T_HAS": 0,
+    "T_VFP": 0,
+    "T_VFS": 0,
+    "T_VAP": 0,
+    "T_VAS": 0
 }
 CONTROL_DICT = {
     "mode": 0,
