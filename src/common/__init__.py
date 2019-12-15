@@ -8,7 +8,6 @@ Shared functions, classes, constants and other objects.
     Kacper Florianski <k.florianski@ncl.ac.uk>
 """
 
-from .statics import *
 from .utils import *
 from .logger import *
 from . import data_manager as dm
