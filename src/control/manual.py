@@ -370,7 +370,7 @@ class Controller:
         """
         Surge is determined by the vertical left axis.
 
-        :return: 1.0 for full foreward surge, -1.0 for full aft surge
+        :return: 1.0 for full forward surge, -1.0 for full backwards surge
         """
         return self.left_axis_y
 
