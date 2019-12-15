@@ -6,7 +6,8 @@ Module storing an implementation of the control model.
 
 The `ControlManager` class is the implementation of a closed loop control system for the ROV, with the readings
 from both the manual and the autonomous modes.
-TODO: Conversion from normalised ranges to expected hardware values is needed (and associated code).
+
+The normalised values are then converted to the ranges expected by hardware and pushed as transmission data.
 """
 from .utils import DrivingMode as _DrivingMode
 from ..common import data_manager as _dm, CONTROL_DICT as _CONTROL_DICT, Log as _Log
@@ -107,9 +108,9 @@ class ControlManager:
 
     def _push(self):
         """
-        TODO: Get and push the transmission data
+        Method used to translate normalised values into the expected hardware ranges, and push to the data manager.
         """
-        pass
+        _dm.transmission.update(_convert(self._data))
 
     def _update(self):
         """
@@ -132,3 +133,27 @@ class ControlManager:
         self._process.start()
         _Log.info("Control manager process started, pid {}".format(self._process.pid))
         return self._process.pid
+
+
+def _convert(data: dict) -> dict:
+    """
+    TODO: Write code in the same manner as the last year's hierarchy based control.
+      Requires the actual values and ids to be known before writing it.
+
+    TODO: Example::
+        def thruster_ap():
+            if surge and yaw:
+                return normalise(yaw//2 + surge//2, ...)  <- possibly create helper normalise method (like in manual.py)
+            elif surge:
+                return normalise(surge, ...)
+            elif yaw:
+                return normalise(yaw, ...)
+            else:
+                return normalise(sway, ...)
+
+    TODO: Consider moving this function elsewhere, for example into the ControlManager
+
+    :param data: Values to convert into hardware-expected ranges
+    :return: Dictionary of values to update the data manager with
+    """
+    return dict()
