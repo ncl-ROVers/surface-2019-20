@@ -1,4 +1,3 @@
-from .utils import get_tests
 from src.common import LOG_DIR, Log
 import os
 
