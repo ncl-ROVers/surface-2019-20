@@ -1,5 +1,11 @@
 """
-TODO: Document
+Verbose File Handler
+====================
+
+A helper module that overrides the default logging module to ensure every logging call, no matter its level, is
+added to a verbose file
+
+Mostly used to load in the config files
 """
 import logging as _logging
 import inspect as _inspect
@@ -10,6 +16,8 @@ _ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".
 def _get_frame():
     """
     Return the frame that called the logging function.
+    Should you be unable to find the frame that called the logging function, return the last caller frame instead
+    
     """
     stack = _inspect.stack()[::-1]
 
@@ -28,7 +36,9 @@ def _get_frame():
 
 class _VerboseFileHandler(_logging.FileHandler):
     """
-    TODO: Document
+    Helper file handler class used for logging configuration.
+    
+    Any emit to a RestrictedFileHandler is also passed to this, so it is all the levels combined
     """
 
     def __init__(self, filename, *args, **kwargs):
@@ -36,10 +46,10 @@ class _VerboseFileHandler(_logging.FileHandler):
 
     def emit(self, record):
         """
-        TODO: Document
-
-        :param record:
-        :return:
+        Overridden function modified so any logging call is put into the verbose file
+        
+        :param record: Record used in the emit function
+        :return: Nothing
         """
         caller = _inspect.getframeinfo(_get_frame())
 
