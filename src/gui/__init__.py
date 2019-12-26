@@ -17,12 +17,14 @@ from .utils import ScreenManager as _ScreenManager, Screen as _Screen
 from ..common import Log
 
 
-def start():
+def start() -> int:
     """
     Start the graphical user interface.
 
     Creates an instance of :class:`PySide2.QtWidgets.QApplication` as well as the `manager` object to handle screen
     selections and rendering.
+
+    :return: Return code of the application
     """
     app = _QApplication()
 
@@ -37,4 +39,4 @@ def start():
     Log.info("Application started")
     rc = app.exec_()
     Log.info("Application stopped")
-    exit(rc)
+    return rc
