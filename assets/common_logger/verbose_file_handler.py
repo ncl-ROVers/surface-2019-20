@@ -2,12 +2,14 @@
 Verbose File Handler
 ====================
 
-A helper module that overrides the default logging module to ensure every
-logging call, no matter its level, is added to the verbose logging file.
+A helper module that extends logging to make every logging call be added to the
+verbose logging file, regardless of its level.
 
-Additionally adds the following fields to the logged record `v_filename' (the
-file from where the logger was called), `v_function' (the calling function), and
-`v_lineno' (the calling line number). These may be used in the verbose logging formatter.
+It additionally amends the following logging record fields to give more
+relevant information:
+- `filename' (the file from where our logger was called)
+- `function' (the calling function)
+- `lineno' (the calling line number).
 """
 import logging as _logging
 import inspect as _inspect
@@ -50,16 +52,18 @@ class _VerboseFileHandler(_logging.FileHandler):
         Overridden function modified so any logging call is put into the verbose file
         
         :param record: Record used in the emit function
-        :return: Nothing
         """
+        # the calling frame
         caller = _inspect.getframeinfo(_get_frame())
 
-        # the calling location's filename (give the path relative to the root
-        # `surface' directory)
-        record.v_filename = _os.path.relpath(caller.filename, _ROOT_DIR)
+        # the calling location's filename, its path relative to the root
+        # `surface' directory
+        record.filename = _os.path.relpath(caller.filename, _ROOT_DIR)
+
         # the calling location's function
-        record.v_function = caller.function
+        record.function = caller.function
+
         # the calling location's line number
-        record.v_lineno = caller.lineno
+        record.lineno = caller.lineno
 
         _logging.FileHandler.emit(self, record)

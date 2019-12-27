@@ -16,6 +16,7 @@ import os as _os
 
 _DEFAULT_LOG_DIR = _LOG_DIR
 _MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
+# TODO change to "config_hardware.json" once the hardware logging is implemented (#57)
 _HARDWARE_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
                   "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
@@ -98,6 +99,7 @@ class Log:
     _main_logger = _get_logger(_MAIN_CONFIG_FILE_PATH)
     _hardware_logger = _get_logger(_HARDWARE_CONFIG_FILE_PATH)
 
+    # TODO: Use enum
     _loggers = {
         "main": "_main_logger",
         "hardware": "_hardware_logger"
