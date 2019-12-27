@@ -2,10 +2,12 @@
 Verbose File Handler
 ====================
 
-A helper module that overrides the default logging module to ensure every logging call, no matter its level, is
-added to a verbose file
+A helper module that overrides the default logging module to ensure every
+logging call, no matter its level, is added to the verbose logging file.
 
-Mostly used to load in the config files
+Additionally adds the following fields to the logged record `v_filename' (the
+file from where the logger was called), `v_function' (the calling function), and
+`v_lineno' (the calling line number). These may be used in the verbose logging formatter.
 """
 import logging as _logging
 import inspect as _inspect
@@ -16,8 +18,7 @@ _ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".
 def _get_frame():
     """
     Return the frame that called the logging function.
-    Should you be unable to find the frame that called the logging function, return the last caller frame instead
-    
+    :return: a frame record (see the `inspect' module for details)
     """
     stack = _inspect.stack()[::-1]
 
@@ -38,7 +39,7 @@ class _VerboseFileHandler(_logging.FileHandler):
     """
     Helper file handler class used for logging configuration.
     
-    Any emit to a RestrictedFileHandler is also passed to this, so it is all the levels combined
+    Any emit to a RestrictedFileHandler is also passed to this, so it is all the levels combined.
     """
 
     def __init__(self, filename, *args, **kwargs):
@@ -53,10 +54,12 @@ class _VerboseFileHandler(_logging.FileHandler):
         """
         caller = _inspect.getframeinfo(_get_frame())
 
-        # give the path relative to the root `surface' directory
+        # the calling location's filename (give the path relative to the root
+        # `surface' directory)
         record.v_filename = _os.path.relpath(caller.filename, _ROOT_DIR)
-        # TODO should have the parent function/class
+        # the calling location's function
         record.v_function = caller.function
+        # the calling location's line number
         record.v_lineno = caller.lineno
 
         _logging.FileHandler.emit(self, record)
