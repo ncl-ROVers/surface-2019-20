@@ -29,5 +29,4 @@ from src import *
 
 
 if __name__ == "__main__":
-    simulation.init()
-#    gui.start()
+    gui.start()
