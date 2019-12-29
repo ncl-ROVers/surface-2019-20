@@ -69,34 +69,28 @@ void Scene::init(int width, int height)
 	m_vertexArray.bindAttribute(0, 0, 3, GL_FLOAT, false, 5 * 4, 0);
 	m_vertexArray.bindAttribute(0, 1, 3, GL_FLOAT, false, 5 * 4, 3 * 4);
 
-	glViewport(0, 0, width, height);
+	resize(width, height);
+
+	m_camera.setPosition({ 0.0f, 1.0f, 3.0f });
+	m_camera.setPitch(-20.0f);
 }
 
 void Scene::update(double delta)
 {
-
+	m_camera.update(delta);
 }
 
 void Scene::render()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glm::vec3 camPos(0.0f, 1.0f, 3.0f);
-	float pitch = -20;
-	float yaw = 0;
 
 	glm::mat4 model = glm::translate(glm::vec3(0.0f, -1.0f, 0.0f)) *
 					  glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * 
 					  glm::scale(glm::vec3(10.0f));
 
-	glm::mat4 tMat = glm::translate(-camPos);
-	glm::mat4 rMat = glm::inverse(glm::rotate(glm::radians(pitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
-								  glm::rotate(glm::radians(yaw), glm::vec3(0.0f, 1.0f, 0.0f)));
-	glm::mat4 view = rMat * tMat;
-
-	glm::mat4 proj = glm::perspective(glm::radians(70.0f), (float)1280 / 720, 0.0001f, 1000.0f);
-	proj[1][1] *= 1;
+	glm::mat4 view = m_camera.getViewMatrix();
+	glm::mat4 proj = m_camera.getProjectionMatrix();
 
 	glm::mat4 transform = proj * view * model;
 
@@ -106,6 +100,13 @@ void Scene::render()
 
 	m_vertexArray.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Scene::resize(int width, int height)
+{
+	glViewport(0, 0, width, height);
+
+	m_camera.resize(width, height);
 }
 
 void Scene::destroy()

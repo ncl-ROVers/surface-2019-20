@@ -13,6 +13,7 @@
 #include <gtx/rotate_vector.hpp>
 
 #include <ostream>
+#include <algorithm>
 
 template<int D, typename T, glm::qualifier Q>
 inline std::ostream& operator<<(std::ostream& os, const glm::vec<D, T, Q>& value)
@@ -25,4 +26,13 @@ inline std::ostream& operator<<(std::ostream& os, const glm::vec<D, T, Q>& value
 	os << value[D - 1] << ")";
 
 	return os;
+}
+
+inline glm::vec3 polarToCartesian(float xRot, float yRot)
+{
+	float x = -std::sin(glm::radians(yRot)) * std::cos(glm::radians(xRot));
+	float y = std::sin(glm::radians(xRot));
+	float z = -std::cos(glm::radians(yRot)) * std::cos(glm::radians(xRot));
+
+	return { x, y, z };
 }

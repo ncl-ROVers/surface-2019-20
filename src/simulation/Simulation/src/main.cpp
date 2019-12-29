@@ -5,6 +5,7 @@
 #include "Common.h"
 
 #include "Scene.h"
+#include "Input.h"
 
 int main()
 {
@@ -44,13 +45,21 @@ int main()
 
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
+		Input::handleKeyEvent(key, scancode, action, mods);
+	});
 
+	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x, double y)
+	{
+		Input::handleMousePosEvent(x, y);
 	});
 
 	glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
 	{
-
+		std::cout << "Window Size: " << glm::vec2(width, height) << std::endl;
+		Scene::singleton()->resize(width, height);
 	});
+
+	Input::setWindow(window);
 
 	//Initialize scene
 	Scene::singleton()->init(width, height);
@@ -84,6 +93,8 @@ int main()
 
 			std::this_thread::sleep_for(1ms);
 		}
+
+		Input::update();
 	}
 
 	//Release resources
