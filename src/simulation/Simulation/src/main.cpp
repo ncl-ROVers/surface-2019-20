@@ -55,7 +55,6 @@ int main()
 
 	glfwSetWindowSizeCallback(window, [](GLFWwindow* window, int width, int height)
 	{
-		std::cout << "Window Size: " << glm::vec2(width, height) << std::endl;
 		Scene::singleton()->resize(width, height);
 	});
 

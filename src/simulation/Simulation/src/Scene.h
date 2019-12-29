@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Shader.h"
-#include "VertexArray.h"
-#include "Camera.h"
+#include "graphics/Shader.h"
+#include "graphics/VertexArray.h"
+#include "graphics/Camera.h"
 
 class Scene
 {
