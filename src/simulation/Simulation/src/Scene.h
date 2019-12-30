@@ -2,15 +2,21 @@
 
 #include "graphics/Shader.h"
 #include "graphics/VertexArray.h"
+#include "graphics/Buffer.h"
 #include "graphics/Camera.h"
+
+#include "physics/entities/Entity.h"
 
 class Scene
 {
 private:
-	Shader m_shader;
+	Shader m_shader;	
 	VertexArray m_vertexArray;
+	Buffer m_indexBuffer;
 
 	Camera m_camera;
+
+	std::vector<Entity*> m_entities;
 private:
 	Scene() {}
 public:

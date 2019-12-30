@@ -27,8 +27,8 @@ public:
 	}
 
 	inline void bind() const { glBindVertexArray(m_vertexArray); }
-	inline void bindBuffer(size_t index) { glBindBuffer(getBufferType(index), getBufferId(index)); }
-	inline void unbindBuffer(GLenum type) { glBindBuffer(type, 0); }
+	inline void bindBuffer(size_t index) const { glBindBuffer(getBufferType(index), getBufferId(index)); }
+	inline void unbindBuffer(GLenum type) const { glBindBuffer(type, 0); }
 	inline void unbind() const { glBindVertexArray(0); }
 
 	void destroy();

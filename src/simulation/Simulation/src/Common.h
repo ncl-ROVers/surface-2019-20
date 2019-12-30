@@ -12,8 +12,10 @@
 
 #include <gtx/rotate_vector.hpp>
 
+#include <vector>
 #include <ostream>
 #include <algorithm>
+#include <iostream>
 
 template<int D, typename T, glm::qualifier Q>
 inline std::ostream& operator<<(std::ostream& os, const glm::vec<D, T, Q>& value)
