@@ -4,6 +4,7 @@
 #include "graphics/VertexArray.h"
 #include "graphics/Buffer.h"
 #include "graphics/Camera.h"
+#include "graphics/Mesh.h"
 
 #include "physics/entities/Entity.h"
 
@@ -13,6 +14,8 @@ private:
 	Shader m_shader;	
 	VertexArray m_vertexArray;
 	Buffer m_indexBuffer;
+
+	Mesh m_mesh;
 
 	Camera m_camera;
 

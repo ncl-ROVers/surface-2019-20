@@ -4,6 +4,7 @@
 #include "physics/MotionIntegrators.h"
 #include "physics/Transform.h"
 
+#include <filesystem>
 #include <string>
 
 using namespace std::string_literals;
@@ -56,32 +57,12 @@ void Scene::init(int width, int height)
 	m_shader.addShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
 	m_shader.compile();
 
-	float vertices[] =
-	{
-		-1.0, 1.0, 0.0, 0.0, 1.0,
-		-1.0, -1.0, 0.0, 0.0, 0.0,
-		1.0, 1.0, 0.0, 1.0, 1.0,
-		1.0, -1.0, 0.0, 1.0, 0.0
-	};
-
-	m_vertexArray.init();
-	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, vertices, 6 * 5 * 4);
-	m_vertexArray.bindAttribute(0, 0, 3, GL_FLOAT, false, 5 * 4, 0);
-	m_vertexArray.bindAttribute(0, 1, 3, GL_FLOAT, false, 5 * 4, 3 * 4);
-
-	unsigned int indices[] = 
-	{
-		0, 1, 2,
-		2, 3, 1
-	};
-
-	m_indexBuffer.create(GL_ELEMENT_ARRAY_BUFFER);
-	m_indexBuffer.data(sizeof(indices), indices);
-
 	resize(width, height);
 
 	m_camera.setPosition({ 0.0f, 1.0f, 3.0f });
 	m_camera.setPitch(-20.0f);
+
+	m_mesh.load(std::filesystem::absolute("./res/monkey.obj").u8string());
 }
 
 void Scene::update(double delta)
@@ -100,9 +81,9 @@ void Scene::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	Transform transform;
-	transform.position(glm::vec3(0.0f, -1.0f, 0.0f));
-	transform.rotation(rotator({ 1.0f, 0.0f, 0.0f }, 90.0f));
-	transform.scale(glm::vec3(10.0f));
+	transform.position(glm::vec3(0.0f, -3.0f, 0.0f));
+	transform.rotation(rotator({ 1.0f, 0.0f, 0.0f }, 0.0f));
+	transform.scale(glm::vec3(1.0f));
 
 	glm::mat4 model = transform.matrix();
 	glm::mat4 view = m_camera.getViewMatrix();
@@ -114,10 +95,7 @@ void Scene::render()
 	m_shader.setUniform("transform", mvpMatrix);
 	m_shader.setUniform("model", model);
 
-	m_vertexArray.bind();
-	m_indexBuffer.bind();
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+	m_mesh.draw();
 	
 	for (Entity* entity : m_entities)
 	{

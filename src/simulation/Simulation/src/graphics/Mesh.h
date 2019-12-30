@@ -3,12 +3,15 @@
 #include "Common.h"
 
 #include "VertexArray.h"
+#include "Buffer.h"
 
 class Mesh
 {
 private:
 	VertexArray m_vertexArray;
-	int m_numVertices = 0;
+	Buffer m_indexBuffer;
+
+	int m_numIndices = 0;
 public:
 	Mesh() {}
 

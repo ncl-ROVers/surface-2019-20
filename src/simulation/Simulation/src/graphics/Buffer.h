@@ -11,7 +11,7 @@ public:
 	Buffer() {}
 
 	void create(GLenum type);
-	void data(GLsizeiptr size, const void* data, GLenum usage = GL_STATIC_DRAW);
+	void data(const void* data, GLsizeiptr size, GLenum usage = GL_STATIC_DRAW);
 
 	inline void bind() const { glBindBuffer(m_type, m_buffer); }
 	inline void unbind() const { glBindBuffer(m_type, 0); }

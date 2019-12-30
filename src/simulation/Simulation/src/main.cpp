@@ -61,6 +61,8 @@ int main()
 	Input::setWindow(window);
 
 	//Initialize scene
+	glEnable(GL_DEPTH_TEST);
+
 	Scene::singleton()->init(width, height);
 
 	//Main game loop

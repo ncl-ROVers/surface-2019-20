@@ -2,6 +2,8 @@ workspace "ROVSimulation"
 	configurations { "Debug", "Release" }
 	platforms { "Win32", "x64" }
 	
+	startproject "Simulation"
+	
 	filter "platforms:Win32"
       architecture "x86"
 

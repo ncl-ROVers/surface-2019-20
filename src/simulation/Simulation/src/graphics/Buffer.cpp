@@ -6,7 +6,7 @@ void Buffer::create(GLenum type)
 	m_type = type;
 }
 
-void Buffer::data(GLsizeiptr size, const void* data, GLenum usage)
+void Buffer::data(const void* data, GLsizeiptr size, GLenum usage)
 {
 	glBindBuffer(m_type, m_buffer);
 	glBufferData(m_type, size, data, usage);
