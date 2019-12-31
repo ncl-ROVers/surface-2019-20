@@ -6,13 +6,13 @@ Module storing an implementation of a static log class and all values associated
 
 The config.json files stored within the assets folder are used to configure most of the logging functionality.
 """
-
 from .utils import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
 import logging as _logging
 import logging.config as _config
 import json as _json
 import subprocess as _subprocess
 import os as _os
+import enum as _enum
 
 _DEFAULT_LOG_DIR = _LOG_DIR
 _MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
@@ -30,6 +30,14 @@ class LogError(Exception):
     A standard exception to handle log-related errors.
     """
     pass
+
+
+class Logger(_enum.Enum):
+    """
+    Logger enum used to easily select loggers to reconfigure.
+    """
+    MAIN = "_main_logger"
+    HARDWARE = "_hardware_logger"
 
 
 def _get_logger(config_file_path: str, *, log_directory: str = "") -> _logging.Logger:
@@ -99,14 +107,8 @@ class Log:
     _main_logger = _get_logger(_MAIN_CONFIG_FILE_PATH)
     _hardware_logger = _get_logger(_HARDWARE_CONFIG_FILE_PATH)
 
-    # TODO: Use enum
-    _loggers = {
-        "main": "_main_logger",
-        "hardware": "_hardware_logger"
-    }
-
     @classmethod
-    def reconfigure(cls, logger: str, config_file_path: str, *, log_directory: str = ""):
+    def reconfigure(cls, logger: Logger, config_file_path: str, *, log_directory: str = ""):
         """
         Helper function to reconfigure a logger
 
@@ -114,12 +116,11 @@ class Log:
         :param config_file_path: Path to the JSON configuration file
         :param log_directory:  Path to where the log files should be stored
         """
-        if logger not in cls._loggers.keys():
-            raise LogError(f"Attempted to reconfigure an invalid logger {logger}"
-                           f"\nAvailable loggers are: {cls._loggers.keys()}")
+        if not isinstance(logger, Logger):
+            raise LogError(f"Attempted to reconfigure an invalid logger {logger} - isn't of type \"Logger\"")
 
         # Update the logger with both new values (or use the empty strings as default to use the default paths)
-        setattr(cls, cls._loggers[logger], _get_logger(config_file_path, log_directory=log_directory))
+        setattr(cls, logger.value, _get_logger(config_file_path, log_directory=log_directory))
 
     @classmethod
     def debug(cls, message: str, *args, **kwargs):
@@ -173,7 +174,7 @@ class Log:
         :param command_result: Result from subprocess.run or similar
         """
 
-        Log.info("The command returned {}, logging stdout and stderr...".format(command_result.returncode))
+        cls._main_logger.info("The command returned {}, logging stdout and stderr...".format(command_result.returncode))
 
         # Log stdout as info
         if command_result.stdout:

@@ -10,8 +10,9 @@
             "datefmt":"%y-%m-%d %H:%M:%S"
         },
         "verbose":{
-            "format":"%(asctime)s %(levelname)-7s %(processName)s(%(process)d) %(filename)s:%(lineno)s %(function)s %(message)s",
-            "datefmt":"%y-%m-%d %H:%M:%S"
+            "format":"{asctime} {levelname:8} | {processName:>10} {process:8} | {filename:30} {function:12} {lineno:5} | {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
         }
     },
     "handlers":{

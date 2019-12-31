@@ -2,14 +2,13 @@
 Verbose File Handler
 ====================
 
-A helper module that extends logging to make every logging call be added to the
-verbose logging file, regardless of its level.
+Helper module storing the class to load in the config files.
 
-It additionally amends the following logging record fields to give more
-relevant information:
-- `filename' (the file from where our logger was called)
-- `function' (the calling function)
-- `lineno' (the calling line number).
+Additionally amends the following logging record fields to give more relevant information:
+
+    * `filename' - file from where the message was logged
+    * `function' - function within which the message was logged
+    * `lineno' - line number of the log statement
 """
 import logging as _logging
 import inspect as _inspect
@@ -17,10 +16,12 @@ import os as _os
 
 _ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
 
+
 def _get_frame():
     """
     Return the frame that called the logging function.
-    :return: a frame record (see the `inspect' module for details)
+
+    :return: Frame (see the `inspect' module for details)
     """
     stack = _inspect.stack()[::-1]
 
@@ -49,21 +50,12 @@ class _VerboseFileHandler(_logging.FileHandler):
 
     def emit(self, record):
         """
-        Overridden function modified so any logging call is put into the verbose file
+        Overridden function modified so any logging call is put into the verbose file.
         
         :param record: Record used in the emit function
         """
-        # the calling frame
         caller = _inspect.getframeinfo(_get_frame())
-
-        # the calling location's filename, its path relative to the root
-        # `surface' directory
         record.filename = _os.path.relpath(caller.filename, _ROOT_DIR)
-
-        # the calling location's function
         record.function = caller.function
-
-        # the calling location's line number
         record.lineno = caller.lineno
-
         _logging.FileHandler.emit(self, record)
