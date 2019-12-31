@@ -138,7 +138,17 @@ void Mesh::load(const std::string& path)
 	std::vector<unsigned int> modelIndices;
 
 	parseOBJFile(path, modelVertices, modelTexCoords, modelNormals, modelIndices);
+	
+	glm::dvec3 centerOfMass(0.0f);
+	for (size_t i = 0; i < modelIndices.size(); ++i)
+	{
+		centerOfMass += modelVertices[modelIndices[i]];
+	}
+	centerOfMass /= (double)modelIndices.size();
+	
+	m_centerOfMassOffset = { (float)centerOfMass.x, (float)centerOfMass.y, (float)centerOfMass.z };
 
+	//Init GL data
 	m_numIndices = modelIndices.size();
 
 	m_vertexArray.init();

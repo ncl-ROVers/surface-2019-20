@@ -22,7 +22,7 @@ public:
 
 	inline void operator=(const Entity& other) = delete;
 
+	inline void setTransform(const Transform& transform) { m_transform = transform; }
 	inline const Transform& getTransform() const { return m_transform; }
 	inline Transform& getTransform() { return m_transform; }
-	inline void setTransform(const Transform& transform) { m_transform = transform; }
 };

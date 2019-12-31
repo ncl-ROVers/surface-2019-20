@@ -13,7 +13,9 @@ uniform mat4 model;
 
 void main() {
 	outTexCoords = texCoords;
-	outNormal = normal;
+	
+	mat3 normalMatrix = transpose(inverse(mat3(model)));
+	outNormal = normalize(normal * normalMatrix);
 
 	outWorldPos = (model * vec4(position, 1.0)).xyz;
 	gl_Position = transform * vec4(position, 1.0);

@@ -1,5 +1,7 @@
 #include "EntityObject.h"
 
+#include "physics/MotionIntegrators.h"
+
 EntityObject::EntityObject(const std::string& modelPath, const std::pair<std::string, std::string>& shaderPaths)
 {
 	m_mesh.load(modelPath);
@@ -18,7 +20,9 @@ EntityObject::~EntityObject()
 
 void EntityObject::update(double delta)
 {
+	motion_integrators::forestRuth(m_transform.position(), m_physicsData.linearVelocity, m_physicsData.linearForce / m_physicsData.mass, (float)delta);
 
+	m_physicsData.linearForce = glm::vec3(0.0f);
 }
 
 void EntityObject::render(const World& world)

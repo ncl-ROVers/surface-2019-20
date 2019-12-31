@@ -13,6 +13,7 @@ void main() {
 	float lightDistance = length(toLight);
 	toLight = normalize(toLight);
 
-	float diffuse = max(dot(inNormal, toLight), 0) * (1.0 / (lightDistance * lightDistance));
+	float diffuse = max(dot(inNormal, toLight), 0);// * (1.0 / (lightDistance * lightDistance));
 	outColor = vec4(vec3(diffuse), 1.0);
+
 }

@@ -22,9 +22,14 @@ public:
 
 	inline glm::mat4 matrix() const { return glm::translate(m_position) * m_rotation.matrix() * glm::scale(m_scale); }
 
-	inline glm::vec3 position() const { return m_position; }
-	inline rotator rotation() const { return m_rotation; }
-	inline glm::vec3 scale() const { return m_scale; }
+	inline const glm::vec3& position() const { return m_position; }
+	inline glm::vec3& position() { return m_position; }
+
+	inline const rotator& rotation() const { return m_rotation; }
+	inline rotator& rotation() { return m_rotation; }
+
+	inline const glm::vec3& scale() const { return m_scale; }
+	inline glm::vec3& scale() { return m_scale; }
 
 	inline void position(const glm::vec3& position) { m_position = position; }
 	inline void rotation(const rotator& rotation) { m_rotation = rotation; }
