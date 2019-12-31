@@ -18,8 +18,11 @@ public:
 	~Shader() {}
 
 	void init();
-	void addShader(GLenum shaderType, const std::string& source);
+	void addShaderFromPath(GLenum shaderType, const std::string& path);
+	void addShader(GLenum shaderType, const char* source, int sourceLength);
 	void compile();
+
+	inline void addShader(GLenum shaderType, const std::string& source) { addShader(shaderType, source.c_str(), source.size()); }
 
 	void bind();
 	void unbind();

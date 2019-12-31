@@ -1,23 +1,16 @@
 #pragma once
 
-#include "graphics/Shader.h"
-#include "graphics/VertexArray.h"
-#include "graphics/Buffer.h"
 #include "graphics/Camera.h"
 #include "graphics/Mesh.h"
+#include "graphics/World.h"
 
 #include "physics/entities/Entity.h"
+#include "physics/entities/EntityObject.h"
 
 class Scene
 {
 private:
-	Shader m_shader;	
-	VertexArray m_vertexArray;
-	Buffer m_indexBuffer;
-
-	Mesh m_mesh;
-
-	Camera m_camera;
+	World m_world;
 
 	std::vector<Entity*> m_entities;
 private:

@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cstdint>
+#include <filesystem>
 
 typedef uint8_t byte;
 

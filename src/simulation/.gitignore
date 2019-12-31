@@ -39,3 +39,6 @@ bin/
 *.vcxproj
 *.filters
 *.user
+
+# Whitelist
+!Simulation/**/*.obj

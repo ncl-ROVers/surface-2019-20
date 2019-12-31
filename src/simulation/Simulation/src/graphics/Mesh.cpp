@@ -32,10 +32,11 @@ namespace std {
 	};
 }
 
-void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices, std::vector<glm::vec2>& modelTexCoords, std::vector<unsigned int>& modelIndices)
+void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices, std::vector<glm::vec2>& modelTexCoords, std::vector<glm::vec3>& modelNormals, std::vector<unsigned int>& modelIndices)
 {
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> texCoords;
+	std::vector<glm::vec3> normals;
 	std::unordered_map<ModelIndex, unsigned int> indexMap;
 
 	auto parseIndex = [&](const ModelIndex& index) -> void
@@ -48,6 +49,7 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 
 			modelVertices.push_back(vertices[index.vertexIndex - 1]);
 			modelTexCoords.push_back(texCoords[index.texCoordIndex - 1]);
+			modelNormals.push_back(normals[index.normalIndex - 1]);
 		}
 		else
 		{
@@ -93,12 +95,20 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 
 			texCoords.emplace_back(x, y);
 		}
+		else if(!strncmp(line, "vn", 2))
+		{
+			float x, y, z;
+			sscanf_s(line, "vn %f %f %f", &x, &y, &z);
+
+			normals.emplace_back(x, y, z);
+		}
 		else if (!strncmp(line, "f ", 2))
 		{
 			if (vertices.size() > modelVertices.size())
 			{
 				modelVertices.reserve(vertices.size());
 				modelTexCoords.reserve(texCoords.size());
+				modelNormals.reserve(normals.size());
 			}
 
 			ModelIndex index0;
@@ -124,9 +134,10 @@ void Mesh::load(const std::string& path)
 {
 	std::vector<glm::vec3> modelVertices;
 	std::vector<glm::vec2> modelTexCoords;
+	std::vector<glm::vec3> modelNormals;
 	std::vector<unsigned int> modelIndices;
 
-	parseOBJFile(path, modelVertices, modelTexCoords, modelIndices);
+	parseOBJFile(path, modelVertices, modelTexCoords, modelNormals, modelIndices);
 
 	m_numIndices = modelIndices.size();
 
@@ -134,8 +145,11 @@ void Mesh::load(const std::string& path)
 	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelVertices.data(), modelVertices.size() * sizeof(modelVertices[0]));
 	m_vertexArray.bindAttribute(0, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
-	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelVertices.data(), modelTexCoords.size() * sizeof(modelTexCoords[0]));
+	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelTexCoords.data(), modelTexCoords.size() * sizeof(modelTexCoords[0]));
 	m_vertexArray.bindAttribute(1, 1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
+	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelNormals.data(), modelNormals.size() * sizeof(modelNormals[0]));
+	m_vertexArray.bindAttribute(2, 2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	m_indexBuffer.create(GL_ELEMENT_ARRAY_BUFFER);
 	m_indexBuffer.data(modelIndices.data(), modelIndices.size() * sizeof(modelIndices[0]));

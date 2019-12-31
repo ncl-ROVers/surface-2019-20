@@ -7,14 +7,11 @@ void Shader::init()
 	m_program = glCreateProgram();
 }
 
-void Shader::addShader(GLenum shaderType,  const std::string& source)
+void Shader::addShader(GLenum shaderType,  const char* source, int sourceLength)
 {
 	GLuint shader = glCreateShader(shaderType);
 	
-	const char* src = source.c_str();
-	GLint srcLength = source.size();
-
-	glShaderSource(shader, 1, &src, &srcLength);
+	glShaderSource(shader, 1, &source, &sourceLength);
 	glCompileShader(shader);
 
 	GLint status = 0;
@@ -23,12 +20,12 @@ void Shader::addShader(GLenum shaderType,  const std::string& source)
 	if (!status)
 	{
 		GLsizei logLength = 0;
-		glGetShaderInfoLog(shader, 0, &logLength, nullptr);
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 
 		char* logMessage = new char[logLength];
 		glGetShaderInfoLog(shader, logLength, nullptr, logMessage);
 
-		std::cout << "=====Shader Error=====" << std::endl << logMessage << std::endl << "======================" << std::endl;
+		std::cout << "=====Shader Error=====" << std::endl << logMessage << "======================" << std::endl;
 
 		delete[] logMessage;
 
@@ -38,6 +35,16 @@ void Shader::addShader(GLenum shaderType,  const std::string& source)
 	glAttachShader(m_program, shader);
 
 	m_shaders.push_back(shader);
+}
+
+void Shader::addShaderFromPath(GLenum shaderType, const std::string& path)
+{
+	long size = 0;
+	byte* src = readFileContent(std::filesystem::absolute(path).u8string(), size);
+
+	addShader(shaderType, (char*)src, size);
+
+	delete[] src;
 }
 
 void Shader::compile()
@@ -51,12 +58,12 @@ void Shader::compile()
 	if (!status)
 	{
 		GLsizei logLength = 0;
-		glGetProgramInfoLog(m_program, 0, &logLength, nullptr);
+		glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &logLength);
 
 		char* logMessage = new char[logLength];
 		glGetProgramInfoLog(m_program, logLength, nullptr, logMessage);
 
-		std::cout << "=====Program Error=====" << std::endl << logMessage << std::endl << "======================" << std::endl;
+		std::cout << "=====Program Error=====" << std::endl << logMessage << "======================" << std::endl;
 
 		delete[] logMessage;
 

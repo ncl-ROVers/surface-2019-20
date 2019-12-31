@@ -7,7 +7,7 @@ class rotator
 private:
 	glm::vec4 m_base;
 public:
-	rotator() : m_base(0.0f) {}
+	rotator() : m_base(0.0f, 0.0f, 0.0f, 1.0f) {}
 	rotator(const glm::vec4& base) : m_base(base) {}
 	rotator(const glm::vec3& axis, float angle) : m_base(0.0f)
 	{

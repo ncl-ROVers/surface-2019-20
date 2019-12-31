@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "physics/Transform.h"
+#include "graphics/World.h"
 
 #include <cstdint>
 
@@ -17,10 +18,11 @@ public:
 	virtual ~Entity() {}
 
 	virtual void update(double delta) = 0;
-	virtual void render() = 0;
+	virtual void render(const World& world) = 0;
 
 	inline void operator=(const Entity& other) = delete;
 
-	inline const Transform& getTransform() { return m_transform; }
+	inline const Transform& getTransform() const { return m_transform; }
+	inline Transform& getTransform() { return m_transform; }
 	inline void setTransform(const Transform& transform) { m_transform = transform; }
 };
