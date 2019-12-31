@@ -15,6 +15,18 @@ where `python` is Python3.8 version and `surface` is relative or absolute path t
     Python 3.8 related code before running this module with Python3.7.
 """
 from src import *
+import os
+import signal
+
+
+def _kill_processes(*args):
+    """
+    Helper function used to kill all child processes spawned by the application.
+
+    :param args: List of pid-s
+    """
+    for pid in args:
+        os.kill(pid, signal.SIGTERM)
 
 
 if __name__ == "__main__":
@@ -27,4 +39,10 @@ if __name__ == "__main__":
 
     controller_pid = controller.start()
     manager_pid = manager.start()
-    gui.start()
+
+    # Fetch and remember the return code of the application execution
+    rc = gui.start()
+
+    # Kill all child processes and exit the application
+    _kill_processes(controller_pid, manager_pid)
+    exit(rc)
