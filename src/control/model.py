@@ -6,12 +6,30 @@ Module storing an implementation of the control model.
 
 The `ControlManager` class is the implementation of a closed loop control system for the ROV, with the readings
 from both the manual and the autonomous modes.
-TODO: Conversion from normalised ranges to expected hardware values is needed (and associated code).
+
+The normalised values are then converted to the ranges expected by hardware and pushed as transmission data.
 """
-from .utils import DrivingMode as _DrivingMode
+from .utils import DrivingMode as _DrivingMode, normalise as _normalise, \
+    NORM_IDLE as _IDLE, NORM_MAX as _MAX, NORM_MIN as _MIN
 from ..common import data_manager as _dm, CONTROL_DICT as _CONTROL_DICT, Log as _Log
 import multiprocessing as _mp
 import time as _time
+
+
+# Declare the hardware-specific max and min values
+_THRUSTER_MAX = 1900
+_THRUSTER_MIN = 1100
+
+
+def _normalise_thruster(value: float) -> int:
+    """
+    Helper function used to normalise the common range into hardware-specific ranges.
+
+    :param value: Value to be normalised
+    :raises: ValueError
+    :return: Normalised value
+    """
+    return int(_normalise(value, _MIN, _MAX, _THRUSTER_MIN, _THRUSTER_MAX))
 
 
 class ControlManager:
@@ -107,9 +125,10 @@ class ControlManager:
 
     def _push(self):
         """
-        TODO: Get and push the transmission data
+        Method used to translate normalised values into the expected hardware ranges, and push to the data manager.
         """
-        pass
+        _dm.transmission.update(self._convert())
+        print(_dm.transmission.get_all())
 
     def _update(self):
         """
@@ -122,6 +141,227 @@ class ControlManager:
             self._merge()
             self._push()
             _time.sleep(self._delay)
+
+    def _convert(self) -> dict:
+        """
+        Method used to convert normalised direction ranges into actual hardware values used to control the ROV.
+
+        Each inner function corresponds to a component on the vehicle.
+
+        :return: Dictionary of values to update the data manager with
+        """
+        # Retrieve the values as variable for convenience
+        yaw = self._data["yaw"]
+        pitch = self._data["pitch"]
+        roll = self._data["roll"]
+        sway = self._data["sway"]
+        surge = self._data["surge"]
+        heave = self._data["heave"]
+
+        def _thruster_hfp() -> int:
+            """
+            Hierarchical control for horizontal fore port thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = -surge
+                else:
+                    value = -yaw
+
+            elif surge:
+                value = -surge
+
+            elif sway:
+                value = -sway
+
+            elif yaw:
+                value = -yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_hfs() -> int:
+            """
+            Hierarchical control for horizontal fore starboard thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = -surge
+                else:
+                    value = yaw
+
+            elif surge:
+                value = -surge
+
+            elif sway:
+                value = sway
+
+            elif yaw:
+                value = yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_hap() -> int:
+            """
+            Hierarchical control for horizontal aft port thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = -yaw
+                else:
+                    value = surge
+
+            elif surge:
+                value = surge
+
+            elif sway:
+                value = -sway
+
+            elif yaw:
+                value = yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_has() -> int:
+            """
+            Hierarchical control for vertical aft starboard thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = yaw
+                else:
+                    value = surge
+
+            elif surge:
+                value = surge
+
+            elif sway:
+                value = sway
+
+            elif yaw:
+                value = -yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_vfp() -> int:
+            """
+            Hierarchical control for vertical fore port thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = -pitch
+
+            elif roll:
+                value = roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_vfs() -> int:
+            """
+            Hierarchical control for vertical fore starboard thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = -pitch
+
+            elif roll:
+                value = -roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_vap() -> int:
+            """
+            Hierarchical control for vertical aft port thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = pitch
+
+            elif roll:
+                value = roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+        def _thruster_vas() -> int:
+            """
+            Hierarchical control for vertical aft starboard thruster.
+
+            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            """
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = pitch
+
+            elif roll:
+                value = -roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+            # Build the dictionary of values and return it
+
+        return {
+            "T_HFP": _thruster_hfp(),
+            "T_HFS": _thruster_hfs(),
+            "T_HAP": _thruster_hap(),
+            "T_HAS": _thruster_has(),
+            "T_VFP": _thruster_vfp(),
+            "T_VFS": _thruster_vfs(),
+            "T_VAP": _thruster_vap(),
+            "T_VAS": _thruster_vas(),
+        }
 
     def start(self):
         """

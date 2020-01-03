@@ -138,11 +138,16 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
     def on_switch(self):
         """
         A semi-abstract method executed on screen switching.
-
-        :return:
         """
         Log.debug("Switched screen to {}".format(self.name))
         self._set_style()
+
+    @abc.abstractmethod
+    def on_exit(self):
+        """
+        A semi-abstract method executed on exiting current screen.
+        """
+        Log.debug("Switched out of {}".format(self.name))
 
 
 class ScreenManager(QMainWindow):
@@ -222,6 +227,7 @@ class ScreenManager(QMainWindow):
 
         :param index: :class:`Screen` enumeration's value
         """
+        self._screens_stacked.currentWidget().on_exit()
         self._screens_stacked.setCurrentIndex(index)
         self.setWindowTitle(self._screens_stacked.currentWidget().name)
         self._screens_stacked.currentWidget().on_switch()

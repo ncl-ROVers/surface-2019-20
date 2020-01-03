@@ -128,6 +128,12 @@ class Loading(Screen):
         """
         super().on_switch()
 
+    def on_exit(self):
+        """
+        Default inherited.
+        """
+        super().on_exit()
+
     @property
     def progress(self) -> int:
         """

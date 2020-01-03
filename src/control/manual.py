@@ -8,8 +8,8 @@ The `Controller` class is the implementation of a closed loop control system for
 executed in separate process. The readings are forwarded to the shared memory in a previously agreed format.
 """
 from ..common import data_manager as _dm, Log as _Log
-from .utils import normalise as _normalise
-from .utils import DrivingMode as _DrivingMode
+from .utils import DrivingMode as _DrivingMode, normalise as _normalise, \
+    NORM_IDLE as _IDLE, NORM_MAX as _MAX, NORM_MIN as _MIN
 import multiprocessing as _mp
 import inputs as _inputs
 import time as _time
@@ -45,10 +45,10 @@ _HARDWARE_AXIS_MAX = 32767
 _HARDWARE_AXIS_MIN = -32768
 _HARDWARE_TRIGGER_MAX = 255
 _HARDWARE_TRIGGER_MIN = 0
-_INTENDED_AXIS_MAX = 1
-_INTENDED_AXIS_MIN = -1
-_INTENDED_TRIGGER_MAX = 1
-_INTENDED_TRIGGER_MIN = 0
+_INTENDED_AXIS_MAX = _MAX
+_INTENDED_AXIS_MIN = _MIN
+_INTENDED_TRIGGER_MAX = _MAX
+_INTENDED_TRIGGER_MIN = _IDLE
 
 
 def _normalise_axis(value: float) -> float:
@@ -59,10 +59,7 @@ def _normalise_axis(value: float) -> float:
     :raises: ValueError
     :return: Normalised value
     """
-    if not (_HARDWARE_AXIS_MAX >= value >= _HARDWARE_AXIS_MIN):
-        raise ValueError(f"Value {value} is not be between {_HARDWARE_AXIS_MIN} and {_HARDWARE_AXIS_MAX}")
-    else:
-        return _normalise(value, _HARDWARE_AXIS_MIN, _HARDWARE_AXIS_MAX, _INTENDED_AXIS_MIN, _INTENDED_AXIS_MAX)
+    return _normalise(value, _HARDWARE_AXIS_MIN, _HARDWARE_AXIS_MAX, _INTENDED_AXIS_MIN, _INTENDED_AXIS_MAX)
 
 
 def _normalise_trigger(value: float) -> float:
@@ -73,11 +70,7 @@ def _normalise_trigger(value: float) -> float:
     :raises: ValueError
     :return: Normalised value
     """
-    if not (_HARDWARE_TRIGGER_MAX >= value >= _HARDWARE_TRIGGER_MIN):
-        raise ValueError(f"Value {value} is not be between {_HARDWARE_TRIGGER_MIN} and {_HARDWARE_TRIGGER_MAX}")
-    else:
-        return _normalise(value, _HARDWARE_TRIGGER_MIN, _HARDWARE_TRIGGER_MAX,
-                          _INTENDED_TRIGGER_MIN, _INTENDED_TRIGGER_MAX)
+    return _normalise(value, _HARDWARE_TRIGGER_MIN, _HARDWARE_TRIGGER_MAX, _INTENDED_TRIGGER_MIN, _INTENDED_TRIGGER_MAX)
 
 
 class Controller:
@@ -377,7 +370,7 @@ class Controller:
         """
         Surge is determined by the vertical left axis.
 
-        :return: 1.0 for full foreward surge, -1.0 for full aft surge
+        :return: 1.0 for full forward surge, -1.0 for full backwards surge
         """
         return self.left_axis_y
 
