@@ -1,16 +1,6 @@
 from src.common import LOG_DIR, Log
 import os
 
-def main():
-    """
-    TODO: Documentation
-    
-    :return
-    """
-
-    for test_func in get_tests(__name__).values():
-        test_func()
-
 
 def get_log_files():
     """
@@ -19,12 +9,12 @@ def get_log_files():
     :return
     """
 
-
     files = set()
     for file in os.listdir(LOG_DIR):
         if file.endswith(".log"):
             files.add(os.path.join(LOG_DIR, file))
     return files
+
 
 def test_create_logs():
     """
@@ -39,7 +29,7 @@ def test_create_logs():
     Log.error("Test error message")
 
     # There should be 5 files created - each for the log level and a verbose for all levels combined
-    assert(len(get_log_files()) == 5)
+    assert (len(get_log_files()) == 5)
 
 
 def test_level_filtering():
@@ -52,6 +42,6 @@ def test_level_filtering():
     for file in get_log_files():
         with open(file) as f:
             if "verbose" in file:
-                assert(len(f.readlines()) == 4)
+                assert (len(f.readlines()) == 4)
             else:
-                assert(len(f.readlines()) == 1)
+                assert (len(f.readlines()) == 1)
