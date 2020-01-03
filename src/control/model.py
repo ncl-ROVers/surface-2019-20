@@ -161,17 +161,15 @@ class ControlManager:
             """
             Hierarchical control for horizontal fore port thruster.
 
-            TODO: Disaster, need to write it on paper
-
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
             if surge and yaw:
 
                 # If backwards, else forwards
                 if surge < _IDLE:
-                    pass
+                    value = -surge
                 else:
-                    pass
+                    value = -yaw
 
             elif surge:
                 value = -surge
@@ -193,7 +191,27 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = -surge
+                else:
+                    value = yaw
+
+            elif surge:
+                value = -surge
+
+            elif sway:
+                value = sway
+
+            elif yaw:
+                value = yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
 
         def _thruster_hap() -> int:
             """
@@ -201,7 +219,27 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = -yaw
+                else:
+                    value = surge
+
+            elif surge:
+                value = surge
+
+            elif sway:
+                value = -sway
+
+            elif yaw:
+                value = yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
 
         def _thruster_has() -> int:
             """
@@ -209,7 +247,27 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if surge and yaw:
+
+                # If backwards, else forwards
+                if surge < _IDLE:
+                    value = yaw
+                else:
+                    value = surge
+
+            elif surge:
+                value = surge
+
+            elif sway:
+                value = sway
+
+            elif yaw:
+                value = -yaw
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
 
         def _thruster_vfp() -> int:
             """
