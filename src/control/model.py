@@ -128,7 +128,6 @@ class ControlManager:
         Method used to translate normalised values into the expected hardware ranges, and push to the data manager.
         """
         _dm.transmission.update(self._convert())
-        print(_dm.transmission.get_all())
 
     def _update(self):
         """
