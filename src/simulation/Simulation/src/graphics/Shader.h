@@ -18,15 +18,19 @@ public:
 	~Shader() {}
 
 	void init();
-	void addShaderFromPath(GLenum shaderType, const std::string& path);
-	void addShader(GLenum shaderType, const char* source, int sourceLength);
 	void compile();
 
 	inline void addShader(GLenum shaderType, const std::string& source) { addShader(shaderType, source.c_str(), source.size()); }
+	void addShaderFromPath(GLenum shaderType, const std::string& path);
+	void addShader(GLenum shaderType, const char* source, int sourceLength);
 
 	void bind();
 	void unbind();
 
+	GLint getUniformLocation(const std::string& name);
+
+	void setUniform(const std::string& name, int value);
+	void setUniform(const std::string& name, float value);
 	void setUniform(const std::string& name, const glm::mat4& matrix);
 
 	void destroy();

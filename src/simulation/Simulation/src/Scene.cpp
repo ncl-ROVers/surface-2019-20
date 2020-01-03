@@ -16,17 +16,17 @@ void Scene::init(int width, int height)
 	m_world.camera.setPitch(-20.0f);
 
 	//Monkey
-	EntityObject* monkey = new EntityObject("./res/models/monkey.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" });
+	EntityObject* monkey = new EntityObject("./res/models/monkey.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" }, "./res/textures/texture.jpg");
 	monkey->getTransform().position(glm::vec3(0.0f, -1.5f, 10.0f));
 	monkey->getPhysicsData().linearVelocity = { 10.0f, 0.0f, 0.0f };
 	monkey->getPhysicsData().mass = 10.0f;
 
 	m_entities.push_back(monkey);
 
-	//Plane
-	EntityObject* plane = new EntityObject("./res/models/plane.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" });
-	plane->getTransform().position(glm::vec3(0.0f, -2.5f, 0.0f));
-	plane->getTransform().scale(glm::vec3(10.0f));
+	//Pool
+	EntityObject* plane = new EntityObject("./res/models/plane.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" }, "./res/textures/texture.jpg");
+//	plane->getTransform().position(glm::vec3(0.0f, -2.5f, 0.0f));
+//	plane->getTransform().scale(glm::vec3(10.0f));
 
 	m_entities.push_back(plane);
 }
@@ -37,8 +37,6 @@ void Scene::update(double delta)
 
 	EntityObject* object = (EntityObject*)m_entities[0];
 	object->addAcceleration(glm::normalize(glm::vec3(0.0f, -1.5f, 0.0f) - object->getTransform().position()) * 10.0f);
-	
-	object = (EntityObject*)m_entities[1];
 
 	for (Entity* entity : m_entities)
 	{
@@ -48,7 +46,7 @@ void Scene::update(double delta)
 
 void Scene::render()
 {
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (Entity* entity : m_entities)

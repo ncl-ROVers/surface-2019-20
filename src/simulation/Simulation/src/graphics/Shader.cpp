@@ -86,7 +86,7 @@ void Shader::unbind()
 	glUseProgram(0);
 }
 
-void Shader::setUniform(const std::string& name, const glm::mat4& matrix)
+GLint Shader::getUniformLocation(const std::string& name)
 {
 	std::unordered_map<std::string, GLint>::iterator it = m_uniforms.find(name);
 
@@ -96,7 +96,22 @@ void Shader::setUniform(const std::string& name, const glm::mat4& matrix)
 		it = m_uniforms.find(name);
 	}
 
-	glUniformMatrix4fv(it->second, 1, GL_FALSE, &matrix[0][0]);
+	return it->second;
+}
+
+void Shader::setUniform(const std::string& name, int value)
+{
+	glUniform1i(getUniformLocation(name), value);
+}
+
+void Shader::setUniform(const std::string& name, float value)
+{
+	glUniform1f(getUniformLocation(name), value);
+}
+
+void Shader::setUniform(const std::string& name, const glm::mat4& matrix)
+{
+	glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
 }
 
 void Shader::destroy()

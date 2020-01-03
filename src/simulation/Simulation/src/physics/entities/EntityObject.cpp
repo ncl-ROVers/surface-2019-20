@@ -2,7 +2,7 @@
 
 #include "physics/MotionIntegrators.h"
 
-EntityObject::EntityObject(const std::string& modelPath, const std::pair<std::string, std::string>& shaderPaths)
+EntityObject::EntityObject(const std::string& modelPath, const std::pair<std::string, std::string>& shaderPaths, const std::string& albedo)
 {
 	m_mesh.load(modelPath);
 
@@ -10,12 +10,15 @@ EntityObject::EntityObject(const std::string& modelPath, const std::pair<std::st
 	m_shader.addShaderFromPath(GL_VERTEX_SHADER, shaderPaths.first);
 	m_shader.addShaderFromPath(GL_FRAGMENT_SHADER, shaderPaths.second);
 	m_shader.compile();
+
+	m_texture.create(albedo.c_str());
 }
 
 EntityObject::~EntityObject()
 {
 	m_mesh.destroy();
 	m_shader.destroy();
+	m_texture.destroy();
 }
 
 void EntityObject::update(double delta)
@@ -34,8 +37,11 @@ void EntityObject::render(const World& world)
 	glm::mat4 mvpMatrix = proj * view * model;
 
 	m_shader.bind();
+	m_shader.setUniform("albedo", 0);
 	m_shader.setUniform("transform", mvpMatrix);
 	m_shader.setUniform("model", model);
+
+	m_texture.bind(0);
 
 	m_mesh.draw();
 }
