@@ -128,6 +128,7 @@ class ControlManager:
         Method used to translate normalised values into the expected hardware ranges, and push to the data manager.
         """
         _dm.transmission.update(self._convert())
+        print(_dm.transmission.get_all())
 
     def _update(self):
         """
@@ -275,7 +276,19 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = -pitch
+
+            elif roll:
+                value = roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
 
         def _thruster_vfs() -> int:
             """
@@ -283,7 +296,19 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = -pitch
+
+            elif roll:
+                value = -roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
 
         def _thruster_vap() -> int:
             """
@@ -291,7 +316,19 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if heave:
+                value = heave
+
+            elif pitch:
+                value = pitch
+
+            elif roll:
+                value = roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
 
         def _thruster_vas() -> int:
             """
@@ -299,9 +336,22 @@ class ControlManager:
 
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
-            pass
+            if heave:
+                value = heave
 
-        # Build the dictionary of values and return it
+            elif pitch:
+                value = pitch
+
+            elif roll:
+                value = -roll
+
+            else:
+                value = _IDLE
+
+            return _normalise_thruster(value)
+
+            # Build the dictionary of values and return it
+
         return {
             "T_HFP": _thruster_hfp(),
             "T_HFS": _thruster_hfs(),
