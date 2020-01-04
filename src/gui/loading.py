@@ -101,7 +101,7 @@ class Loading(Screen):
             """)
 
         # Fetch the model image and scale it to fit the window if it's too big
-        model = QPixmap(os.path.join(common.GUI_LOADING, "model.png"))
+        model = QPixmap(os.path.join(common.GUI_LOADING_DIR, "model.png"))
         model = model.scaled(min(SCREEN_WIDTH, model.width()), min(SCREEN_HEIGHT, model.height()))
 
         # Paint the background and render the net and the model in the middle

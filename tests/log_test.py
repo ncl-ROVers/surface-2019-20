@@ -1,12 +1,15 @@
-from src.common import LOG_DIR, Log
+from src.common import COMMON_LOGGER_DIR, Log
 import os
 
+# Reconfigure the logger to use a separate folder (instead of the real logs)
+#Log.reconfigure(os.path.join(COMMON_LOGGER_DIR, "config.json"))
 
-def get_log_files():
+
+def get_log_files() -> set:
     """
-    TODO: Documentation
+    Helper function used to retrieve a set of absolute paths to the log files
     
-    :return
+    :return: A set of paths
     """
 
     files = set()
@@ -28,8 +31,8 @@ def test_create_logs():
     Log.warning("Test warning message")
     Log.error("Test error message")
 
-    # There should be 5 files created - each for the log level and a verbose for all levels combined
-    assert (len(get_log_files()) == 5)
+    # There should be 5 files created - each for the log level and a verbose file for all levels combined
+    assert len(get_log_files()) == 5
 
 
 def test_level_filtering():

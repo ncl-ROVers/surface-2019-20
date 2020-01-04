@@ -18,8 +18,8 @@ LOG_DIR = _os.path.join(ROOT_DIR, "log")
 # Declare the paths to the source paths
 SRC_COMMON_DIR = _os.path.join(SRC_DIR, "common")
 SRC_GUI_DIR = _os.path.join(SRC_DIR, "gui")
-SRC_LOG_DIR = _os.path.join(SRC_DIR, "log")
+SRC_CONTROL_DIR = _os.path.join(SRC_DIR, "control")
 
 # Declare the paths to the assets folders
-GUI_LOADING = _os.path.join(ASSETS_DIR, "gui_loading")
-COMMON_LOGGER = _os.path.join(ASSETS_DIR, "common_logger")
+GUI_LOADING_DIR = _os.path.join(ASSETS_DIR, "gui_loading")
+COMMON_LOGGER_DIR = _os.path.join(ASSETS_DIR, "common_logger")

@@ -1,65 +1,33 @@
-# Creating tests for Python using Pytest
+# Testing infrastructure
 
-## Using Pytest
+## Unit tests
 
--Test files and test functions must contain:
-  ```test_*``` or ```_*test```
-so that Pytest can automatically detect the tests
+We are using [pytest](https://docs.pytest.org/en/latest/contents.html) as our unit testing infrastructure. The test
+files and the test functions must match the following patterns: `test_*` or `*_test`.
 
--You can then run pytest from PyCharm IDE using: 
+#### Running the tests
 
-**Run 'pytest ...' on a test method, file, or directory**
+You can run the tests using either the command prompt as described
+[here](https://docs.pytest.org/en/latest/usage.html#calling-pytest-through-python-m-pytest), or in *PyCharm* by
+selecting the `tests` folder and selecting *Run 'pytest in tests'*. More information is available
+[here](https://www.jetbrains.com/help/pycharm/pytest.html#run-pytest-test).
 
-and the results will be displayed in the 'Run' terminal
+The results will be displayed in the *Run* window.
 
-## Example Tests
+#### Examples
 
-Here are some examples of test methods (test_create_logs() & test_level_filtering()) that use assert:
-```
-from src.common import LOG_DIR, Log
-import os
+Here is an example test function from `log_test.py`:
 
-
-def get_log_files():
-    """
-    TODO: Documentation
-    
-    :return
-    """
-
-    files = set()
-    for file in os.listdir(LOG_DIR):
-        if file.endswith(".log"):
-            files.add(os.path.join(LOG_DIR, file))
-    return files
-
-
+```python
 def test_create_logs():
-    """
-    TODO: Documentation
-    
-    :return
-    """
 
     Log.debug("Test debug message")
     Log.info("Test info message")
     Log.warning("Test warning message")
     Log.error("Test error message")
 
-    # There should be 5 files created - each for the log level and a verbose for all levels combined
-    assert (len(get_log_files()) == 5)
+    # There should be 5 files created - each for the log level and a verbose file for all levels combined
+    assert len(get_log_files()) == 5
+```
 
-
-def test_level_filtering():
-    """
-    TODO: Documentation
-    
-    :return
-    """
-
-    for file in get_log_files():
-        with open(file) as f:
-            if "verbose" in file:
-                assert (len(f.readlines()) == 4)
-            else:
-                assert (len(f.readlines()) == 1)
+Notice that both the module and the function contain the `_test` (or `test_`) expression in their names.
