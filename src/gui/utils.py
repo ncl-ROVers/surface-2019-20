@@ -380,12 +380,12 @@ class ScreenManager(QMainWindow):
         self._menu_bar_container.setLayout(self._menu_bar)
         self._base.addWidget(self._menu_bar_container)
         self._base.addWidget(self._main_layout_container)
-        self._menu_bar_container.setVisible(False)
 
         # Set some basic properties
         self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
         self._menu_bar_container.setFixedHeight(MENU_BAR_HEIGHT)
         self._sliding_menu.setVisible(False)
+        self._menu_bar_container.setVisible(False)
 
         # Finally load the layout
         self._container = QWidget()
