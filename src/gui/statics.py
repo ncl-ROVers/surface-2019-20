@@ -8,8 +8,8 @@ of the program.
 
 import enum
 
-SCREEN_HEIGHT = 520
 SCREEN_WIDTH = 960
+SCREEN_HEIGHT = 520
 WINDOW_INDICATOR = 'full_screen'
 
 

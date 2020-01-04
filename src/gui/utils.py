@@ -8,10 +8,11 @@ program, or are modifying their contents. Includes common to the package functio
 
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-from .statics import *
 from ..common import Log
+import src.gui.statics as st
 import typing
 import abc
+from win32api import GetSystemMetrics
 
 
 class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):
@@ -71,15 +72,15 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
         :return: QPixmap styled to represent the default background
         """
-        r, g, b, a = Colour.MAJOR.value
+        r, g, b, a = st.Colour.MAJOR.value
         brush = QBrush(QColor(r, g, b, a))
 
         # Create an empty canvas and fill it with the colour
-        canvas = QPixmap(SCREEN_WIDTH, SCREEN_HEIGHT)
+        canvas = QPixmap(st.SCREEN_WIDTH, st.SCREEN_HEIGHT)
         painter = QPainter()
         painter.begin(canvas)
         painter.setBrush(brush)
-        painter.drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+        painter.drawRect(0, 0, st.SCREEN_WIDTH, st.SCREEN_HEIGHT)
         painter.end()
 
         return canvas
@@ -133,6 +134,16 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         self._set_style()
 
 
+def _full_screen_check():
+    """
+    Obtain the resolution of the system as assign to the program
+    if the window mode is "full screen"
+    """
+    if st.WINDOW_INDICATOR == 'full_screen':
+        st.SCREEN_WIDTH = GetSystemMetrics(0)
+        st.SCREEN_HEIGHT = GetSystemMetrics(1)
+
+
 class ScreenManager(QMainWindow):
     """
     Manager class used as the GUI's main window.
@@ -172,7 +183,9 @@ class ScreenManager(QMainWindow):
         """
         super(ScreenManager, self).__init__()
 
-        self._flag_setting(indicator=WINDOW_INDICATOR)
+        _full_screen_check()
+
+        self._flag_setting(indicator=st.WINDOW_INDICATOR)
 
         # Declare the screen structure - a box layout with a stacked widget holding the screens
         self._base = QHBoxLayout()
@@ -236,7 +249,7 @@ class ScreenManager(QMainWindow):
         'full_screen':  Set full screen
         'border_less':  Setting the window without borders
         """
-        self.setGeometry(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.setGeometry(0, 0, st.SCREEN_WIDTH, st.SCREEN_HEIGHT)
         if indicator.__eq__('borders'):
             pass
         elif indicator.__eq__('full_screen'):

@@ -8,7 +8,7 @@ Module storing an implementation of a loading screen and all values associated w
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-from .statics import *
+import src.gui.statics as st
 from .utils import Screen
 from .. import common
 import os
@@ -102,13 +102,13 @@ class Loading(Screen):
 
         # Fetch the model image and scale it to fit the window if it's too big
         model = QPixmap(os.path.join(common.GUI_LOADING, "model.png"))
-        model = model.scaled(min(SCREEN_WIDTH, model.width()), min(SCREEN_HEIGHT, model.height()))
+        model = model.scaled(min(st.SCREEN_WIDTH, model.width()), min(st.SCREEN_HEIGHT, model.height()))
 
         # Paint the background and render the net and the model in the middle
         canvas = self._background_pixmap
         painter = QPainter()
         painter.begin(canvas)
-        painter.drawPixmap((SCREEN_WIDTH - model.width()) // 2, (SCREEN_HEIGHT - model.height()) // 2, model)
+        painter.drawPixmap((st.SCREEN_WIDTH - model.width()) // 2, (st.SCREEN_HEIGHT - model.height()) // 2, model)
         painter.end()
 
         # Update the manager's palette to display the changes

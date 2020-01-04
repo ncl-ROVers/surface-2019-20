@@ -25,7 +25,6 @@ def start():
     selections and rendering.
     """
     app = _QApplication()
-
     # Create and configure the screen manager, load all assets and switch to the home screen
     manager = _ScreenManager(_Loading(), _Home())
     manager.post_init()
