@@ -214,6 +214,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         * _set_style - a semi-abstract method to set the style of current screen
         * post_init - a semi-abstract method called directly after the screen is created
         * on_switch - a semi-abstract method called whenever the screen manager switches the screen
+        * on_exit - a semi-abstract method called whenever the screen manager switches to a different screen
 
     Usage
     -----
