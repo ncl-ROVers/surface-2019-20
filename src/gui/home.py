@@ -12,30 +12,36 @@ class Home(Screen):
 
     def __init__(self):
         """
-        TODO: Document
+        Default inherited.
         """
         super(Home, self).__init__()
 
     def _config(self):
         """
-        TODO: Document
+        Default inherited.
         """
         super()._config()
 
     def _set_style(self):
         """
-        TODO: Document
+        Default inherited.
         """
         super()._set_style()
 
     def post_init(self):
         """
-        TODO: Document
+        Default inherited.
         """
         super().post_init()
 
     def on_switch(self):
         """
-        TODO: Document
+        Default inherited.
         """
         super().on_switch()
+
+    def on_exit(self):
+        """
+        Default inherited.
+        """
+        super().on_exit()

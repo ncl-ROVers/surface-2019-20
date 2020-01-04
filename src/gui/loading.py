@@ -8,8 +8,7 @@ Module storing an implementation of a loading screen and all values associated w
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-from .statics import *
-from .utils import Screen
+from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH
 from .. import common
 import os
 
@@ -96,6 +95,7 @@ class Loading(Screen):
             QLabel {
                 font-size: 30px;
                 font-weight: bold;
+                font-family: "Courier New", Courier, monospace;
                 color: white;
             }
             """)
@@ -127,6 +127,12 @@ class Loading(Screen):
         Default inherited.
         """
         super().on_switch()
+
+    def on_exit(self):
+        """
+        Default inherited.
+        """
+        super().on_exit()
 
     @property
     def progress(self) -> int:
