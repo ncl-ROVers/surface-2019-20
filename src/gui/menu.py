@@ -18,7 +18,10 @@ class menu(QWidget):
 
 
         self._layout = QVBoxLayout()
+        self.sub_lay = QHBoxLayout()
         self._menu = QFrame(self)  # A menu frame
+        self.but_test = QPushButton("oink")
+        self.but_test_2 = QPushButton("oink 2")
 
         self._label_one = QPushButton(self._menu)
         self._label_one.clicked.connect(self.labelOneFunction)
@@ -38,10 +41,11 @@ class menu(QWidget):
         self._menu_button.move(0, 0)
 
         self._toggle = QPropertyAnimation(self._menu, b"maximumWidth")
-
+        self.sub_lay.addWidget(self._menu)
+        self.sub_lay.addWidget(self.but_test_2)
         self._layout.addWidget(self._header_label)
-        self._layout.addWidget(self._menu)
-
+        self._layout.addLayout(self.sub_lay)
+        self._layout.addWidget(self.but_test)
 
         self.setLayout(self._layout)
 
@@ -84,7 +88,7 @@ class menu(QWidget):
     def toggle_animation(self):
 
         if self._width == 0:
-            self._toggle.setDuration(1000)
+            self._toggle.setDuration(100)
             self._toggle.setStartValue(0)
             self._toggle.setEndValue(200)
             self._toggle.start()
@@ -93,26 +97,26 @@ class menu(QWidget):
 
 
         else:
-            self._toggle.setDuration(1000)
+            self._toggle.setDuration(100)
             self._toggle.setStartValue(200)
             self._toggle.setEndValue(0)
             self._toggle.start()
             self._width = 0
 
     def labelOneFunction(self):
-        print("works")
+        print("works1")
 
     def labelTwoFunction(self):
-        print("works")
+        print("works2")
 
     def labelThreeFunction(self):
-        print("works")
+        print("works3")
 
     def labelFourFunction(self):
-        print("works")
+        print("works4")
 
     def labelFiveFunction(self):
-        print("Works")
+        print("Works5")
 
 
 if __name__ == "__main__":
