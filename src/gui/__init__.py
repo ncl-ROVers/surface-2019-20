@@ -8,6 +8,7 @@ Interaction with this module should only happen via the :func:`start` function.
 
 .. moduleauthor::
     Kacper Florianski <k.florianski@ncl.ac.uk>
+    Adanna Obibuaku <A.Obibuaku@newcastle.ac.uk>
 """
 
 from PySide2.QtWidgets import QApplication as _QApplication
