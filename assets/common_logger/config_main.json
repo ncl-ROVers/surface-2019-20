@@ -10,8 +10,9 @@
             "datefmt":"%y-%m-%d %H:%M:%S"
         },
         "verbose":{
-            "format":"%(asctime)s %(levelname)s %(message)s",
-            "datefmt":"%y-%m-%d %H:%M:%S"
+            "format":"{asctime} {levelname:8} | {processName:>10} {process:8} | {filename:30} {function:12} {lineno:5} | {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
         }
     },
     "handlers":{
@@ -50,7 +51,7 @@
             "filename":"error.log"
         },
         "verbose":{
-            "class":"logging.FileHandler",
+            "class":"assets.common_logger.verbose_file_handler._VerboseFileHandler",
             "level":"DEBUG",
             "formatter":"verbose",
             "encoding":"utf8",

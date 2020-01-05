@@ -8,8 +8,7 @@ Module storing an implementation of a loading screen and all values associated w
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-import src.gui.statics as st
-from .utils import Screen
+from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH
 from .. import common
 import os
 
@@ -32,6 +31,7 @@ class Loading(Screen):
         * _set_style - a method to set the style of the loading screen - this screen uses custom assets
         * post_init - default implementation of the inherited method
         * on_switch - default implementation of the inherited method
+        * on_exit - default implementation of the inherited method
         * progress - a property used to handle current progress bar's progress value
         * load - a function used to load all assets and initialise any objects needed later
 
@@ -96,19 +96,20 @@ class Loading(Screen):
             QLabel {
                 font-size: 30px;
                 font-weight: bold;
+                font-family: "Courier New", Courier, monospace;
                 color: white;
             }
             """)
 
         # Fetch the model image and scale it to fit the window if it's too big
-        model = QPixmap(os.path.join(common.GUI_LOADING, "model.png"))
-        model = model.scaled(min(st.SCREEN_WIDTH, model.width()), min(st.SCREEN_HEIGHT, model.height()))
+        model = QPixmap(os.path.join(common.GUI_LOADING_DIR, "model.png"))
+        model = model.scaled(min(SCREEN_WIDTH, model.width()), min(SCREEN_HEIGHT, model.height()))
 
         # Paint the background and render the net and the model in the middle
         canvas = self._background_pixmap
         painter = QPainter()
         painter.begin(canvas)
-        painter.drawPixmap((st.SCREEN_WIDTH - model.width()) // 2, (st.SCREEN_HEIGHT - model.height()) // 2, model)
+        painter.drawPixmap((SCREEN_WIDTH - model.width()) // 2, (SCREEN_HEIGHT - model.height()) // 2, model)
         painter.end()
 
         # Update the manager's palette to display the changes
@@ -127,6 +128,12 @@ class Loading(Screen):
         Default inherited.
         """
         super().on_switch()
+
+    def on_exit(self):
+        """
+        Default inherited.
+        """
+        super().on_exit()
 
     @property
     def progress(self) -> int:
