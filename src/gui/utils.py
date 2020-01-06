@@ -8,33 +8,13 @@ Standard utils module storing common to the package classes, functions, constant
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from PySide2.QtCore import *
-import pyautogui
 from ..common import Log
+import pyautogui
 import typing
 import abc
 import enum
 
-WINDOW_INDICATOR = 'full_screen'
-DEFAULT_WIDTH = 1280
-DEFAULT_HEIGHT = 720
-
-
-def get_window_size():
-    """
-    Detect the setting of the screen mode and return the height and width
-    :return [width, height]:
-        * width - the width of the window
-        * height - the height of the window
-    """
-    if WINDOW_INDICATOR == 'full_screen':
-        return pyautogui.size()
-    else:
-        return [DEFAULT_WIDTH, DEFAULT_HEIGHT]
-
-
-screen_size = get_window_size()
-SCREEN_WIDTH = screen_size[0]
-SCREEN_HEIGHT = screen_size[1]
+SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
 SLIDING_MENU_WIDTH = SCREEN_WIDTH // 8
 MENU_BAR_HEIGHT = SCREEN_HEIGHT // 12
 
@@ -211,8 +191,13 @@ class _MenuBar(QHBoxLayout):
         self._menu_button = QPushButton("Show/hide menu")
         self._menu_button.clicked.connect(lambda _: get_manager().menu.toggle())
 
+        # Create the exit button
+        self._exit_button = QPushButton("Exit application")
+        self._exit_button.clicked.connect(lambda _: get_manager().close())
+
         # Add all widgets and set the layout
         self.addWidget(self._menu_button)
+        self.addWidget(self._exit_button)
 
 
 class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):
@@ -399,7 +384,6 @@ class ScreenManager(QMainWindow):
         self._menu_bar_container.setLayout(self._menu_bar)
         self._base.addWidget(self._menu_bar_container)
         self._base.addWidget(self._main_layout_container)
-        self._flag_setting(indicator=WINDOW_INDICATOR)
 
         # Set some basic properties
         self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -408,6 +392,7 @@ class ScreenManager(QMainWindow):
         self._menu_bar_container.setVisible(False)
 
         # Finally load the layout
+        self.showFullScreen()
         self._container = QWidget()
         self._container.setLayout(self._base)
         self.setCentralWidget(self._container)
@@ -472,20 +457,3 @@ class ScreenManager(QMainWindow):
         """
         for scr in self._screens.values():
             scr.post_init()
-
-    def _flag_setting(self, indicator='borders'):
-        """
-        Set display mode for the window
-
-        :param indicator:
-        'borders':      Setting the window with borders
-        'full_screen':  Set full screen
-        'border_less':  Setting the window without borders
-        """
-        self.setGeometry(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
-        if indicator.__eq__('borders'):
-            pass
-        elif indicator.__eq__('full_screen'):
-            self.showFullScreen()
-        elif indicator.__eq__('border_less'):
-            self.setWindowFlags(Qt.FramelessWindowHint)
