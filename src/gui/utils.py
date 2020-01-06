@@ -9,15 +9,14 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from PySide2.QtCore import *
 from ..common import Log
+import pyautogui
 import typing
 import abc
 import enum
 
-SCREEN_HEIGHT = 1080
-SCREEN_WIDTH = 1920
-
-SLIDING_MENU_WIDTH = SCREEN_WIDTH//8
-MENU_BAR_HEIGHT = SCREEN_HEIGHT//12
+SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+SLIDING_MENU_WIDTH = SCREEN_WIDTH // 8
+MENU_BAR_HEIGHT = SCREEN_HEIGHT // 12
 
 
 def get_manager() -> typing.Union[QMainWindow, None]:
@@ -192,8 +191,13 @@ class _MenuBar(QHBoxLayout):
         self._menu_button = QPushButton("Show/hide menu")
         self._menu_button.clicked.connect(lambda _: get_manager().menu.toggle())
 
+        # Create the exit button
+        self._exit_button = QPushButton("Exit application")
+        self._exit_button.clicked.connect(lambda _: get_manager().close())
+
         # Add all widgets and set the layout
         self.addWidget(self._menu_button)
+        self.addWidget(self._exit_button)
 
 
 class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):
@@ -388,6 +392,7 @@ class ScreenManager(QMainWindow):
         self._menu_bar_container.setVisible(False)
 
         # Finally load the layout
+        self.showFullScreen()
         self._container = QWidget()
         self._container.setLayout(self._base)
         self.setCentralWidget(self._container)
@@ -439,7 +444,7 @@ class ScreenManager(QMainWindow):
         """
         return self._sliding_menu
 
-    @ property
+    @property
     def bar(self) -> _MenuBar:
         """
         Getter to retrieve the menu bar.
