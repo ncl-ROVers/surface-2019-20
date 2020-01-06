@@ -31,6 +31,7 @@ class Loading(Screen):
         * _set_style - a method to set the style of the loading screen - this screen uses custom assets
         * post_init - default implementation of the inherited method
         * on_switch - default implementation of the inherited method
+        * on_exit - default implementation of the inherited method
         * progress - a property used to handle current progress bar's progress value
         * load - a function used to load all assets and initialise any objects needed later
 
