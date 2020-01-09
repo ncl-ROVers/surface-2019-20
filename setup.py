@@ -1,9 +1,5 @@
 import setuptools
 
-# Read the README file for the long description.
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
 setuptools.setup(
     name="ncl-rovers",
     version="1.0",
@@ -12,7 +8,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ncl-ROVers",
-    packages=setuptools.find_packages(),
+    packages=[],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
