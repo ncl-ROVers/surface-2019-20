@@ -9,6 +9,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH
+from ..common import Log
 from .. import common
 import os
 
@@ -165,6 +166,8 @@ class Loading(Screen):
           Storing the objects is undecided as of now, probably put them into the manager because every screen can access
           the manager. Perhaps create a DataManager instance within the ScreenManager?
         """
+        Log.debug("Loading started")
+
         from time import sleep
         QApplication.instance().processEvents()
         sleep(1)
@@ -172,3 +175,5 @@ class Loading(Screen):
             QApplication.instance().processEvents()
             self.progress = x
             sleep(0.01)
+
+        Log.debug("Loading finished")

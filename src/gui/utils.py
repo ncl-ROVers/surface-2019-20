@@ -24,6 +24,7 @@ def get_manager() -> typing.Union[QMainWindow, None]:
     Getter to find the screen manager and return it.
     :return: :class:`ScreenManager` or None if couldn't be found
     """
+    Log.debug("Retrieving screen manager")
     for widget in QApplication.instance().topLevelWidgets():
         if "ScreenManager" in repr(widget):
             return widget
