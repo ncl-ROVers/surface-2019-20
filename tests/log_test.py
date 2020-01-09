@@ -3,6 +3,8 @@ Log-related tests.
 
 The tests are first reconfiguring the loggers to use the local assets folder instead of the production environment.
 """
+import pytest
+
 from src.common import COMMON_LOGGER_DIR, TESTS_ASSETS_DIR, Log, Logger
 import os
 
@@ -49,7 +51,8 @@ def test_level_filtering():
                 assert (len(f.readlines()) == 1)
 
 
-def config():
+@pytest.fixture(scope="session", autouse=True)
+def config(request):
     """
     TODO: Use pytest to run this before all functions in this module
     """
@@ -62,5 +65,4 @@ def config():
     Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
                     log_directory=TESTS_ASSETS_DIR)
 
-
-config()
+    #request.addfinalizer(cleanup)
