@@ -399,6 +399,7 @@ class Controller:
             return
 
         if event.code in _DISPATCH_MAP:
+            _Log.debug(f"New controller event read - {event.code}")
             self.__setattr__(_DISPATCH_MAP[event.code], event.state)
             self._update()
         else:
@@ -408,6 +409,7 @@ class Controller:
         """
         Method used to update the shared memory controller data using the current controller's state.
         """
+        _Log.debug("Updating manual control shared memory")
 
         # When entering the autonomous driving mode, reset the manual control values
         if self._mode == _DrivingMode.AUTONOMOUS:

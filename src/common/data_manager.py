@@ -67,7 +67,7 @@ class _Memory:
         # Create a shared memory object to store the data or fetch the existing one
         try:
             self._shm = _shm.ShareableList(tuple(v for v in data.values()), name=name)
-            _Log.debug(f"Successfully created shared memory \"{name}\" with a total of {len(data)} keys")
+            _Log.info(f"Successfully created shared memory \"{name}\" with a total of {len(data)} keys")
         except FileExistsError:
             self._shm = _shm.ShareableList(name=name)
 
@@ -81,6 +81,8 @@ class _Memory:
         :raises: KeyError
         :return: Value stored under the key
         """
+        _Log.debug(f"Getting {key} from {self._name} shared memory")
+
         # Raise error early if key not registered
         if key not in self._lookup:
             raise KeyError(f"{key} not found - remember to add the key to the data manager!")
@@ -100,6 +102,8 @@ class _Memory:
         :param value: Value to be inserted
         :raises: KeyError
         """
+        _Log.debug(f"Setting {key} to {value} in {self._name} shared memory")
+
         # Raise error early if key not registered
         if key not in self._lookup:
             raise KeyError(f"{key} not found - remember to add the key to the data manager!")
@@ -114,6 +118,8 @@ class _Memory:
 
         :return: Dictionary of stored values
         """
+        _Log.debug(f"Getting all data from {self._name} shared memory")
+
         self._lock.acquire()
         data = {key: self._shm[self._lookup[key]] for key in self._data}
         self._lock.release()
@@ -126,6 +132,8 @@ class _Memory:
         :param data: Data to update
         :raises: KeyError
         """
+        _Log.debug(f"Updating {self._name} shared memory with multiple entries")
+
         # Raise error early if any keys are not registered
         if not set(data.keys()).issubset(set(self._data.keys())):
             raise KeyError(f"{set(data.keys())} is not a subset of {set(self._data.keys())}")

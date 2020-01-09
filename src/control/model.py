@@ -88,6 +88,7 @@ class ControlManager:
         Dispatches each 'manual_' and 'autonomous_' key, value pairs into corresponding dictionaries, and the 'mode' key
         into a private field.
         """
+        _Log.debug("Pulling data for the control model")
         data = _dm.control.get_all()
 
         for key in _CONTROL_DICT:
@@ -109,6 +110,7 @@ class ControlManager:
         2. In autonomous, ignore manual data
         3. In balancing, manual has a higher priority than manual.
         """
+        _Log.debug("Merging control model data")
 
         # Ignore autonomous data in manual control
         if self._mode == _DrivingMode.MANUAL:
@@ -127,6 +129,7 @@ class ControlManager:
         """
         Method used to translate normalised values into the expected hardware ranges, and push to the data manager.
         """
+        _Log.debug("Pushing control model data (updating transmission data)")
         _dm.transmission.update(self._convert())
 
     def _update(self):
