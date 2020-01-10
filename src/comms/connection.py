@@ -3,7 +3,6 @@ TODO: Document
 """
 import socket as _socket
 import json as _json
-import time as _time
 import multiprocessing as _mp
 from .utils import ConnectionStatus as _ConnectionStatus
 from ..common import data_manager as _dm

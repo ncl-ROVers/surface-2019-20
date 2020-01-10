@@ -1,3 +1,3 @@
-# GUI
+# Communication
 
 Documentation to follow...
