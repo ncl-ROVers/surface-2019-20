@@ -15,11 +15,12 @@ import os as _os
 from multiprocessing import shared_memory as _shm
 from .logger import Log as _Log
 from .utils import TRANSMISSION_DICT as _TRANSMISSION_DICT, CONTROL_DICT as _CONTROL_DICT, \
-    COMMON_LOCKS_DIR as _LOCKS_DIR
+    COMMON_LOCKS_DIR as _LOCKS_DIR, RECEIVED_DICT as _RECEIVED_DICT
 from filelock import FileLock as _FileLock
 
 # Declare shared memory names
 _TRANSMISSION_NAME = "transmission"
+_RECEIVED_NAME = "received"
 _CONTROL_NAME = "control"
 
 
@@ -182,19 +183,30 @@ class _DataManager:
         # Create or fetch named locks
         self._transmission_lock = _FileLock(_os.path.join(_LOCKS_DIR, _TRANSMISSION_NAME + ".lock"))
         self._control_lock = _FileLock(_os.path.join(_LOCKS_DIR, _CONTROL_NAME + ".lock"))
+        self._received_lock = _FileLock(_os.path.join(_LOCKS_DIR, _RECEIVED_NAME + ".lock"))
 
         # Create shared memory objects to store the data, these will be read-only exposed via class properties
         self._transmission = _Memory(_TRANSMISSION_NAME, _TRANSMISSION_DICT, self._transmission_lock)
         self._control = _Memory(_CONTROL_NAME, _CONTROL_DICT, self._control_lock)
+        self._received = _Memory(_RECEIVED_NAME, _RECEIVED_DICT, self._received_lock)
 
     @property
     def transmission(self) -> _Memory:
         """
-        Getter for the transmission memory segment
+        Getter for the transmission memory segment (data to transmit)
 
         :return: Transmission memory segment
         """
         return self._transmission
+
+    @property
+    def received(self) -> _Memory:
+        """
+        Getter for the received (data) memory segment
+
+        :return: Received memory segment
+        """
+        return self._received
 
     @property
     def control(self) -> _Memory:
@@ -209,6 +221,7 @@ class _DataManager:
 # Create some type hinting variables for PyInspections
 transmission: _Memory
 control: _Memory
+received: _Memory
 
 
 # Override the module to be the class object instead

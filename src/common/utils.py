@@ -52,3 +52,7 @@ CONTROL_DICT = {
     "autonomous_surge": 0,
     "autonomous_heave": 0
 }
+# TODO: Replace with proper data once known
+RECEIVED_DICT = {
+    "test": ""
+}

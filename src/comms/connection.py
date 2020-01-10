@@ -105,9 +105,39 @@ class Connection:
 
         Being a separate process, it is safe to let this function run in an infinite while loop, because to stop this
         communication it is sufficient to stop (terminate) the process (OS-level interruption).
+
+        Breaks the infinite loop on errors, leaving the calling code to accommodate for errors.
         """
         while True:
-            pass
+            try:
+                _Log.debug("Fetching data for transmission")
+                data = _dm.transmission.get_all()
+
+                # Encode the transmission data as JSON and send the bytes to the server
+                _Log.debug("Sending transmission data")
+                self._socket.sendall(bytes(_json.dumps(data), encoding="utf-8"))
+
+                _Log.debug("Receiving transmission data")
+                data = self._socket.recv(4096)
+
+                # Exit if connection closed by server
+                if not data:
+                    _Log.info("Connection closed by server")
+                    break
+
+                try:
+                    data = _json.loads(data.decode("utf-8").strip())
+                except (UnicodeError, _json.JSONDecodeError) as e:
+                    _Log.debug(f"Failed to decode following data: {data} - {e}")
+                    break
+
+                # Only handle valid, non-empty data
+                if data and isinstance(data, dict):
+                    _dm.received.update(data)
+
+            except (ConnectionError, OSError) as e:
+                _Log.error(f"An error occurred while communicating with the server - {e}")
+                break
 
     def _new_socket(self) -> _socket.socket:
         """
