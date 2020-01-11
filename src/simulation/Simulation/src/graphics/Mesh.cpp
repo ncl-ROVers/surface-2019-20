@@ -132,27 +132,31 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 
 void Mesh::load(const std::string& path)
 {
-	std::vector<glm::vec3> modelVertices;
 	std::vector<glm::vec2> modelTexCoords;
 	std::vector<glm::vec3> modelNormals;
-	std::vector<unsigned int> modelIndices;
+	
+	parseOBJFile(path, m_vertices, modelTexCoords, modelNormals, m_indices);
 
-	parseOBJFile(path, modelVertices, modelTexCoords, modelNormals, modelIndices);
-	
-	glm::dvec3 centerOfMass(0.0f);
-	for (size_t i = 0; i < modelIndices.size(); ++i)
+	//m_centerOfMassOffset = glm::zero<glm::vec3>();
+	glm::dvec3 centerOfMass = glm::zero<glm::dvec3>();
+	for (size_t i = 0; i < m_indices.size(); ++i)
 	{
-		centerOfMass += modelVertices[modelIndices[i]];
+		centerOfMass += m_vertices[m_indices[i]];
 	}
-	centerOfMass /= (double)modelIndices.size();
-	
+	centerOfMass /= (double)m_indices.size();
+
 	m_centerOfMassOffset = { (float)centerOfMass.x, (float)centerOfMass.y, (float)centerOfMass.z };
 
+	for (size_t i = 0; i < m_vertices.size(); ++i)
+	{
+		m_vertices[i] -= m_centerOfMassOffset;
+	}
+
 	//Init GL data
-	m_numIndices = modelIndices.size();
+	m_numIndices = m_vertices.size();
 
 	m_vertexArray.init();
-	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelVertices.data(), modelVertices.size() * sizeof(modelVertices[0]));
+	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, m_vertices.data(), m_vertices.size() * sizeof(m_vertices[0]));
 	m_vertexArray.bindAttribute(0, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelTexCoords.data(), modelTexCoords.size() * sizeof(modelTexCoords[0]));
@@ -162,7 +166,13 @@ void Mesh::load(const std::string& path)
 	m_vertexArray.bindAttribute(2, 2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	m_indexBuffer.create(GL_ELEMENT_ARRAY_BUFFER);
-	m_indexBuffer.data(modelIndices.data(), modelIndices.size() * sizeof(modelIndices[0]));
+	m_indexBuffer.data(m_indices.data(), m_indices.size() * sizeof(m_indices[0]));
+}
+
+void Mesh::calcPhysicsData(double mass)
+{
+	m_data = calcRigidBodyInfo(mass, m_vertices, m_indices);
+	m_data.centerOfMassOffset = m_centerOfMassOffset;
 }
 
 void Mesh::draw()

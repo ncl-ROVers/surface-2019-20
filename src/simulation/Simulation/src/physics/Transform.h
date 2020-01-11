@@ -16,11 +16,11 @@ public:
 		m_rotation(other.m_rotation),
 		m_scale(other.m_scale) {}
 	
-	inline Transform& translateTransform(const glm::vec3& translation) { m_scale += translation; return *this; }
+	inline Transform& translateTransform(const glm::vec3& translation) { m_position += translation; return *this; }
 	inline Transform& rotateTransform(const rotator& rotation) { m_rotation *= rotation; return *this; }
 	inline Transform& scaleTransform(const glm::vec3& scale) { m_scale *= scale; return *this; }
 
-	inline glm::mat4 matrix() const { return glm::translate(m_position) * m_rotation.matrix() * glm::scale(m_scale); }
+	inline glm::mat4 matrix() const { return glm::translate(m_position) * m_rotation.matrix4() * glm::scale(m_scale); }
 
 	inline const glm::vec3& position() const { return m_position; }
 	inline glm::vec3& position() { return m_position; }

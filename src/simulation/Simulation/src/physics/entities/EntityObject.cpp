@@ -5,6 +5,8 @@
 EntityObject::EntityObject(const std::string& modelPath, const std::pair<std::string, std::string>& shaderPaths, const std::string& albedo)
 {
 	m_mesh.load(modelPath);
+	m_mesh.calcPhysicsData(1.0);
+	m_rigidBody = m_mesh.getPhysicsData();
 
 	m_shader.init();
 	m_shader.addShaderFromPath(GL_VERTEX_SHADER, shaderPaths.first);
@@ -23,9 +25,28 @@ EntityObject::~EntityObject()
 
 void EntityObject::update(double delta)
 {
-	motion_integrators::forestRuth(m_transform.position(), m_physicsData.linearVelocity, m_physicsData.linearForce / m_physicsData.mass, (float)delta);
+	//TODO: Improved integration
+	m_transform.translateTransform(m_rigidBody.linearVelocity * (float)delta);
 
-	m_physicsData.linearForce = glm::vec3(0.0f);
+	const glm::vec3& omega = m_rigidBody.angularVelocity;
+
+	rotator rdot = (rotator(glm::vec4(omega, 0.0f)) * m_transform.rotation()) * 0.5f;
+	rdot *= (float)delta;
+
+	m_transform.rotation((m_transform.rotation() + rdot).normalize());
+
+	m_rigidBody.linearMomentum += m_rigidBody.totalForce * (float)delta;//dPdt
+	m_rigidBody.angularMomentum += m_rigidBody.totalTorque * (float)delta;//dLdt
+
+	m_rigidBody.linearVelocity = m_rigidBody.linearMomentum / (float)m_rigidBody.mass;
+
+	glm::mat3 r = m_transform.rotation().matrix();
+
+	m_rigidBody.invMomentOfInteria = r * m_rigidBody.invBodyI * glm::transpose(r);
+	m_rigidBody.angularVelocity = m_rigidBody.invMomentOfInteria * m_rigidBody.angularMomentum;
+
+	m_rigidBody.totalForce = glm::vec3(0.0f);
+	m_rigidBody.totalTorque = glm::vec3(0.0f);
 }
 
 void EntityObject::render(const World& world)

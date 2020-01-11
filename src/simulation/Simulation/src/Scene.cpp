@@ -18,8 +18,9 @@ void Scene::init(int width, int height)
 	//Monkey
 	EntityObject* monkey = new EntityObject("./res/models/monkey.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" }, "./res/textures/texture.jpg");
 	monkey->getTransform().position(glm::vec3(0.0f, -1.5f, 10.0f));
-	monkey->getPhysicsData().linearVelocity = { 10.0f, 0.0f, 0.0f };
-	monkey->getPhysicsData().mass = 10.0f;
+	monkey->addForce({ 0, 1, 0 }, { 0, 0, -10 });
+//	monkey->setLinearVelocity({ 10.0f, 0.0f, 0.0f });
+//	monkey->getRigidBodyData().mass = 10.0f;
 
 	m_entities.push_back(monkey);
 
@@ -36,7 +37,8 @@ void Scene::update(double delta)
 	m_world.camera.update(delta);
 
 	EntityObject* object = (EntityObject*)m_entities[0];
-	object->addAcceleration(glm::normalize(glm::vec3(0.0f, -1.5f, 0.0f) - object->getTransform().position()) * 10.0f);
+//	object->addForce({ 0, 1, 0 }, { 0, 0, -10 });
+//	object->addAcceleration(glm::normalize(glm::vec3(0.0f, -1.5f, 0.0f) - object->getTransform().position()) * 10.0f);
 
 	for (Entity* entity : m_entities)
 	{
