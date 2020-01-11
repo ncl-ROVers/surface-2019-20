@@ -32,6 +32,7 @@ def _kill_processes(*args):
 if __name__ == "__main__":
     controller = control.Controller()
     manager = control.ControlManager()
+    connection = comms.Connection()
 
     if not controller:
         common.Log.error("Failed to initialise the controller")
@@ -39,9 +40,13 @@ if __name__ == "__main__":
 
     controller_pid = controller.start()
     manager_pid = manager.start()
+    connection.connect()
 
     # Fetch and remember the return code of the application execution
     rc = gui.start()
+
+    # Cleanup the sockets and terminate the connection process
+    connection.disconnect()
 
     # Kill all child processes and exit the application
     _kill_processes(controller_pid, manager_pid)

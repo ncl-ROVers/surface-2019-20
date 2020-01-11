@@ -4,7 +4,6 @@ Loading screen
 
 Module storing an implementation of a loading screen and all values associated with it.
 """
-
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *

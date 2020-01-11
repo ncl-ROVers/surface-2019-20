@@ -17,3 +17,4 @@ Each module within the same package should be imported in the following way::
 from . import common
 from . import control
 from . import gui
+from . import comms
