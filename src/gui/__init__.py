@@ -11,7 +11,6 @@ Interaction with this module should only happen via the :func:`start` function.
     Adanna Obibuaku <A.Obibuaku@newcastle.ac.uk>
     Zhanqiu Wang <Z.Wang111@newcastle.ac.uk>
 """
-
 from PySide2.QtWidgets import QApplication as _QApplication
 from .loading import Loading as _Loading
 from .home import Home as _Home

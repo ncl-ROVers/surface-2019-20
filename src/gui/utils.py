@@ -37,8 +37,8 @@ class Colour(enum.Enum):
 
     Each colour is in the RGBA format.
     """
-
     MAJOR = 34, 51, 54, 255
+    ACCENT = 8, 64, 67, 255
 
 
 class _SlidingMenu(QFrame):
