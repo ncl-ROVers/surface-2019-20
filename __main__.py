@@ -30,15 +30,15 @@ def _kill_processes(*args):
 
 
 if __name__ == "__main__":
-    controller = control.Controller()
+    #controller = control.Controller()
     manager = control.ControlManager()
     connection = comms.Connection()
 
-    if not controller:
-        common.Log.error("Failed to initialise the controller")
-        exit(1)
+    # if not controller:
+    #     common.Log.error("Failed to initialise the controller")
+    #     exit(1)
 
-    controller_pid = controller.start()
+    #controller_pid = controller.start()
     manager_pid = manager.start()
     connection.connect()
 
@@ -49,5 +49,5 @@ if __name__ == "__main__":
     connection.disconnect()
 
     # Kill all child processes and exit the application
-    _kill_processes(controller_pid, manager_pid)
+    _kill_processes(manager_pid)#(controller_pid, manager_pid)
     exit(rc)
