@@ -1,5 +1,8 @@
 """
-TODO: Document
+Connection
+==========
+
+Module storing an implementation of a socket-based connection with the ROV.
 """
 import socket as _socket
 import json as _json
@@ -11,7 +14,45 @@ from ..common import Log as _Log
 
 class Connection:
     """
-    TODO: Document
+    Connection class used as a two-way data exchange medium.
+
+    Handles sending transmission data to ROV and receiving information back.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create and initialise socket and process related constructs
+        * status - a getter to retrieve current connection status
+        * connect - a method used to connect with the ROV
+        * disconnect - a method used to disconnect with the ROV
+        * reconnect - a helper method used to disconnect and connect in one step
+        * _communicate - a private method which does the actual communication with the ROV (send and recv)
+        * _new_socket - a private method which re-initialises the socket
+        * _new_process - a private method which re-initialises the process
+        * _cleanup - a private method used to (attempt to) clean-up the resources
+
+    Usage
+    -----
+
+    The connection should be created as follows::
+
+        connection = Connection()
+        connection.connect()
+
+    Once finished, to cleanup the resources, a disconnection should happen::
+
+        connection.disconnect()
+
+    Note that the operating system should be capable of cleaning up any incorrectly closed sockets (upon
+    server-initiated disconnection, the sockets must (at least) go into the TIME_WAIT state), but the processes will not
+    be cleaned and persist as zombie processes.
+
+    .. warning::
+
+        The calling functions must handle when the attempts to connect, disconnect etc. should be made, and detect when
+        the communication stops (for example by checking the status). This is NOT handled internally.
     """
 
     def __init__(self, ip: str = "localhost", *, port: int = 50000):
@@ -179,3 +220,5 @@ class Connection:
         except (ConnectionError, OSError) as e:
             if not ignore_errors:
                 raise e
+            else:
+                _Log.debug(f"Connection ignoring the following error - {e}")

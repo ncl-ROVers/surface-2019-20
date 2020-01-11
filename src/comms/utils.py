@@ -1,5 +1,8 @@
 """
-TODO: Document
+Communication Utils
+===================
+
+Standard utils module storing common to the package classes, functions, constants, and other objects.
 """
 import enum as _enum
 
