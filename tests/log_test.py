@@ -4,9 +4,8 @@ Log-related tests.
 The tests are first reconfiguring the loggers to use the local assets folder instead of the production environment.
 """
 import pytest
-
-from src.common import COMMON_LOGGER_DIR, TESTS_ASSETS_DIR, Log, Logger
 import os
+from src.common import COMMON_LOGGER_DIR, TESTS_ASSETS_DIR, Log, Logger
 
 
 def get_log_files() -> set:
@@ -53,11 +52,11 @@ def test_level_filtering():
 
 @pytest.fixture(scope="module", autouse=True)
 def config():
-
     """
-    Pytest fixture for config function - used to execute config before any test is ran
-    scope parameter used to share fixture instance across full session
-    autouse parameter ensures all tests in session use the fixture automatically
+    PyTest fixture for the configuration function - used to execute config before any test is ran.
+
+    `scope` parameter is used to share fixture instance across the module session, whereas `autouse` ensures all tests
+    in session use the fixture automatically.
     """
 
     # Remove all log files from the assets folder.
