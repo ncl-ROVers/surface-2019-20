@@ -51,7 +51,7 @@ def test_level_filtering():
                 assert (len(f.readlines()) == 1)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def config():
 
     """
