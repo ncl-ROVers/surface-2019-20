@@ -60,9 +60,6 @@ autouse parameter ensures all tests in session use the fixture automatically
 
 @pytest.fixture(scope="session", autouse=True)
 def config():
-    """
-    TODO: Use pytest to run this before all functions in this module
-    """
 
     # Remove all log files from the assets folder.
     for log_file in get_log_files():
