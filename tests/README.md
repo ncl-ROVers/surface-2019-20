@@ -31,3 +31,26 @@ def test_create_logs():
 ```
 
 Notice that both the module and the function contain the `_test` (or `test_`) expression in their names.
+
+Here is an example of a configuration function which runs before all tests are executed:
+
+```python
+@pytest.fixture(scope="module", autouse=True)
+def config():
+    """
+    PyTest fixture for the configuration function - used to execute config before any test is ran.
+
+    `scope` parameter is used to share fixture instance across the module session, whereas `autouse` ensures all tests
+    in session use the fixture automatically.
+    """
+
+    # Remove all log files from the assets folder.
+    for log_file in get_log_files():
+        os.remove(log_file)
+
+    # Reconfigure the logger to use a separate folder (instead of the real logs)
+    Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
+                    log_directory=TESTS_ASSETS_DIR)
+```
+
+You can use a similar structure in your code to configure your environment before running the tests.
