@@ -51,15 +51,14 @@ def test_level_filtering():
                 assert (len(f.readlines()) == 1)
 
 
-'''
-Pytest fixture for config function - used to execute config before any test is ran
-scope parameter used to share fixture instance across full session
-autouse parameter ensures all tests in session use the fixture automatically
-'''
-
-
 @pytest.fixture(scope="session", autouse=True)
 def config():
+
+    """
+    Pytest fixture for config function - used to execute config before any test is ran
+    scope parameter used to share fixture instance across full session
+    autouse parameter ensures all tests in session use the fixture automatically
+    """
 
     # Remove all log files from the assets folder.
     for log_file in get_log_files():
