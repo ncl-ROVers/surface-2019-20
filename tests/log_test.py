@@ -51,8 +51,15 @@ def test_level_filtering():
                 assert (len(f.readlines()) == 1)
 
 
+'''
+Pytest fixture for config function - used to execute config before any test is ran
+scope parameter used to share fixture instance across full session
+autouse parameter ensures all tests in session use the fixture automatically
+'''
+
+
 @pytest.fixture(scope="session", autouse=True)
-def config(request):
+def config():
     """
     TODO: Use pytest to run this before all functions in this module
     """
@@ -64,5 +71,3 @@ def config(request):
     # Reconfigure the logger to use a separate folder (instead of the real logs)
     Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
                     log_directory=TESTS_ASSETS_DIR)
-
-    #request.addfinalizer(cleanup)
