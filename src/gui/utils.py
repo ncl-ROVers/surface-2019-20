@@ -240,6 +240,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
     Loading = 0
     Home = 1
+    Sample = 2
 
     def __init__(self):
         """
