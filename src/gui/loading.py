@@ -4,17 +4,47 @@ Loading screen
 
 Module storing an implementation of a loading screen and all values associated with it.
 """
+import os
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH
+from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH, get_manager
 from ..common import Log
-from .. import common
-import os
+from .. import comms, control, common
+
 
 # Declare the progress bar's range
 _MAX_LOADING = 100
 _MIN_LOADING = 0
+
+
+def load_controller():
+    """
+    Initialise the controller instance and save it in the manager.
+    """
+    get_manager().controller = control.Controller()
+
+
+def load_control_manager():
+    """
+    Initialise the control manager instance and save it in the manager.
+    """
+    get_manager().control_manager = control.ControlManager()
+
+
+def load_connection():
+    """
+    Initialise the connection instance and save it in the manager.
+    """
+    get_manager().connection = comms.Connection()
+
+
+# Declare the list of operations to load (must be callable functions)
+operations = (
+    load_controller,
+    load_control_manager,
+    load_connection
+)
 
 
 class Loading(Screen):
@@ -161,18 +191,15 @@ class Loading(Screen):
 
     def load(self):
         """
-        TODO: Currently a sample to be removed later. This function should load all assets and initialise all objects.
-          Storing the objects is undecided as of now, probably put them into the manager because every screen can access
-          the manager. Perhaps create a DataManager instance within the ScreenManager?
+        TODO: Document
         """
         Log.debug("Loading started")
 
-        from time import sleep
-        QApplication.instance().processEvents()
-        sleep(1)
-        for x in range(101):
+        total_operations = len(operations)
+
+        for i, op in enumerate(operations):
+            # TODO: Continue
             QApplication.instance().processEvents()
             self.progress = x
-            sleep(0.01)
 
         Log.debug("Loading finished")

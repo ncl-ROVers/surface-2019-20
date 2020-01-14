@@ -11,12 +11,23 @@ Interaction with this module should only happen via the :func:`start` function.
     Adanna Obibuaku <A.Obibuaku@newcastle.ac.uk>
     Zhanqiu Wang <Z.Wang111@newcastle.ac.uk>
 """
-
+import os
+import signal
 from PySide2.QtWidgets import QApplication as _QApplication
 from .loading import Loading as _Loading
 from .home import Home as _Home
 from .utils import ScreenManager as _ScreenManager, Screen as _Screen
 from ..common import Log
+
+
+def _kill_processes(*args):
+    """
+    Helper function used to kill all child processes spawned by the application.
+
+    :param args: List of pid-s
+    """
+    for pid in args:
+        os.kill(pid, signal.SIGTERM)
 
 
 def start() -> int:
@@ -28,6 +39,16 @@ def start() -> int:
 
     :return: Return code of the application
     """
+
+    processes_to_kill = list()
+    # TODO: Continue
+    if controller:
+        controller_pid = controller.start()
+        processes_to_kill.append(controller_pid)
+    manager_pid = manager.start()
+    processes_to_kill.append(manager_pid)
+    connection.connect()
+
     app = _QApplication()
 
     # Create and configure the screen manager, load all assets and switch to the home screen
@@ -41,4 +62,9 @@ def start() -> int:
     Log.info("Application started")
     rc = app.exec_()
     Log.info("Application stopped")
+    # Cleanup the sockets and terminate the connection process
+    connection.disconnect()
+
+    # Kill all child processes and exit the application
+    _kill_processes(*processes_to_kill)
     return rc
