@@ -33,11 +33,11 @@ if __name__ == "__main__":
     controller = control.Controller()
     manager = control.ControlManager()
     connection = comms.Connection()
-
+    """
     if not controller:
         common.Log.error("Failed to initialise the controller")
         exit(1)
-
+"""
     controller_pid = controller.start()
     manager_pid = manager.start()
     connection.connect()
