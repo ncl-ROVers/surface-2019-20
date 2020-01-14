@@ -9,7 +9,7 @@ private:
 public:
 	Texture() {}
 
-	void create(const char* path);
+	void create(const std::string& path);
 	void create(int width, int height, unsigned char* data);
 
 	void bind(unsigned int textureUnit);

@@ -4,6 +4,8 @@
 #include "physics/MotionIntegrators.h"
 #include "physics/Transform.h"
 
+#include "physics/entities/EntityGrid.h"
+
 #include <string>
 
 using namespace std::string_literals;
@@ -15,30 +17,21 @@ void Scene::init(int width, int height)
 	m_world.camera.setPosition({ 0.0f, 1.0f, 3.0f });
 	m_world.camera.setPitch(-20.0f);
 
-	//Monkey
-	EntityObject* monkey = new EntityObject("./res/models/monkey.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" }, "./res/textures/texture.jpg");
-	monkey->getTransform().position(glm::vec3(0.0f, -1.5f, 10.0f));
-	monkey->addForce({ 0, 1, 0 }, { 0, 0, -10 });
-//	monkey->setLinearVelocity({ 10.0f, 0.0f, 0.0f });
-//	monkey->getRigidBodyData().mass = 10.0f;
+	EntityROV* rov = new EntityROV();
+	rov->getTransform().position(glm::vec3(1.0f, 1.5f, -10.0f));
+	rov->setThrusterPower(THRUSTER_BACK_RIGHT, 0.1f);
+	rov->setThrusterPower(THRUSTER_BACK_LEFT, 0.1f);
+	rov->setThrusterPower(THRUSTER_TOP_RIGHT, 0.1f);
+	rov->setThrusterPower(THRUSTER_BOTTOM_LEFT, -0.1f);
 
-	m_entities.push_back(monkey);
+	m_entities.push_back(rov);
 
-	//Pool
-	EntityObject* plane = new EntityObject("./res/models/plane.obj", { "./res/shaders/shader.vert", "./res/shaders/shader.frag" }, "./res/textures/texture.jpg");
-//	plane->getTransform().position(glm::vec3(0.0f, -2.5f, 0.0f));
-//	plane->getTransform().scale(glm::vec3(10.0f));
-
-	m_entities.push_back(plane);
+	m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(10)));
 }
 
 void Scene::update(double delta)
 {
 	m_world.camera.update(delta);
-
-	EntityObject* object = (EntityObject*)m_entities[0];
-//	object->addForce({ 0, 1, 0 }, { 0, 0, -10 });
-//	object->addAcceleration(glm::normalize(glm::vec3(0.0f, -1.5f, 0.0f) - object->getTransform().position()) * 10.0f);
 
 	for (Entity* entity : m_entities)
 	{
@@ -48,7 +41,7 @@ void Scene::update(double delta)
 
 void Scene::render()
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (Entity* entity : m_entities)

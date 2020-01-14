@@ -22,14 +22,14 @@ private:
 public:
 	Mesh() {}
 
-	void load(const std::string& path);
+	void load(const std::string& path, glm::vec3 vertexScale = glm::vec3(1.0f));
 	void calcPhysicsData(double mass);
 	void draw();
 
 	inline const std::vector<glm::vec3> getVertices() const { return m_vertices; }
 	inline const std::vector<unsigned int> getIndices() const { return m_indices; }
 
-	inline RigidBodyData getPhysicsData() const { return m_data; }
+	inline const RigidBodyData& getPhysicsData() const { return m_data; }
 
 	void destroy();
 };

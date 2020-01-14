@@ -9,12 +9,13 @@ layout(location = 0) out vec4 outColor;
 uniform sampler2D albedo;
 
 void main() {
-	vec3 lightPos = vec3(0.0, 20, 0.0);
+	vec3 lightPos = vec3(0.0, 2.5, 0.0);
 	
 	vec3 toLight = lightPos - inWorldPos;
 	float lightDistance = length(toLight);
 	toLight = normalize(toLight);
 
 	float lighting = max(dot(inNormal, toLight), 0) * (1.0 / (lightDistance * lightDistance));
-	outColor = texture(albedo, inTexCoords);// vec4(vec3(100.0 * lighting), 1.0);
+	//outColor = vec4(texture(albedo, inTexCoords).xyz * lighting, 1.0);
+	outColor = texture(albedo, inTexCoords);
 }

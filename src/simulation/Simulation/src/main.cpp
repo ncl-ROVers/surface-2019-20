@@ -7,6 +7,11 @@
 #include "Scene.h"
 #include "Input.h"
 
+void APIENTRY debugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+{
+	std::cerr << message << std::endl;
+}
+
 int main()
 {
 	int width = 1280;
@@ -65,6 +70,10 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+	glDebugMessageCallback(debugOutput, nullptr);
 
 	Scene::singleton()->init(width, height);
 

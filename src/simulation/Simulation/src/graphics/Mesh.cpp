@@ -45,6 +45,7 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 
 		if (it == indexMap.end())
 		{
+			indexMap[index] = modelVertices.size();
 			modelIndices.push_back(modelVertices.size());
 
 			modelVertices.push_back(vertices[index.vertexIndex - 1]);
@@ -130,14 +131,13 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 	delete[] fileData;
 }
 
-void Mesh::load(const std::string& path)
+void Mesh::load(const std::string& path, glm::vec3 vertexScale)
 {
 	std::vector<glm::vec2> modelTexCoords;
 	std::vector<glm::vec3> modelNormals;
 	
 	parseOBJFile(path, m_vertices, modelTexCoords, modelNormals, m_indices);
 
-	//m_centerOfMassOffset = glm::zero<glm::vec3>();
 	glm::dvec3 centerOfMass = glm::zero<glm::dvec3>();
 	for (size_t i = 0; i < m_indices.size(); ++i)
 	{
@@ -150,10 +150,11 @@ void Mesh::load(const std::string& path)
 	for (size_t i = 0; i < m_vertices.size(); ++i)
 	{
 		m_vertices[i] -= m_centerOfMassOffset;
+		m_vertices[i] *= vertexScale;
 	}
 
 	//Init GL data
-	m_numIndices = m_vertices.size();
+	m_numIndices = m_indices.size();
 
 	m_vertexArray.init();
 	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, m_vertices.data(), m_vertices.size() * sizeof(m_vertices[0]));
@@ -173,6 +174,10 @@ void Mesh::calcPhysicsData(double mass)
 {
 	m_data = calcRigidBodyInfo(mass, m_vertices, m_indices);
 	m_data.centerOfMassOffset = m_centerOfMassOffset;
+
+	m_vertices.resize(1);
+	size_t c = m_vertices.capacity();
+	m_indices.resize(1);
 }
 
 void Mesh::draw()

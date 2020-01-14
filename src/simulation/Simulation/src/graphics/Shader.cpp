@@ -29,6 +29,8 @@ void Shader::addShader(GLenum shaderType,  const char* source, int sourceLength)
 
 		delete[] logMessage;
 
+		std::cin.get();
+
 		exit(3);
 	}
 
@@ -66,6 +68,8 @@ void Shader::compile()
 		std::cout << "=====Program Error=====" << std::endl << logMessage << "======================" << std::endl;
 
 		delete[] logMessage;
+
+		std::cin.get();
 
 		exit(3);
 	}

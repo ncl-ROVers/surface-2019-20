@@ -5,7 +5,7 @@
 #include "graphics/World.h"
 
 #include "physics/entities/Entity.h"
-#include "physics/entities/EntityObject.h"
+#include "physics/entities/EntityROV.h"
 
 class Scene
 {
