@@ -61,9 +61,6 @@ class Sample(Screen):
         form.setLayout(layout)
         scene.addItem(form)
 
-        button = QPushButton("Click me")
-        button.clicked.connect(self.say_hello)
-
         view = QGraphicsView(scene)
         self._layout = QHBoxLayout()
         self._layout.addWidget(view)
