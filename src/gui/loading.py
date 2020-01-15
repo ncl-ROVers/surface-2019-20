@@ -207,6 +207,9 @@ class Loading(Screen):
         # Make sure the loading bar increments the correct amount, by knowing the total number of operations to perform
         step_increment = 100 / len(OPERATIONS)
 
+        # Display empty bar (usually too quick to notice!)
+        QApplication.instance().processEvents()
+
         # Do each operation and increment the loading bar
         for i, op in enumerate(OPERATIONS):
             op()
