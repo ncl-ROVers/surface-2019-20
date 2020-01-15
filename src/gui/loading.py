@@ -22,28 +22,37 @@ def load_controller():
     """
     Initialise the controller instance and save it in the manager.
     """
-    get_manager().controller = control.Controller()
+    get_manager().references.controller = control.Controller()
 
 
 def load_control_manager():
     """
     Initialise the control manager instance and save it in the manager.
     """
-    get_manager().control_manager = control.ControlManager()
+    get_manager().references.control_manager = control.ControlManager()
 
 
 def load_connection():
     """
     Initialise the connection instance and save it in the manager.
     """
-    get_manager().connection = comms.Connection()
+    get_manager().references.connection = comms.Connection()
+
+
+def load_attempt_connection():
+    """
+    Connect to the ROV. TODO: Move it to code handling automatic connection and disconnection
+    """
+    # Connect to the ROV
+    get_manager().references.connection.connect()
 
 
 # Declare the list of operations to load (must be callable functions)
-operations = (
+OPERATIONS = (
     load_controller,
     load_control_manager,
-    load_connection
+    load_connection,
+    load_attempt_connection
 )
 
 
@@ -191,15 +200,17 @@ class Loading(Screen):
 
     def load(self):
         """
-        TODO: Document
+        Method used to "load" the assets and other objects by calling the loading functions.
         """
         Log.debug("Loading started")
 
-        total_operations = len(operations)
+        # Make sure the loading bar increments the correct amount, by knowing the total number of operations to perform
+        step_increment = 100 / len(OPERATIONS)
 
-        for i, op in enumerate(operations):
-            # TODO: Continue
+        # Do each operation and increment the loading bar
+        for i, op in enumerate(OPERATIONS):
+            op()
+            self.progress = int(step_increment * (i+1))
             QApplication.instance().processEvents()
-            self.progress = x
 
         Log.debug("Loading finished")

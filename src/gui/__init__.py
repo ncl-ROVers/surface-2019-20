@@ -39,32 +39,37 @@ def start() -> int:
 
     :return: Return code of the application
     """
-
-    processes_to_kill = list()
-    # TODO: Continue
-    if controller:
-        controller_pid = controller.start()
-        processes_to_kill.append(controller_pid)
-    manager_pid = manager.start()
-    processes_to_kill.append(manager_pid)
-    connection.connect()
-
     app = _QApplication()
+
+    # Declare a list of processes to terminate - each PID added to it will later be sent SIGTERM signal
+    processes_to_terminate = list()
 
     # Create and configure the screen manager, load all assets and switch to the home screen
     manager = _ScreenManager(_Loading(), _Home())
     manager.post_init()
     manager.show()
     manager.screen.load()
+
+    # Start the controller readings if it's connected
+    if manager.references.controller:
+        controller_pid = manager.references.controller.start()
+        processes_to_terminate.append(controller_pid)
+
+    # Start the control manager to update the transmission shared memory
+    control_manager_pid = manager.references.control_manager.start()
+    processes_to_terminate.append(control_manager_pid)
+
+    # Once loaded and started all components, switch to the Home screen
     manager.screen = _Screen.Home
 
     # Start the application and later exit with its return code
     Log.info("Application started")
     rc = app.exec_()
     Log.info("Application stopped")
+
     # Cleanup the sockets and terminate the connection process
-    connection.disconnect()
+    manager.references.connection.disconnect()
 
     # Kill all child processes and exit the application
-    _kill_processes(*processes_to_kill)
+    _kill_processes(*processes_to_terminate)
     return rc
