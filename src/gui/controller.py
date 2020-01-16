@@ -11,7 +11,7 @@ from PySide2.QtGui import *
 import os
 
 
-class Sample(Screen):
+class Controller(Screen):
     """
     TODO: Document
     """
@@ -21,8 +21,8 @@ class Sample(Screen):
         Default inherited.
         """
         # Background image
-        super(Sample, self).__init__()
-        self._Pixmap = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png")) # Temporary directory for now
+        super(Controller, self).__init__()
+        self._Pixmap = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png"))
         self._label = QLabel()
         self._label.setPixmap(self._Pixmap)
 
