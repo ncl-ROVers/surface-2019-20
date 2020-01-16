@@ -32,7 +32,7 @@ def start() -> int:
     app = _QApplication()
 
     # Create and configure the screen manager, load all assets and switch to the home screen
-    manager = _ScreenManager(_Loading(), _Home(), _())
+    manager = _ScreenManager(_Loading(), _Home(), _Sample())
     manager.post_init()
     manager.show()
     manager.screen.load()
