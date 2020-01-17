@@ -9,6 +9,16 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 import os
+import pyautogui
+
+SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+
+class QPixmap(QPixmap):
+    def ScaledToScreen(self, percent):
+            # Gets window screen size and returns pixmap after applying scaling factor in percentage
+            _scaledwidth = SCREEN_WIDTH * percent
+            _scaledheight = SCREEN_HEIGHT * percent
+            return self.scaled(_scaledwidth, _scaledheight, aspectMode=Qt.KeepAspectRatio)
 
 
 class Controller(Screen):
@@ -20,15 +30,20 @@ class Controller(Screen):
         """
         Default inherited.
         """
-        # Background image
+        # Controller pixmap
         super(Controller, self).__init__()
-        self._Pixmap = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png"))
+        self._pixmap = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png"))
+        # Enlarge controller pixmap to 85% of screen size
+        self._pixmap = self._pixmap.ScaledToScreen(0.85)
+
         self._label = QLabel()
-        self._label.setPixmap(self._Pixmap)
+        self._label.setPixmap(self._pixmap)
 
         self._layout = QVBoxLayout()
         self._layout.addWidget(self._label, alignment=Qt.AlignCenter)
         self.setLayout(self._layout)
+
+
 
     def _config(self):
         """
