@@ -1,6 +1,6 @@
 """
-Loading screen
-==============
+Data manager
+============
 
 Module storing an implementation of a data manager, exposing some common values via shared memory. Gets replaced with an
 instance of the manager on import.
