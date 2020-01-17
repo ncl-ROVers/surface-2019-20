@@ -13,12 +13,13 @@ import pyautogui
 
 SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
 
+
 class QPixmap(QPixmap):
     def ScaledToScreen(self, percent):
-            # Gets window screen size and returns pixmap after applying scaling factor in percentage
-            _scaledwidth = SCREEN_WIDTH * percent
-            _scaledheight = SCREEN_HEIGHT * percent
-            return self.scaled(_scaledwidth, _scaledheight, aspectMode=Qt.KeepAspectRatio)
+        # Gets window screen size and returns pixmap after applying scaling factor in percentage
+        _scaledwidth = SCREEN_WIDTH * percent
+        _scaledheight = SCREEN_HEIGHT * percent
+        return self.scaled(_scaledwidth, _scaledheight, aspectMode=Qt.KeepAspectRatio)
 
 
 class Controller(Screen):
@@ -42,8 +43,6 @@ class Controller(Screen):
         self._layout = QVBoxLayout()
         self._layout.addWidget(self._label, alignment=Qt.AlignCenter)
         self.setLayout(self._layout)
-
-
 
     def _config(self):
         """
