@@ -19,7 +19,7 @@ class QPixmap(QPixmap):
         # Gets window screen size and returns pixmap after applying scaling factor in percentage
         _scaledwidth = SCREEN_WIDTH * percent
         _scaledheight = SCREEN_HEIGHT * percent
-        return self.scaled(_scaledwidth, _scaledheight, aspectMode=Qt.KeepAspectRatio)
+        return self.scaled(_scaledwidth, _scaledheight, aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
 
 
 class Controller(Screen):
