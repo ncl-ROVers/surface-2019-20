@@ -1,25 +1,11 @@
 """
 TODO: Document
 """
-from .utils import Screen
-from .. import common
-
-from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-
+from .utils import Screen
+from .. import common
 import os
-import pyautogui
-
-SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
-
-
-class QPixmap(QPixmap):
-    def ScaledToScreen(self, percent):
-        # Gets window screen size and returns pixmap after applying scaling factor in percentage
-        _scaledwidth = SCREEN_WIDTH * percent
-        _scaledheight = SCREEN_HEIGHT * percent
-        return self.scaled(_scaledwidth, _scaledheight, aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
 
 
 class Controller(Screen):
@@ -29,32 +15,42 @@ class Controller(Screen):
 
     def __init__(self):
         """
-        Default inherited.
+        Standard constructor.
         """
-        # Controller pixmap
         super(Controller, self).__init__()
-        self._pixmap = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png"))
-        # Enlarge controller pixmap to 85% of screen size
-        self._pixmap = self._pixmap.ScaledToScreen(0.85)
+
+        # These values will be used to scale the images correctly, they are set in the `on_switch` method.
+        self._width = 0
+        self._height = 0
 
         self._label = QLabel()
-        self._label.setPixmap(self._pixmap)
-
         self._layout = QVBoxLayout()
-        self._layout.addWidget(self._label, alignment=Qt.AlignCenter)
+
+        self._config()
         self.setLayout(self._layout)
 
     def _config(self):
         """
-        Default inherited.
+        Standard configuration method.
+
+        Margins must be set to 0 or else the screen's width will be (image size + margin), and push the menu bar away.
         """
         super()._config()
+        self._layout.addWidget(self._label, alignment=Qt.AlignCenter)
+        self._layout.setMargin(0)
+        self._label.setMargin(0)
 
     def _set_style(self):
         """
-        Default inherited.
+        Standard styling method.
         """
         super()._set_style()
+
+        # Scale the model to match the size of the screen and set it as the label's pixel map
+        controller = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png"))
+        controller = controller.scaled(min(self._width, controller.width()), min(self._height, controller.height()),
+                                       aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._label.setPixmap(controller)
 
     def post_init(self):
         """
@@ -64,10 +60,11 @@ class Controller(Screen):
 
     def on_switch(self):
         """
-        Display the menu bar as it should only be disabled in the loading screen.
+        Save the width and height calculated on switch, to adjust the image size correctly.
         """
+        self._width = self.width()
+        self._height = self.height()
         super().on_switch()
-        self.manager.bar.parent().setVisible(True)
 
     def on_exit(self):
         """
