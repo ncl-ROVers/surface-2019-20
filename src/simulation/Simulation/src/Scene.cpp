@@ -5,6 +5,7 @@
 #include "physics/Transform.h"
 
 #include "physics/entities/EntityGrid.h"
+#include "physics/entities/EntityWater.h"
 
 #include <string>
 
@@ -26,7 +27,20 @@ void Scene::init(int width, int height)
 
 	m_entities.push_back(rov);
 
-	m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(10)));
+	//m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(10)));
+	EntityWater* water = new EntityWater(38, 38, 70, 70);
+	water->getTransform().position({ 0, 4, 0 });
+
+	m_entities.push_back(water);
+
+	MaterialData poolMaterial;
+	poolMaterial.albedo = "./res/textures/texture.jpg";
+	poolMaterial.vertexShader = "./res/shaders/shader.vert";
+	poolMaterial.fragmentShader = "./res/shaders/shader.frag";
+	poolMaterial.model = "./res/models/pool.obj";
+
+	EntityObject* pool = new EntityObject(poolMaterial);
+	m_entities.push_back(pool);
 }
 
 void Scene::update(double delta)

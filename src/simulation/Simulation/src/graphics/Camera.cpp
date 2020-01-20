@@ -78,7 +78,7 @@ void Camera::update(double delta)
 
 void Camera::resize(int width, int height)
 {
-	m_projMatrix = glm::perspective(glm::radians(70.0f), (float)width / height, 0.0001f, 1000.0f);
+	m_projMatrix = glm::perspective(glm::radians(70.0f), (float)width / height, 0.01f, 1000.0f);
 }
 
 glm::vec3 Camera::getForward() const
