@@ -18,12 +18,19 @@ void Scene::init(int width, int height)
 	m_world.camera.setPosition({ 0.0f, 1.0f, 3.0f });
 	m_world.camera.setPitch(-20.0f);
 
-	EntityROV* rov = new EntityROV();
-	rov->getTransform().position(glm::vec3(1.0f, 1.5f, -10.0f));
-	rov->setThrusterPower(THRUSTER_BACK_RIGHT, 0.1f);
-	rov->setThrusterPower(THRUSTER_BACK_LEFT, 0.1f);
-	rov->setThrusterPower(THRUSTER_TOP_RIGHT, 0.1f);
-	rov->setThrusterPower(THRUSTER_BOTTOM_LEFT, -0.1f);
+	//Load configuration
+	m_config.loadConfig("../rov_setup.txt");
+
+	EntityROV* rov = new EntityROV(m_config.getRovMass());
+	rov->getTransform().position(m_config.getRovPosition());
+	rov->getTransform().rotation(quaternion(glm::vec3(1, 0, 0), m_config.getRovRotation().x) *
+ 								 quaternion(glm::vec3(0, 1, 0), m_config.getRovRotation().y) *
+								 quaternion(glm::vec3(0, 0, 1), m_config.getRovRotation().z));
+
+	for (int i = 0; i < THRUSTER_COUNT; ++i)
+	{
+		rov->setThrusterPower(i, m_config.getThrusterPower(i));
+	}
 
 	m_entities.push_back(rov);
 

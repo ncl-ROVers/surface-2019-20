@@ -14,13 +14,15 @@
 #define THRUSTER_TOP_LEFT 6
 #define THRUSTER_BOTTOM_LEFT 7
 
+#define THRUSTER_COUNT 8
+
 class EntityROV : public EntityRigidBody
 {
 private:
 	std::tuple<glm::vec3, quaternion, float> m_thrusterPositions[8];
 	EntityObject* m_entityThrusters[8];
 public:
-	EntityROV();
+	EntityROV(double mass = 1.0);
 	~EntityROV();
 
 	void update(double delta) override;

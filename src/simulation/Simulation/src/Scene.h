@@ -6,11 +6,13 @@
 
 #include "physics/entities/Entity.h"
 #include "physics/entities/EntityROV.h"
+#include "Config.h"
 
 class Scene
 {
 private:
 	World m_world;
+	Config m_config;
 
 	std::vector<Entity*> m_entities;
 private:

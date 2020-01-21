@@ -13,8 +13,8 @@ MaterialData getMaterialData()
 	return monkeyMaterial;
 }
 
-EntityROV::EntityROV() :
-	EntityRigidBody(getMaterialData(), 1.0, BODY_SCALE)
+EntityROV::EntityROV(double mass) :
+	EntityRigidBody(getMaterialData(), mass, BODY_SCALE)
 {
 	glm::vec3 v0 = (quaternion({ 0, 0, 0 }, 0)).localRotate(glm::vec3(0, 1, 0));
 	glm::vec3 v1 = (quaternion({ 1, 0, 0 }, 90)).localRotate(glm::vec3(0, 1, 0));

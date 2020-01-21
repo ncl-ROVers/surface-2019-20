@@ -41,7 +41,7 @@ void Shader::addShader(GLenum shaderType,  const char* source, int sourceLength)
 
 void Shader::addShaderFromPath(GLenum shaderType, const std::string& path)
 {
-	long size = 0;
+	long int size = 0;
 	byte* src = readFileContent(std::filesystem::absolute(path).u8string(), size);
 
 	addShader(shaderType, (char*)src, size);
