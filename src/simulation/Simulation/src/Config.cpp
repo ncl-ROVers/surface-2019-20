@@ -28,41 +28,43 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 		//Process line
 		const char* line = &data[startIndex];
 
-		if (line[0] == 't')
-		{
-			int thrusterIndex = 0;
-			float power = 0.0f;
-
-			sscanf_s(line, "t%d %f", &thrusterIndex, &power);
-
-			if (thrusterIndex > 0 || thrusterIndex < THRUSTER_COUNT)
-			{
-				m_thrusterPower[thrusterIndex] = power;
-			}
-		}
-		else if (line[0] == 'm')
+		if (!strncmp(line, "MASS", 4))
 		{
 			double mass;
 
-			sscanf_s(line, "m %lf", &mass);
+			sscanf_s(line, "MASS %lf", &mass);
 
 			m_rovMass = mass;
 		}
-		else if (line[0] == 'p')
+		else if (!strncmp(line, "POS", 3))
 		{
 			glm::vec3 position;
 
-			sscanf_s(line, "p %f %f %f", &position.x, &position.y, &position.z);
+			sscanf_s(line, "POS %f %f %f", &position.x, &position.y, &position.z);
 
 			m_rovPosition = position;
 		}
-		else if (line[0] == 'r')
+		else if (!strncmp(line, "ROT", 3))
 		{
 			glm::vec3 rotation;
 
-			sscanf_s(line, "r %f %f %f", &rotation.x, &rotation.y, &rotation.z);
+			sscanf_s(line, "ROT %f %f %f", &rotation.x, &rotation.y, &rotation.z);
 
 			m_rovRotation = rotation;
+		}
+		else if (!strncmp(line, "T_", 2))
+		{
+			const char* indices = line + 2;
+			int index = 0;
+
+			index += (indices[0] == 'V') ? 4 : 0;
+			index += (indices[1] == 'A') ? 2 : 0;
+			index += (indices[2] == 'S') ? 1 : 0;
+			
+			float power = 0.0f;
+			sscanf_s(line + 6, "%f", &power);
+
+			m_thrusterPower[index] = power;
 		}
 
 		startIndex = ++endIndex;
