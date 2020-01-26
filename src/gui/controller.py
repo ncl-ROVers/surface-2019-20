@@ -47,7 +47,7 @@ class Controller(Screen):
         super()._set_style()
 
         # Scale the model to match the size of the screen and set it as the label's pixel map
-        controller = QPixmap(os.path.join(common.GUI_LOADING_DIR, "controller.png"))
+        controller = QPixmap(os.path.join(common.GUI_CONTROLLER_DIR, "controller.png"))
         controller = controller.scaled(min(self._width, controller.width()), min(self._height, controller.height()),
                                        aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
         self._label.setPixmap(controller)
