@@ -6,17 +6,20 @@
 
 #include "physics/entities/Entity.h"
 #include "physics/entities/EntityROV.h"
+
 #include "Config.h"
+#include "LaunchCache.h"
 
 class Scene
 {
 private:
 	World m_world;
 	Config m_config;
+	LaunchCache m_cache;
 
 	std::vector<Entity*> m_entities;
 private:
-	Scene() {}
+	Scene() : m_cache("../_cache") {}
 public:
 	void init(int width, int height);
 	void update(double delta);
@@ -24,6 +27,9 @@ public:
 	void destroy();
 
 	void resize(int width, int height);
+
+	inline LaunchCache* getCache() { return &m_cache; }
+	inline const LaunchCache* getCache() const { return &m_cache; }
 
 	static Scene* singleton();
 };

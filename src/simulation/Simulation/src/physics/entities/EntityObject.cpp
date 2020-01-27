@@ -1,9 +1,39 @@
 #include "EntityObject.h"
 
+#include "Scene.h"
+
+inline std::string toCacheName(std::string path)
+{
+	std::string saveName = std::filesystem::path(path).filename().generic_string();
+
+	size_t dotIndex = 0;
+	while ((dotIndex = saveName.find_first_of('.')) != std::string::npos)
+	{
+		saveName.erase(dotIndex);
+	}
+
+	return saveName;
+}
+
 EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsData, double mass, const glm::vec3& scale)
 {
-	m_mesh.load(materialData.model, scale);
-	if (calcPhysicsData)
+	LaunchCache* cache = Scene::singleton()->getCache();
+
+	std::string saveName = toCacheName(materialData.model);
+	
+	if (!cache->isMeshCached(saveName))
+	{
+		std::cout << "Loading model: " << materialData.model << std::endl;
+		m_mesh.load(materialData.model, scale);
+		cache->saveMeshData(saveName, m_mesh);
+	}
+	else
+	{
+		std::cout << "Loading model from cache: " << materialData.model << std::endl;
+		cache->loadMeshData(saveName, m_mesh);
+	}
+
+	if (calcPhysicsData && !m_mesh.hasRigidBodyData())
 	{
 		m_mesh.calcPhysicsData(mass);
 	}
@@ -35,6 +65,9 @@ void EntityObject::render(const World& world)
 	m_shader.setUniform("albedo", 0);
 	m_shader.setUniform("transform", mvpMatrix);
 	m_shader.setUniform("model", model);
+
+	m_shader.setUniform("sunDirection", world.sunDirection);
+	m_shader.setUniform("ambientLighting", world.ambientLight);
 
 	m_texture.bind(0);
 

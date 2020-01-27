@@ -24,4 +24,4 @@ struct RigidBodyData
 	glm::vec3 totalTorque;
 };
 
-RigidBodyData calcRigidBodyInfo(double mass, const std::vector<glm::vec3>& vertices, const std::vector<unsigned int>& indices);
+RigidBodyData calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices);

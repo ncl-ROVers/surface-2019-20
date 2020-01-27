@@ -22,5 +22,8 @@ public:
 	virtual void update(double delta) override {}
 	virtual void render(const World& world) override;
 
+	inline Mesh* getMesh() { return &m_mesh; }
+	inline const Mesh* getMesh() const { return &m_mesh; }
+
 	inline const RigidBodyData& getPhysicsData() const { return m_mesh.getPhysicsData(); }
 };

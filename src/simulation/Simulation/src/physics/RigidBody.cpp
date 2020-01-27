@@ -1,15 +1,15 @@
 #include "RigidBody.h"
 
-RigidBodyData calcRigidBodyInfo(double mass, const std::vector<glm::vec3>& vertices, const std::vector<unsigned int>& indices)
+RigidBodyData calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
 {
 	RigidBodyData data;
 
-	float vertexMass = (float)(mass / (double)indices.size());
+	float vertexMass = (float)(mass / (double)numIndices);
 
-	data.bodyI = glm::zero<glm::mat3>();
 	data.mass = mass;
+	data.bodyI = glm::zero<glm::mat3>();
 
-	for (size_t i = 0; i < indices.size(); ++i)
+	for (size_t i = 0; i < numIndices; ++i)
 	{
 		glm::vec3 vertex = vertices[indices[i]];
 

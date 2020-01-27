@@ -85,6 +85,7 @@ void EntityWater::render(const World& world)
 
 	m_waterRenderShader.setUniform("transform", mvpMatrix);
 	m_waterRenderShader.setUniform("time", glfwGetTime());
+	m_waterRenderShader.setUniform("model", model);
 
 	m_vertexBuffer.bind();
 	m_indexBuffer.bind();

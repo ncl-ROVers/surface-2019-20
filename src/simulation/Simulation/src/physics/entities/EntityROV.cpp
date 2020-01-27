@@ -4,13 +4,13 @@
 
 MaterialData getMaterialData()
 {
-	MaterialData monkeyMaterial;
-	monkeyMaterial.model = "./res/models/box.obj";
-	monkeyMaterial.vertexShader = "./res/shaders/shader.vert";
-	monkeyMaterial.fragmentShader = "./res/shaders/shader.frag";
-	monkeyMaterial.albedo = "./res/textures/rov_body.png";
+	MaterialData material;
+	material.model = "./res/models/box.obj";
+	material.vertexShader = "./res/shaders/shader.vert";
+	material.fragmentShader = "./res/shaders/shader.frag";
+	material.albedo = "./res/textures/rov_body.png";
 
-	return monkeyMaterial;
+	return material;
 }
 
 EntityROV::EntityROV(double mass) :

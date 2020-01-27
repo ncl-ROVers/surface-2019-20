@@ -133,51 +133,120 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 
 void Mesh::load(const std::string& path, glm::vec3 vertexScale)
 {
+	std::vector<glm::vec3> modelVertices;
 	std::vector<glm::vec2> modelTexCoords;
 	std::vector<glm::vec3> modelNormals;
+	std::vector<unsigned int> modelIndices;
 	
-	parseOBJFile(path, m_vertices, modelTexCoords, modelNormals, m_indices);
+	parseOBJFile(path, modelVertices, modelTexCoords, modelNormals, modelIndices);
 
 	glm::dvec3 centerOfMass = glm::zero<glm::dvec3>();
-	for (size_t i = 0; i < m_indices.size(); ++i)
+	for (size_t i = 0; i < modelIndices.size(); ++i)
 	{
-		centerOfMass += m_vertices[m_indices[i]];
+		centerOfMass += modelVertices[modelIndices[i]];
 	}
-	centerOfMass /= (double)m_indices.size();
+	centerOfMass /= (double)modelIndices.size();
 
 	m_centerOfMassOffset = { (float)centerOfMass.x, (float)centerOfMass.y, (float)centerOfMass.z };
 
-	for (size_t i = 0; i < m_vertices.size(); ++i)
+	for (size_t i = 0; i < modelVertices.size(); ++i)
 	{
-		m_vertices[i] -= m_centerOfMassOffset;
-		m_vertices[i] *= vertexScale;
+		modelVertices[i] -= m_centerOfMassOffset;
+		modelVertices[i] *= vertexScale;
 	}
 
 	//Init GL data
-	m_numIndices = m_indices.size();
+	loadDirect(modelVertices.data(), modelVertices.size(),
+			   modelTexCoords.data(), modelTexCoords.size(),
+			   modelNormals.data(), modelNormals.size(),
+			   modelIndices.data(), modelIndices.size());
+}
+
+void Mesh::loadDirect(glm::vec3* vertices, size_t numVertices, glm::vec2* texCoords, size_t numTexCoords, glm::vec3* normals, size_t numNormals, unsigned int* indices, size_t numIndices)
+{
+	//TODO: Cache phsyics data
+
+	m_numVertices = numVertices;
+	m_numIndices = numIndices;
+	m_numTexCoords = numTexCoords;
+	m_numNormals = numNormals;
 
 	m_vertexArray.init();
-	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, m_vertices.data(), m_vertices.size() * sizeof(m_vertices[0]));
+	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, vertices, numVertices * sizeof(vertices[0]));
 	m_vertexArray.bindAttribute(0, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
-	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelTexCoords.data(), modelTexCoords.size() * sizeof(modelTexCoords[0]));
+	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, texCoords, numTexCoords * sizeof(texCoords[0]));
 	m_vertexArray.bindAttribute(1, 1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 
-	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, modelNormals.data(), modelNormals.size() * sizeof(modelNormals[0]));
+	m_vertexArray.createBuffer(GL_ARRAY_BUFFER, normals, numNormals * sizeof(normals[0]));
 	m_vertexArray.bindAttribute(2, 2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
 	m_indexBuffer.create(GL_ELEMENT_ARRAY_BUFFER);
-	m_indexBuffer.data(m_indices.data(), m_indices.size() * sizeof(m_indices[0]));
+	m_indexBuffer.data(indices, numIndices * sizeof(indices[0]));
+
+	m_indexBuffer.unbind();
+	m_vertexArray.unbind();
 }
 
 void Mesh::calcPhysicsData(double mass)
 {
-	m_data = calcRigidBodyInfo(mass, m_vertices, m_indices);
+	glm::vec3* vertices = (glm::vec3*)mapMeshData(0, m_numVertices * sizeof(glm::vec3), GL_MAP_READ_BIT, MeshDataType::DATA_VERTICES);
+	unsigned int* indices = (unsigned int*)mapMeshData(0, m_numIndices * sizeof(unsigned int), GL_MAP_READ_BIT, MeshDataType::DATA_INDICES);
+
+	m_data = calcRigidBodyInfo(mass, vertices, m_numVertices, indices, m_numIndices);
 	m_data.centerOfMassOffset = m_centerOfMassOffset;
 
-	m_vertices.resize(1);
-	size_t c = m_vertices.capacity();
-	m_indices.resize(1);
+	unmapMeshData(MeshDataType::DATA_VERTICES);
+	unmapMeshData(MeshDataType::DATA_INDICES);
+
+	m_hasRBData = true;
+}
+
+void Mesh::bufferFromType(MeshDataType type, GLuint& bufferID, GLenum& bufferType) const
+{
+	switch (type)
+	{
+	case DATA_VERTICES:
+	case DATA_TEXCOORDS:
+	case DATA_NORMALS:
+		bufferID = m_vertexArray.getBufferId((size_t)type);
+		bufferType = m_vertexArray.getBufferType((size_t)type);
+		break;
+	case DATA_INDICES:
+		bufferID = m_indexBuffer.get();
+		bufferType = m_indexBuffer.getType();
+		break;
+	}
+}
+
+void Mesh::copyMeshData(void* dst, long int srcOffset, long int srcSize, MeshDataType type) const
+{
+	GLuint bufferID = 0;
+	GLenum bufferType = 0;
+	bufferFromType(type, bufferID, bufferType);
+
+	glBindBuffer(bufferType, bufferID);
+	glGetBufferSubData(GL_ARRAY_BUFFER, srcOffset, srcSize, dst);
+}
+
+void* Mesh::mapMeshData(long int offset, long int size, GLbitfield access, MeshDataType type) const
+{
+	GLuint bufferID = 0;
+	GLenum bufferType = 0;
+	bufferFromType(type, bufferID, bufferType);
+	
+	glBindBuffer(bufferType, bufferID);
+	return glMapBufferRange(bufferType, offset, size, access);
+}
+
+void Mesh::unmapMeshData(MeshDataType type) const
+{
+	GLuint bufferID = 0;
+	GLenum bufferType = 0;
+	bufferFromType(type, bufferID, bufferType);
+
+	glBindBuffer(bufferType, bufferID);
+	glUnmapBuffer(bufferType);
 }
 
 void Mesh::draw()

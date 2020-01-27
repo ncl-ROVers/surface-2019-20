@@ -16,5 +16,8 @@ public:
 	inline void bind() const { glBindBuffer(m_type, m_buffer); }
 	inline void unbind() const { glBindBuffer(m_type, 0); }
 
+	GLuint get() const { return m_buffer; }
+	GLenum getType() const { return m_type; }
+
 	void destroy();
 };

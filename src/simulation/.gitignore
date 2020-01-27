@@ -33,6 +33,7 @@
 
 bin/
 .vs/
+_cache/
 
 *.spv
 *.sln

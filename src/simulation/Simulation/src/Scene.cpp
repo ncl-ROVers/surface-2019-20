@@ -15,8 +15,12 @@ void Scene::init(int width, int height)
 {
 	resize(width, height);
 
+	//Setup world
 	m_world.camera.setPosition({ 0.0f, 1.0f, 3.0f });
 	m_world.camera.setPitch(-20.0f);
+
+	m_world.sunDirection = glm::normalize(glm::vec3(1, -3, -2));
+	m_world.ambientLight = glm::vec3(0.4f);
 
 	//Load configuration
 	m_config.loadConfig("../rov_setup.txt");
