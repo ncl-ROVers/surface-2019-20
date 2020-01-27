@@ -66,6 +66,10 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 
 			m_thrusterPower[index] = power;
 		}
+		else if (!strncmp(line, "SCENE", 5))
+		{
+			m_useGridScene = !strncmp(line + 6, "GRID", 4);
+		}
 
 		startIndex = ++endIndex;
 	}

@@ -38,20 +38,26 @@ void Scene::init(int width, int height)
 
 	m_entities.push_back(rov);
 
-	//m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(10)));
-	EntityWater* water = new EntityWater(38, 38, 70, 70);
-	water->getTransform().position({ 0, 4, 0 });
+	if (m_config.useGridScene())
+	{
+		m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(10)));
+	}
+	else
+	{
+		EntityWater* water = new EntityWater(38, 38, 70, 70);
+		water->getTransform().position({ 0, 4, 0 });
 
-	m_entities.push_back(water);
+		m_entities.push_back(water);
 
-	MaterialData poolMaterial;
-	poolMaterial.albedo = "./res/textures/texture.jpg";
-	poolMaterial.vertexShader = "./res/shaders/shader.vert";
-	poolMaterial.fragmentShader = "./res/shaders/shader.frag";
-	poolMaterial.model = "./res/models/pool.obj";
+		MaterialData poolMaterial;
+		poolMaterial.albedo = "./res/textures/texture.jpg";
+		poolMaterial.vertexShader = "./res/shaders/shader.vert";
+		poolMaterial.fragmentShader = "./res/shaders/shader.frag";
+		poolMaterial.model = "./res/models/pool.obj";
 
-	EntityObject* pool = new EntityObject(poolMaterial);
-	m_entities.push_back(pool);
+		EntityObject* pool = new EntityObject(poolMaterial);
+		m_entities.push_back(pool);
+	}
 }
 
 void Scene::update(double delta)

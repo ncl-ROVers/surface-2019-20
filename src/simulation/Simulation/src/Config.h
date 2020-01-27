@@ -13,6 +13,8 @@ private:
 
 	glm::vec3 m_rovPosition = glm::vec3(0.0f);
 	glm::vec3 m_rovRotation = glm::vec3(0.0f);
+
+	bool m_useGridScene = false;
 public:
 	Config() {}
 
@@ -24,4 +26,6 @@ public:
 	inline glm::vec3 getRovRotation() const { return m_rovRotation; }
 
 	inline float getThrusterPower(int index) const { return m_thrusterPower[index]; }
+
+	inline bool useGridScene() const { return m_useGridScene; }
 };

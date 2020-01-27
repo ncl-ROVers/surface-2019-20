@@ -1,11 +1,11 @@
 #include "EntityROV.h"
 
-#define BODY_SCALE glm::vec3(1.0f, 1.0f, 2.0f)
+#define BODY_SCALE glm::vec3(0.3f)
 
 MaterialData getMaterialData()
 {
 	MaterialData material;
-	material.model = "./res/models/box.obj";
+	material.model = "./res/models/rov.obj";
 	material.vertexShader = "./res/shaders/shader.vert";
 	material.fragmentShader = "./res/shaders/shader.frag";
 	material.albedo = "./res/textures/rov_body.png";
@@ -16,15 +16,15 @@ MaterialData getMaterialData()
 EntityROV::EntityROV(double mass) :
 	EntityRigidBody(getMaterialData(), mass, BODY_SCALE)
 {
-	m_thrusterPositions[THRUSTER_HORIZONTAL_FORE_PORT] = { glm::vec3(-1.1f, -1.1f, -0.3f), quaternion({ 0, 0, 0, 1 }), 0 };
-	m_thrusterPositions[THRUSTER_HORIZONTAL_FORE_STARBOARD] = { glm::vec3(1.1f, -1.1f, -0.3f), quaternion({ 0, 0, 0, 1 }), 0 };
-	m_thrusterPositions[THRUSTER_HORIZONTAL_AFT_PORT] = { glm::vec3(-1.1f, -1.1f, 0.3f), quaternion({ 0, 0, 0, 1 }), 0 };
-	m_thrusterPositions[THRUSTER_HORIZONTAL_AFT_STARBOARD] = { glm::vec3(1.1f, -1.1f, 0.3f), quaternion({ 0, 0, 0, 1 }), 0 };
+	m_thrusterPositions[THRUSTER_HORIZONTAL_FORE_PORT] = { glm::vec3(-2.57f, -1.07f, 0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, -45), 0 };
+	m_thrusterPositions[THRUSTER_HORIZONTAL_FORE_STARBOARD] = { glm::vec3(-2.57f, -1.07f, -0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, -135), 0 };
+	m_thrusterPositions[THRUSTER_HORIZONTAL_AFT_PORT] = { glm::vec3(2.77f, -1.07f, -0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, 135), 0 };
+	m_thrusterPositions[THRUSTER_HORIZONTAL_AFT_STARBOARD] = { glm::vec3(2.77f, -1.07f, 0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, 45), 0 };
 
-	m_thrusterPositions[THRUSTER_VERTICAL_FORE_PORT] = { glm::vec3(-1.1f, 0.6f, -1.1f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, -135), 0 };
-	m_thrusterPositions[THRUSTER_VERTICAL_FORE_STARBOARD] = { glm::vec3(1.1f, 0.6f, -1.1f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, 135), 0 };
-	m_thrusterPositions[THRUSTER_VERTICAL_AFT_PORT] = { glm::vec3(-1.1f, 0.6f, 1.1f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, -45), 0 };
-	m_thrusterPositions[THRUSTER_VERTICAL_AFT_STARBOARD] = { glm::vec3(1.1f, 0.6f, 1.1f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, 45), 0 };
+	m_thrusterPositions[THRUSTER_VERTICAL_FORE_PORT] = { glm::vec3(-1.1f, 1.3f, 2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
+	m_thrusterPositions[THRUSTER_VERTICAL_FORE_STARBOARD] = { glm::vec3(-1.1f, 1.3f, -2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
+	m_thrusterPositions[THRUSTER_VERTICAL_AFT_PORT] = { glm::vec3(1.05f, 1.3f, -2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
+	m_thrusterPositions[THRUSTER_VERTICAL_AFT_STARBOARD] = { glm::vec3(1.05f, 1.3f, 2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
 
 	EntityObject* thrusters = (EntityObject*)m_entityThrusters;
 	for(int i = 0; i < 8; ++i)

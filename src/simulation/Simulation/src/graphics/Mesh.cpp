@@ -164,8 +164,6 @@ void Mesh::load(const std::string& path, glm::vec3 vertexScale)
 
 void Mesh::loadDirect(glm::vec3* vertices, size_t numVertices, glm::vec2* texCoords, size_t numTexCoords, glm::vec3* normals, size_t numNormals, unsigned int* indices, size_t numIndices)
 {
-	//TODO: Cache phsyics data
-
 	m_numVertices = numVertices;
 	m_numIndices = numIndices;
 	m_numTexCoords = numTexCoords;
