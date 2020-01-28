@@ -1,5 +1,7 @@
 #include "Config.h"
 
+#include "json/json11.hpp"
+
 void Config::loadConfig(const std::string& path)
 {
 	long int size = 0;
@@ -18,59 +20,51 @@ void Config::loadConfig(const std::string& path)
 
 void Config::loadConfigFromMemory(const char* data, long int dataLength)
 {
-	long int startIndex = 0;
-	long int endIndex = 0;
+	using namespace json11;
 
-	for (; endIndex < dataLength;)
+	std::string err;
+	Json root = Json::parse(std::string(data, dataLength), err);
+
+	if (!err.empty())
 	{
-		while ((data[endIndex] != '\r' && data[endIndex] != '\n') && endIndex < dataLength) endIndex++;
+		std::cerr << "Error loading config file: " << err << std::endl;
+	}
 
-		//Process line
-		const char* line = &data[startIndex];
+	const Json* obj = nullptr;
+	if (!(obj = &root["mass"])->is_null() && obj->is_number())
+	{
+		m_rovMass = obj->number_value();
+	}
 
-		if (!strncmp(line, "MASS", 4))
+	if (!(obj = &root["pos"])->is_null() && obj->is_array())
+	{
+		const Json::array& coords = obj->array_items();
+		
+		m_rovPosition = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+	}
+
+	if (!(obj = &root["rot"])->is_null() && obj->is_array())
+	{
+		const Json::array& coords = obj->array_items();
+
+		m_rovRotation = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+	}
+
+	if (!(obj = &root["thrusters"])->is_null() && obj->is_object())
+	{
+		for (const std::pair<std::string, Json>& thruster : obj->object_items())
 		{
-			double mass;
-
-			sscanf_s(line, "MASS %lf", &mass);
-
-			m_rovMass = mass;
-		}
-		else if (!strncmp(line, "POS", 3))
-		{
-			glm::vec3 position;
-
-			sscanf_s(line, "POS %f %f %f", &position.x, &position.y, &position.z);
-
-			m_rovPosition = position;
-		}
-		else if (!strncmp(line, "ROT", 3))
-		{
-			glm::vec3 rotation;
-
-			sscanf_s(line, "ROT %f %f %f", &rotation.x, &rotation.y, &rotation.z);
-
-			m_rovRotation = rotation;
-		}
-		else if (!strncmp(line, "T_", 2))
-		{
-			const char* indices = line + 2;
 			int index = 0;
+			index += (thruster.first[0] == 'v') ? 4 : 0;
+			index += (thruster.first[1] == 'a') ? 2 : 0;
+			index += (thruster.first[2] == 's') ? 1 : 0;
 
-			index += (indices[0] == 'V') ? 4 : 0;
-			index += (indices[1] == 'A') ? 2 : 0;
-			index += (indices[2] == 'S') ? 1 : 0;
-			
-			float power = 0.0f;
-			sscanf_s(line + 6, "%f", &power);
-
-			m_thrusterPower[index] = power;
+			m_thrusterPower[index] = thruster.second.is_number() ? (float)thruster.second.number_value() : 0.0f;
 		}
-		else if (!strncmp(line, "SCENE", 5))
-		{
-			m_useGridScene = !strncmp(line + 6, "GRID", 4);
-		}
+	}
 
-		startIndex = ++endIndex;
+	if (!(obj = &root["scene"])->is_null() && obj->is_string())
+	{
+		m_useGridScene = obj->string_value() == "grid";
 	}
 }

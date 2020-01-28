@@ -15,7 +15,8 @@ inline std::string toCacheName(std::string path)
 	return saveName;
 }
 
-EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsData, double mass, const glm::vec3& scale)
+EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsData, double mass, const glm::vec3& scale) :
+	m_materialData(materialData)
 {
 	LaunchCache* cache = Scene::singleton()->getCache();
 
@@ -48,6 +49,11 @@ EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsDat
 
 EntityObject::~EntityObject()
 {
+	LaunchCache* cache = Scene::singleton()->getCache();
+	std::string saveName = toCacheName(m_materialData.model);
+
+	cache->saveMeshData(saveName, m_mesh);
+
 	m_mesh.destroy();
 	m_shader.destroy();
 	m_texture.destroy();

@@ -1,7 +1,12 @@
-MAS 10.0
-POS 1.0 1.5 -5.0
-SCENE GRID
-T_HAS 0.1
-T_VAS 0.1
-T_VFP 0.1
-T_HFP -0.1
+{
+	"scene": "grid",
+	"mass": 50.0,
+	"pos": [ 1.0, 1.5, -5.0 ],
+	"rot": [ 0.0, 0.0, 0.0 ],
+	"thrusters": {
+		"has": 0.01,
+		"vas": 0.01,
+		"vfp": 0.01,
+		"hfp": -0.01
+	}
+}

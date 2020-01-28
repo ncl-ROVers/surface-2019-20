@@ -15,6 +15,8 @@ protected:
 	Mesh m_mesh;
 	Shader m_shader;
 	Texture m_texture;
+
+	MaterialData m_materialData;
 public:
 	EntityObject(const MaterialData& materialData, bool calcPhysicsData = false, double mass = 1.0, const glm::vec3& scale = glm::vec3(1.0f));
 	virtual ~EntityObject();
