@@ -24,6 +24,7 @@ public:
 
 	inline glm::vec3 getLinearForce() const { return m_rigidBody.totalForce; }
 
+	inline void setRigidBodyData(const RigidBodyData& data) { m_rigidBody = data; }
 	inline RigidBodyData& getRigidBodyData() { return m_rigidBody; }
 	inline const RigidBodyData& getRigidBodyData() const { return m_rigidBody; }
 };

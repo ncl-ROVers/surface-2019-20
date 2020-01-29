@@ -68,6 +68,8 @@ void Scene::update(double delta)
 	{
 		entity->update(delta);
 	}
+
+	m_physicsEngine.processEntities(delta);
 }
 
 void Scene::render()

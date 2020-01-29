@@ -1,13 +1,11 @@
 #include "RigidBody.h"
 
-RigidBodyData calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
+void RigidBodyData::calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
 {
-	RigidBodyData data;
-
 	float vertexMass = (float)(mass / (double)numIndices);
 
-	data.mass = mass;
-	data.bodyI = glm::zero<glm::mat3>();
+	this->mass = mass;
+	this->bodyI = glm::zero<glm::mat3>();
 
 	for (size_t i = 0; i < numIndices; ++i)
 	{
@@ -15,22 +13,81 @@ RigidBodyData calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVert
 
 		glm::mat3 asMatrix(vertex, glm::vec3(0.0f), glm::vec3(0.0f));
 
-		data.bodyI += vertexMass * (glm::dot(vertex, vertex) * glm::identity<glm::mat3>() - asMatrix * glm::transpose(asMatrix));
+		this->bodyI += vertexMass * (glm::dot(vertex, vertex) * glm::identity<glm::mat3>() - asMatrix * glm::transpose(asMatrix));
 	}
 
-	data.invBodyI = glm::inverse(data.bodyI);
+	this->invBodyI = glm::inverse(this->bodyI);
 
-	data.centerOfMassOffset = glm::zero<glm::vec3>();
+	this->centerOfMassOffset = glm::zero<glm::vec3>();
 
-	data.linearMomentum = glm::zero<glm::vec3>();
-	data.angularMomentum = glm::zero<glm::vec3>();
+	this->linearMomentum = glm::zero<glm::vec3>();
+	this->angularMomentum = glm::zero<glm::vec3>();
 
-	data.invMomentOfInteria = glm::identity<glm::mat3>();
-	data.linearVelocity = glm::zero<glm::vec3>();
-	data.angularVelocity = glm::zero<glm::vec3>();
+	this->invMomentOfInteria = glm::identity<glm::mat3>();
+	this->linearVelocity = glm::zero<glm::vec3>();
+	this->angularVelocity = glm::zero<glm::vec3>();
 
-	data.totalForce = glm::zero<glm::vec3>();
-	data.totalTorque = glm::zero<glm::vec3>();
+	this->totalForce = glm::zero<glm::vec3>();
+	this->totalTorque = glm::zero<glm::vec3>();
+}
 
-	return data;
+RigidBodyDerivative RigidBodyData::derivative(const Transform& transform) const
+{
+	RigidBodyDerivative deriv;
+
+	deriv.dPosition = this->linearVelocity;
+	deriv.dRotation = (quaternion(glm::vec4(this->angularVelocity, 0.0f)) * transform.rotation()) * 0.5f;
+	deriv.dLinearMomentum = this->totalForce;
+	deriv.dAngularMomentum = this->totalTorque;
+
+	return deriv;
+}
+
+void RigidBodyData::step(Transform& transform, const RigidBodyDerivative& derivative)
+{
+	transform.translateTransform(derivative.dPosition);
+	transform.rotation((transform.rotation() + derivative.dRotation).normalize());
+
+	this->linearMomentum += derivative.dLinearMomentum;
+	this->angularMomentum += derivative.dAngularMomentum;
+
+	this->linearVelocity = this->linearMomentum / (float)this->mass;
+
+	glm::mat3 r = transform.rotation().matrix();
+
+	this->invMomentOfInteria = r * this->invBodyI * glm::transpose(r);
+	this->angularVelocity = this->invMomentOfInteria * this->angularMomentum;
+}
+
+RigidBodyDerivative RigidBodyDerivative::operator+(const RigidBodyDerivative& other) const
+{
+	RigidBodyDerivative deriv;
+	deriv.dPosition = dPosition + other.dPosition;
+	deriv.dRotation = dRotation + other.dRotation;
+	deriv.dLinearMomentum = dLinearMomentum + other.dLinearMomentum;
+	deriv.dAngularMomentum = dAngularMomentum + other.dAngularMomentum;
+
+	return deriv;
+}
+
+RigidBodyDerivative RigidBodyDerivative::operator-() const
+{
+	RigidBodyDerivative deriv;
+	deriv.dPosition = -dPosition;
+	deriv.dRotation = dRotation * -1.0f;
+	deriv.dLinearMomentum = -dLinearMomentum;
+	deriv.dAngularMomentum = -dAngularMomentum;
+
+	return deriv;
+}
+
+RigidBodyDerivative RigidBodyDerivative::operator*(double delta) const
+{
+	RigidBodyDerivative deriv;
+	deriv.dPosition = dPosition * (float)delta;
+	deriv.dRotation = dRotation * (float)delta;
+	deriv.dLinearMomentum = dLinearMomentum * (float)delta;
+	deriv.dAngularMomentum = dAngularMomentum * (float)delta;
+
+	return deriv;
 }

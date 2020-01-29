@@ -6,6 +6,7 @@
 
 #include "physics/entities/Entity.h"
 #include "physics/entities/EntityROV.h"
+#include "physics/PhysicsEngine.h"
 
 #include "Config.h"
 #include "LaunchCache.h"
@@ -16,6 +17,7 @@ private:
 	World m_world;
 	Config m_config;
 	LaunchCache m_cache;
+	PhysicsEngine m_physicsEngine;
 
 	std::vector<Entity*> m_entities;
 private:
@@ -30,6 +32,9 @@ public:
 
 	inline LaunchCache* getCache() { return &m_cache; }
 	inline const LaunchCache* getCache() const { return &m_cache; }
+
+	inline PhysicsEngine* getPhysicsEngine() { return &m_physicsEngine; }
+	inline const PhysicsEngine* getPhysicsEngine() const { return &m_physicsEngine; }
 
 	static Scene* singleton();
 };

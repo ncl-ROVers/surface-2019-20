@@ -1,6 +1,6 @@
 #include "EntityRigidBody.h"
 
-#include "physics/MotionIntegrators.h"
+#include "Scene.h"
 
 EntityRigidBody::EntityRigidBody(const MaterialData& materialData, double mass, const glm::vec3& scale) :
 	EntityObject(materialData, true, mass, scale)
@@ -10,28 +10,7 @@ EntityRigidBody::EntityRigidBody(const MaterialData& materialData, double mass, 
 
 void EntityRigidBody::update(double delta)
 {
-	//TODO: Improved integration (Runge-Kutta ODE solver)
-	m_transform.translateTransform(m_rigidBody.linearVelocity * (float)delta);
-
-	const glm::vec3& omega = m_rigidBody.angularVelocity;
-
-	quaternion rdot = (quaternion(glm::vec4(omega, 0.0f)) * m_transform.rotation()) * 0.5f;
-	rdot *= (float)delta;
-
-	m_transform.rotation((m_transform.rotation() + rdot).normalize());
-
-	m_rigidBody.linearMomentum += m_rigidBody.totalForce * (float)delta;//dPdt
-	m_rigidBody.angularMomentum += m_rigidBody.totalTorque * (float)delta;//dLdt
-
-	m_rigidBody.linearVelocity = m_rigidBody.linearMomentum / (float)m_rigidBody.mass;
-
-	glm::mat3 r = m_transform.rotation().matrix();
-
-	m_rigidBody.invMomentOfInteria = r * m_rigidBody.invBodyI * glm::transpose(r);
-	m_rigidBody.angularVelocity = m_rigidBody.invMomentOfInteria * m_rigidBody.angularMomentum;
-
-	m_rigidBody.totalForce = glm::vec3(0.0f);
-	m_rigidBody.totalTorque = glm::vec3(0.0f);
+	Scene::singleton()->getPhysicsEngine()->stepEntity(this);
 }
 
 void EntityRigidBody::addForceLocal(const glm::vec3& pos, const glm::vec3& force)

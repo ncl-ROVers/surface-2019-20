@@ -191,7 +191,7 @@ void Mesh::calcPhysicsData(double mass)
 	glm::vec3* vertices = (glm::vec3*)mapMeshData(0, m_numVertices * sizeof(glm::vec3), GL_MAP_READ_BIT, MeshDataType::DATA_VERTICES);
 	unsigned int* indices = (unsigned int*)mapMeshData(0, m_numIndices * sizeof(unsigned int), GL_MAP_READ_BIT, MeshDataType::DATA_INDICES);
 
-	m_data = calcRigidBodyInfo(mass, vertices, m_numVertices, indices, m_numIndices);
+	m_data.calcRigidBodyInfo(mass, vertices, m_numVertices, indices, m_numIndices);
 	m_data.centerOfMassOffset = m_centerOfMassOffset;
 
 	unmapMeshData(MeshDataType::DATA_VERTICES);
