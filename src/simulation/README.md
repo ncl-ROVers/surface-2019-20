@@ -37,3 +37,23 @@ A thruster index is made out of three characters:
 1. `s` or `v`: `h` for horizontal (down). `v` for vertical (up).
 2. `a` or`f`: `a` for aft (backward). `f` for fore (forward).
 3. `h` or `p`: `s` for starboard (right). `p` for port (left).
+
+`scene`: Specify the scene to be loaded. (Format: string)
+1. `grid`: A simple scene with just a horizontal grid.
+2. `pool`: A scene inside a pool.
+
+`camera`: Specify camera settings. (Format: string/object)
+* String: Select from a list of presets.
+	1. `firstperson`: First person camera controlled by WASD and the mouse.
+	2. `headless`: No output from main camera. Only enable communication with surface. (Not currently supported!)
+* Object: Explicitly specify camera properties.
+	1. `pos`: Specify the initial camera position. (Format: `[ <x>, <y>, <z> ]`)
+	2. `pitch`: Specify the initial pitch of the camera. (Format: `<pitch>`)
+	3. `yaw`: Specify the initial yaw of the camera. (Format: `<yaw>`)
+	4. `fov`: Specify the Field Of View of the camera in degrees. (Format: `<fov>`)
+	5. `allowMovement`: Enable or disable camera movement. (Format: `true` / `false`)
+	6. `allowLooking`: Enable or disable camera rotation. (Format: `true` / `false`)
+
+`cache`: Specify cache settings. (Format: string/boolean)
+* String: Specify the cache directory. (Format: `<cache_dir>`)
+* Boolean: Enable or disable the cache. (Format: `true` / `false`)

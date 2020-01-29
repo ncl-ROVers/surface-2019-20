@@ -8,8 +8,8 @@
 #include "physics/entities/EntityROV.h"
 #include "physics/PhysicsEngine.h"
 
-#include "Config.h"
-#include "LaunchCache.h"
+#include "io/Config.h"
+#include "io/LaunchCache.h"
 
 class Scene
 {
@@ -21,7 +21,7 @@ private:
 
 	std::vector<Entity*> m_entities;
 private:
-	Scene() : m_cache("../_cache") {}
+	Scene() {}
 public:
 	void init(int width, int height);
 	void update(double delta);

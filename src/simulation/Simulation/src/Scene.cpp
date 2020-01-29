@@ -1,7 +1,6 @@
 #include "Scene.h"
 
 #include "Common.h"
-#include "physics/MotionIntegrators.h"
 #include "physics/Transform.h"
 
 #include "physics/entities/EntityGrid.h"
@@ -15,15 +14,20 @@ void Scene::init(int width, int height)
 {
 	resize(width, height);
 
+	//Load configuration
+	m_config.loadConfig("../rov_setup.txt");
+
 	//Setup world
-	m_world.camera.setPosition({ 0.0f, 1.0f, 3.0f });
-	m_world.camera.setPitch(-20.0f);
+	m_world.camera.fromSettings(m_config.getCameraSettings());
 
 	m_world.sunDirection = glm::normalize(glm::vec3(1, -3, -2));
 	m_world.ambientLight = glm::vec3(0.4f);
 
-	//Load configuration
-	m_config.loadConfig("../rov_setup.txt");
+	m_cache.setEnabled(m_config.isCacheEnabled());
+	if (m_config.getCacheDir() != "")
+	{
+		m_cache.setCacheDir(m_config.getCacheDir());
+	}
 
 	EntityROV* rov = new EntityROV(m_config.getRovMass());
 	rov->getTransform().position(m_config.getRovPosition());
@@ -38,11 +42,11 @@ void Scene::init(int width, int height)
 
 	m_entities.push_back(rov);
 
-	if (m_config.useGridScene())
+	if (m_config.getSceneType() == SCENE_TYPE_GRID)
 	{
 		m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(10)));
 	}
-	else
+	else if (m_config.getSceneType() == SCENE_TYPE_POOL)
 	{
 		EntityWater* water = new EntityWater(38, 38, 70, 70);
 		water->getTransform().position({ 0, 4, 0 });
