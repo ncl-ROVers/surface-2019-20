@@ -21,6 +21,8 @@
 #include <cstdint>
 #include <filesystem>
 
+#include "io/Logger.h"
+
 typedef uint8_t byte;
 
 template<int D, typename T, glm::qualifier Q>

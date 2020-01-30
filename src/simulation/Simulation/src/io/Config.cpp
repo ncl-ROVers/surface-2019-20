@@ -20,14 +20,14 @@ bool isValidArray(const json11::Json* obj, const std::string& name, size_t requi
 {
 	if (!obj->is_array())
 	{
-		std::cerr << "JSON object '" << name << "' is not an array!" << std::endl;
+		LOG_WARN("JSON object '", name, "' is not an array!");
 	}
 
 	const json11::Json::array& asArray = obj->array_items();
 
 	if (asArray.size() != requiredSize)
 	{
-		std::cerr << "JSON array '" << name << "' (size=" << asArray.size() << ") is not the correct size(" << requiredSize << ").";
+		LOG_WARN("JSON array '", name, "' (size=", asArray.size(), ") is not the correct size(", requiredSize, ").");
 		return false;
 	}
 
@@ -41,7 +41,7 @@ void Config::loadConfig(const std::string& path)
 
 	if (!src)
 	{
-		std::cerr << "Unable to open config file.\n";
+		LOG_ERROR("Unable to open config file.");
 		return;
 	}
 
@@ -59,7 +59,8 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 
 	if (!err.empty())
 	{
-		std::cerr << "Error loading config file: " << err << std::endl;
+		LOG_ERROR("Error parsing config file: ", err);
+		return;
 	}
 
 	const Json* obj = nullptr;
@@ -107,8 +108,8 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 		}
 		else
 		{
-			std::cerr << "Scene type '" << obj->string_value() << "' not recognized!" << std::endl;
-			std::cerr << "Setting scene type to default." << std::endl;
+			LOG_WARN("Scene type '", obj->string_value(), "' not recognized!");
+			LOG_WARN("Setting scene type to default.");
 		}
 	}
 
@@ -122,8 +123,8 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 			}
 			else if (obj->string_value() == "headless")
 			{
-				std::cerr << "Headless simulation support is not currently supported!" << std::endl;
-				std::cerr << "Switching to first peson camera." << std::endl;
+				LOG_WARN("Headless simulation support is not currently supported!");
+				LOG_WARN("Switching to first peson camera.");
 				m_cameraSettings = firstPersonCamera();
 			}
 		}

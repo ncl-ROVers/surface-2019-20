@@ -14,12 +14,12 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 	std::string path = fs::path(m_cacheDir).append(saveName).generic_string();
 	if (!fs::exists(m_cacheDir))
 	{
-		std::cout << "Create cache directory" << std::endl;
+		LOG_VERBOSE("Create cache directory");
 
 		if (!fs::create_directory(m_cacheDir))
 		{
-			std::cerr << "Unable to create cache directory at: " << m_cacheDir << std::endl;
-			std::cin.get();
+			LOG_ERROR("Unable to create cache directory at: ", m_cacheDir);
+			LOG_PAUSE();
 
 			exit(4);
 		}
@@ -99,8 +99,8 @@ bool LaunchCache::isMeshCached(const std::string& saveName)
 
 int throwError()
 {
-	std::cout << "Error parsing cache file! File too short." << std::endl;
-	std::cin.get();
+	LOG_ERROR("Error parsing cache file! File too short.");
+	LOG_PAUSE();
 
 	exit(5);
 

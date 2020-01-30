@@ -24,13 +24,13 @@ EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsDat
 	
 	if (!cache->isMeshCached(saveName))
 	{
-		std::cout << "Loading model: " << materialData.model << std::endl;
+		LOG_VERBOSE("Loading model: ", materialData.model);
 		m_mesh.load(materialData.model, scale);
 		cache->saveMeshData(saveName, m_mesh);
 	}
 	else
 	{
-		std::cout << "Loading model from cache: " << materialData.model << std::endl;
+		LOG_VERBOSE("Loading model from cache: ", materialData.model);
 		cache->loadMeshData(saveName, m_mesh);
 	}
 

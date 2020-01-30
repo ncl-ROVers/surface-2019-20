@@ -25,11 +25,13 @@ void Shader::addShader(GLenum shaderType,  const char* source, int sourceLength)
 		char* logMessage = new char[logLength];
 		glGetShaderInfoLog(shader, logLength, nullptr, logMessage);
 
-		std::cout << "=====Shader Error=====" << std::endl << logMessage << "======================" << std::endl;
+		LOG_ERROR("=====Shader Error=====");
+		LOG_ERROR(logMessage);
+		LOG_ERROR("======================");
 
 		delete[] logMessage;
 
-		std::cin.get();
+		LOG_PAUSE();
 
 		exit(3);
 	}
@@ -65,11 +67,13 @@ void Shader::compile()
 		char* logMessage = new char[logLength];
 		glGetProgramInfoLog(m_program, logLength, nullptr, logMessage);
 
-		std::cout << "=====Program Error=====" << std::endl << logMessage << "======================" << std::endl;
+		LOG_ERROR("=====Program Errorr=====");
+		LOG_ERROR(logMessage);
+		LOG_ERROR("========================");
 
 		delete[] logMessage;
 
-		std::cin.get();
+		LOG_PAUSE();
 
 		exit(3);
 	}

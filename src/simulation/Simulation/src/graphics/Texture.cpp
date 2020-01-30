@@ -9,7 +9,7 @@ void Texture::create(const std::string& path)
 
 	if (!data)
 	{
-		std::cerr << "Couldn't find texture specified: " << path << std::endl;
+		LOG_ERROR("Couldn't find texture specified: ", path);
 	}
 
 	create(width, height, data);

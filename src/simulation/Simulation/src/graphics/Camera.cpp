@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include "Input.h"
+#include "io/Input.h"
 
 Camera::Camera() :
 	m_position(0.0f), m_pitch(0.0f), m_yaw(0.0f), m_isActive(false)

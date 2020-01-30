@@ -9,7 +9,7 @@
 
 void APIENTRY debugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
-	std::cerr << message << std::endl;
+	LOG_ERROR(message);
 }
 
 int main()
@@ -20,7 +20,9 @@ int main()
 	//Intialize GLFW and create the window
 	if (!glfwInit())
 	{
-		std::cerr << "Failed to intialize GLFW!" << std::endl;
+		LOG_ERROR("Failed to intialize GLFW!");
+		LOG_PAUSE();
+
 		exit(1);
 	}
 
@@ -34,7 +36,9 @@ int main()
 	GLFWwindow* window = glfwCreateWindow(width, height, "ROV Simulation", nullptr, nullptr);
 	if (!window)
 	{
-		std::cerr << "Couldn't create GLFW window!" << std::endl;
+		LOG_ERROR("Couldn't create GLFW window!");
+		LOG_PAUSE();
+
 		exit(1);
 	}
 
@@ -43,7 +47,9 @@ int main()
 	int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	if (!status)
 	{
-		std::cerr << "Faild to load GLAD!" << std::endl;
+		LOG_ERROR("Faild to load GLAD!");
+		LOG_PAUSE();
+
 		exit(2);
 	}
 
