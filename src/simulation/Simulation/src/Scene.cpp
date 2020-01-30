@@ -15,7 +15,7 @@ void Scene::init(int width, int height)
 	resize(width, height);
 
 	//Load configuration
-	m_config.loadConfig("../rov_setup.txt");
+	m_config.loadConfig("../rov_setup.json");
 
 	//Setup world
 	m_world.camera.fromSettings(m_config.getCameraSettings());

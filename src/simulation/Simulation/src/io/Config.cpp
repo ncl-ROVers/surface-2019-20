@@ -16,11 +16,39 @@ CameraSettings firstPersonCamera()
 	return cameraSetting;
 }
 
-bool isValidArray(const json11::Json* obj, const std::string& name, size_t requiredSize)
+const char* typeName(json11::Json::Type type)
 {
-	if (!obj->is_array())
+	using namespace json11;
+
+	switch (type)
 	{
-		LOG_WARN("JSON object '", name, "' is not an array!");
+	case Json::NUL: return "NULL";
+	case Json::NUMBER: return "NUMBER";
+	case Json::BOOL: return "BOOL";
+	case Json::STRING: return "STRING";
+	case Json::ARRAY: return "ARRAY";
+	case Json::OBJECT: return "OBJECT";
+	}
+
+	return "Unknown";
+}
+
+bool isFieldOfType(const json11::Json* obj, const char* name, json11::Json::Type type)
+{
+	if (obj->type() != type)
+	{
+		LOG_WARN("JSON field '", name, "' should be of type '", typeName(type), "' not '", typeName(obj->type()), "'! Ignoring field.");
+		return false;
+	}
+
+	return true;
+}
+
+bool isValidArray(const json11::Json* obj, const char* name, size_t requiredSize)
+{
+	if (!isFieldOfType(obj, name, json11::Json::ARRAY))
+	{
+		return false;
 	}
 
 	const json11::Json::array& asArray = obj->array_items();
@@ -64,26 +92,26 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 	}
 
 	const Json* obj = nullptr;
-	if ((obj = &root["mass"])->is_number())
+	if (isFieldOfType(obj = &root["mass"], "mass", Json::NUMBER))
 	{
 		m_rovMass = obj->number_value();
 	}
 
-	if ((obj = &root["pos"])->is_array() && isValidArray(obj, "pos", 3))
+	if (isValidArray(obj = &root["pos"], "pos", 3))
 	{
 		const Json::array& coords = obj->array_items();
 		
 		m_rovPosition = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
 	}
 
-	if ((obj = &root["rot"])->is_array() && isValidArray(obj, "rot", 3))
+	if (isValidArray(obj = &root["rot"], "rot", 3))
 	{
 		const Json::array& coords = obj->array_items();
 
 		m_rovRotation = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
 	}
 
-	if ((obj = &root["thrusters"])->is_object())
+	if (isFieldOfType(obj = &root["thrusters"], "thrusters", Json::OBJECT))
 	{
 		for (const std::pair<std::string, Json>& thruster : obj->object_items())
 		{
@@ -96,7 +124,7 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 		}
 	}
 
-	if ((obj = &root["scene"])->is_string())
+	if (isFieldOfType(obj = &root["scene"], "scene", Json::STRING))
 	{
 		if (obj->string_value() == "grid")
 		{
@@ -136,31 +164,35 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 			{
 				if (prop.first == "pos" && isValidArray(&prop.second, "pos", 3))
 				{
-					const Json::array& coords = obj->array_items();
+					const Json::array& coords = prop.second.array_items();
 
 					m_cameraSettings.position = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
 				}
-				else if (prop.first == "pitch" && prop.second.is_number())
+				else if (prop.first == "pitch" && isFieldOfType(&prop.second, "pitch", Json::NUMBER))
 				{
 					m_cameraSettings.pitch = (float)prop.second.number_value();
 				}
-				else if (prop.first == "yaw" && prop.second.is_number())
+				else if (prop.first == "yaw" && isFieldOfType(&prop.second, "yaw", Json::NUMBER))
 				{
 					m_cameraSettings.yaw = (float)prop.second.number_value();
 				}
-				else if (prop.first == "fov" && prop.second.is_number())
+				else if (prop.first == "fov" && isFieldOfType(&prop.second, "fov", Json::NUMBER))
 				{
 					m_cameraSettings.fov = (float)prop.second.number_value();
 				}
-				else if (prop.first == "allowMovement" && prop.second.is_bool())
+				else if (prop.first == "allowMovement" && isFieldOfType(&prop.second, "allowMovement", Json::BOOL))
 				{
 					m_cameraSettings.allowMovement = prop.second.bool_value();
 				}
-				else if (prop.first == "allowLooking" && prop.second.is_bool())
+				else if (prop.first == "allowLooking" && isFieldOfType(&prop.second, "allowLooking", Json::BOOL))
 				{
 					m_cameraSettings.allowLooking = prop.second.bool_value();
 				}
 			}
+		}
+		else
+		{
+			LOG_WARN("JSON field 'camera' should be either a string or an object, not '", typeName(obj->type()), "'.");
 		}
 	}
 	else
@@ -178,6 +210,10 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 		{
 			m_cacheEnabled = true;
 			m_cacheDir = obj->string_value();
+		}
+		else
+		{
+			LOG_WARN("JSON field 'cache' should be either a string or a boolean, not '", typeName(obj->type()), "'.");
 		}
 	}
 }
