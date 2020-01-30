@@ -2,7 +2,7 @@
 Restricted File Handler
 =======================
 
-Helper module storing the class to load in the `config.json` file.
+Helper module storing the class to load in the config files.
 """
 import logging as _logging
 

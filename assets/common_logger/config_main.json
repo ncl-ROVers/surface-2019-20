@@ -10,14 +10,15 @@
             "datefmt":"%y-%m-%d %H:%M:%S"
         },
         "verbose":{
-            "format":"%(asctime)s %(levelname)s %(message)s",
-            "datefmt":"%y-%m-%d %H:%M:%S"
+            "format":"{asctime} \t {levelname} \t| {processName} \t {process} \t | {filename:30} \t {function:15} {lineno} \t | {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
         }
     },
     "handlers":{
         "console":{
             "class":"logging.StreamHandler",
-            "level":"DEBUG",
+            "level":"INFO",
             "formatter":"console",
             "stream":"ext://sys.stdout"
         },
@@ -50,7 +51,7 @@
             "filename":"error.log"
         },
         "verbose":{
-            "class":"logging.FileHandler",
+            "class":"assets.common_logger.verbose_file_handler._VerboseFileHandler",
             "level":"DEBUG",
             "formatter":"verbose",
             "encoding":"utf8",

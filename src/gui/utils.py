@@ -2,16 +2,215 @@
 GUI Utils
 =========
 
-Standard utils module storing all values, classes and other objects which may change throughout the execution of the
-program, or are modifying their contents. Includes common to the package functions.
+Standard utils module storing common to the package classes, functions, constants, and other objects.
 """
 
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
-from .statics import *
+from PySide2.QtCore import *
+from .. import comms, control
 from ..common import Log
+import pyautogui
 import typing
 import abc
+import enum
+
+SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+SLIDING_MENU_WIDTH = SCREEN_WIDTH // 8
+MENU_BAR_HEIGHT = SCREEN_HEIGHT // 12
+
+
+def get_manager() -> typing.Union[QMainWindow, None]:
+    """
+    Getter to find the screen manager and return it.
+    :return: :class:`ScreenManager` or None if couldn't be found
+    """
+    Log.debug("Retrieving screen manager")
+    for widget in QApplication.instance().topLevelWidgets():
+        if "ScreenManager" in repr(widget):
+            return widget
+    return None
+
+
+class _References:
+    """
+    Helper class used to store the references to objects loaded within the loading screen.
+
+    Each reference can be either None or of the type hinted.
+    """
+    controller: control.Controller = None
+    control_manager: control.ControlManager = None
+    connection: comms.Connection = None
+
+
+class Colour(enum.Enum):
+    """
+    Colour enumeration storing different colour values for the GUI style.
+
+    Each colour is in the RGBA format.
+    """
+
+    MAJOR = 34, 51, 54, 255
+
+
+class _SlidingMenu(QFrame):
+    """
+    Sliding menu widget used to navigate between screens.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create the widget and add all buttons
+        * toggled - getter determining if the menu is currently shown
+        * show - show the menu (slide in)
+        * hide - hide the menu (slide out)
+        * toggle - show/hide the menu (depending on current state)
+
+    Usage
+    -----
+
+    You can access the menu through the manager, and display or hide it::
+
+        get_manager().menu.toggle()
+
+    You can also explicitly show or hide it with the corresponding function, although such usage is not recommended.
+    """
+
+    class _MenuButton(QPushButton):
+        """
+        Button class representing a button within the sliding menu.
+
+        Styles it properly and adds custom functionality.
+        """
+
+        def __init__(self, name: str):
+            """
+            Standard constructor.
+
+            Connects the click event to switching screens.
+
+            :param name: Name of the screen (displayed as the button)
+            """
+            super(_SlidingMenu._MenuButton, self).__init__(name)
+            self._name = name
+            self.clicked.connect(self._on_click)
+
+        def _on_click(self):
+            """
+            Function executed when a sliding menu button is pressed.
+            """
+            Log.debug("Pressed sliding menu button - {}".format(self._name))
+            get_manager().screen = getattr(Screen, self._name)
+
+    def __init__(self, screen_names: set):
+        """
+        Standard constructor.
+
+        Creates the buttons to display within the menu and setups the menu to display correctly.
+
+        :param screen_names: Screen names to display in the sliding menu
+        """
+        super(_SlidingMenu, self).__init__()
+
+        # Set animation properties
+        self._toggle = QPropertyAnimation(self, QByteArray(b"maximumWidth"))
+        self._toggle.setDuration(100)
+
+        # Remember if the menu has been shown
+        self._toggled = False
+
+        # Set frame properties
+        self.setFrameStyle(QFrame.WinPanel | QFrame.Raised)
+        self.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
+        self.setVisible(False)
+
+        # Create the buttons dynamically for each screen, and add them to the layout
+        self._layout = QVBoxLayout()
+        for name in screen_names:
+            if getattr(Screen, name) != Screen.Loading:
+                self._layout.addWidget(self._MenuButton(name))
+
+        # Finally set the layout
+        self.setLayout(self._layout)
+
+    @property
+    def toggled(self) -> bool:
+        """
+        Getter to retrieve boolean determining if the menu is currently displayed.
+        """
+        return self._toggled
+
+    def show(self):
+        """
+        Function used to show the menu.
+        """
+        Log.debug("Showing sliding menu")
+        self.setVisible(True)
+        self._toggle.setStartValue(0)
+        self._toggle.setEndValue(SLIDING_MENU_WIDTH)
+        self._toggle.start()
+        self._toggled = True
+
+    def hide(self):
+        """
+        Function used to hide the menu.
+        """
+        Log.debug("Hiding sliding menu")
+        self._toggle.setStartValue(SLIDING_MENU_WIDTH)
+        self._toggle.setEndValue(0)
+        self._toggle.start()
+        self._toggled = False
+
+    def toggle(self):
+        """
+        Function used to show/hide the menu based on its current state (opposite action)
+        """
+        if self._toggled:
+            self.hide()
+        else:
+            self.show()
+
+
+class _MenuBar(QHBoxLayout):
+    """
+    Menu bar layout containing various widgets which will be visible in all screens (apart from the loading screen).
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create the widget and add them to the layout
+
+    Elements
+    --------
+
+    The following elements are provided:
+
+        * Menu button - a button used to show/hide the sliding menu
+    """
+
+    def __init__(self):
+        """
+        Standard constructor.
+
+        Creates the widgets to display within the menu bar.
+        """
+        super(_MenuBar, self).__init__()
+
+        # Create the sliding menu button
+        self._menu_button = QPushButton("Show/hide menu")
+        self._menu_button.clicked.connect(lambda _: get_manager().menu.toggle())
+
+        # Create the exit button
+        self._exit_button = QPushButton("Exit application")
+        self._exit_button.clicked.connect(lambda _: get_manager().close())
+
+        # Add all widgets and set the layout
+        self.addWidget(self._menu_button)
+        self.addWidget(self._exit_button)
 
 
 class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):
@@ -32,6 +231,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         * _set_style - a semi-abstract method to set the style of current screen
         * post_init - a semi-abstract method called directly after the screen is created
         * on_switch - a semi-abstract method called whenever the screen manager switches the screen
+        * on_exit - a semi-abstract method called whenever the screen manager switches to a different screen
 
     Usage
     -----
@@ -91,11 +291,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
         :return: :class:`ScreenManager` or None if couldn't be found
         """
-
-        for widget in QApplication.instance().topLevelWidgets():
-            if "ScreenManager" in repr(widget):
-                return widget
-        return None
+        return get_manager()
 
     @abc.abstractmethod
     def _config(self):
@@ -126,11 +322,16 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
     def on_switch(self):
         """
         A semi-abstract method executed on screen switching.
-
-        :return:
         """
         Log.debug("Switched screen to {}".format(self.name))
         self._set_style()
+
+    @abc.abstractmethod
+    def on_exit(self):
+        """
+        A semi-abstract method executed on exiting current screen.
+        """
+        Log.debug("Switched out of {}".format(self.name))
 
 
 class ScreenManager(QMainWindow):
@@ -145,8 +346,11 @@ class ScreenManager(QMainWindow):
     The following list shortly summarises each function:
 
         * __init__ - a constructor to create and configure all QT objects and class-specific fields
+        * references - a getter to retrieve the references loaded in the loading screen
         * screen - a property to switch between the screens
         * screens - a getter to retrieve all screens stored
+        * menu - a getter to retrieve the sliding menu
+        * bar - a getter to retrieve the menu bar
         * post_init - a method which calls `post_init` of each screen
 
     Usage
@@ -172,25 +376,53 @@ class ScreenManager(QMainWindow):
         """
         super(ScreenManager, self).__init__()
 
-        # Declare the screen structure - a box layout with a stacked widget holding the screens
-        self._base = QHBoxLayout()
+        # Declare access to the references - objects loaded by the load function will be stored there
+        self._references = _References()
+
+        # Declare the screen structure - a box layout with a menu bar and a horizontal layout for screen and menu
+        self._base = QVBoxLayout()
+        self._main_layout = QHBoxLayout()
+        self._main_layout_container = QWidget()
+        self._menu_bar = _MenuBar()
+        self._menu_bar_container = QWidget()
         self._screens_stacked = QStackedWidget()
+
+        # Add all screens and create an associated sliding window
         self._screens = dict()
-
-        # Set some basic window properties
-        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-        # Add all screens
         for screen in args:
             self._screens_stacked.addWidget(screen)
             self._screens[screen.name] = screen
-        self._base.addWidget(self._screens_stacked)
+        self._sliding_menu = _SlidingMenu(set(self._screens.keys()))
 
-        # Finally set the layout
+        # Setup the layouts correctly
+        self._main_layout.addWidget(self._sliding_menu)
+        self._main_layout.addWidget(self._screens_stacked)
+        self._main_layout_container.setLayout(self._main_layout)
+        self._menu_bar_container.setLayout(self._menu_bar)
+        self._base.addWidget(self._menu_bar_container)
+        self._base.addWidget(self._main_layout_container)
+
+        # Set some basic properties
+        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+        self._menu_bar_container.setFixedHeight(MENU_BAR_HEIGHT)
+        self._sliding_menu.setVisible(False)
+        self._menu_bar_container.setVisible(False)
+
+        # Finally load the layout
+        self.showFullScreen()
         self._container = QWidget()
         self._container.setLayout(self._base)
         self.setCentralWidget(self._container)
         self.screen = Screen.Loading
+
+    @property
+    def references(self) -> _References:
+        """
+        Getter to retrieve the references to items
+
+        :return: Instance of the references class
+        """
+        return self._references
 
     @property
     def screen(self) -> Screen:
@@ -205,11 +437,21 @@ class ScreenManager(QMainWindow):
     def screen(self, index: int):
         """
         Setter to switch to a screen at a given index.
-
         Additionally sets the window name and calls the screen's `on_switch` method.
-
         :param index: :class:`Screen` enumeration's value
         """
+        # Ignore attempts to switch to current screen (apart from loading screen)
+        if self._screens_stacked.currentIndex() == index and index != 0:
+            Log.debug("Attempted to switch to current screen")
+            return
+
+        # Ignore attempts to switch to the loading screen (except for the initial switch)
+        if self._screens_stacked.currentIndex() != 0 and index == 0:
+            Log.error("Attempted to switch to the loading screen")
+            return
+
+        # Switch the screen by setting the index and calling associated screen functions
+        self._screens_stacked.currentWidget().on_exit()
         self._screens_stacked.setCurrentIndex(index)
         self.setWindowTitle(self._screens_stacked.currentWidget().name)
         self._screens_stacked.currentWidget().on_switch()
@@ -220,6 +462,20 @@ class ScreenManager(QMainWindow):
         Getter to retrieve a mapping of screen name (str) to a :class:`Screen` object.
         """
         return self._screens
+
+    @property
+    def menu(self) -> _SlidingMenu:
+        """
+        Getter to retrieve the sliding menu.
+        """
+        return self._sliding_menu
+
+    @property
+    def bar(self) -> _MenuBar:
+        """
+        Getter to retrieve the menu bar.
+        """
+        return self._menu_bar
 
     def post_init(self):
         """

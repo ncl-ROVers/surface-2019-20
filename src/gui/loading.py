@@ -4,18 +4,56 @@ Loading screen
 
 Module storing an implementation of a loading screen and all values associated with it.
 """
-
+import os
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-from .statics import *
-from .utils import Screen
-from .. import common
-import os
+from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH, get_manager
+from ..common import Log
+from .. import comms, control, common
+
 
 # Declare the progress bar's range
 _MAX_LOADING = 100
 _MIN_LOADING = 0
+
+
+def load_controller():
+    """
+    Initialise the controller instance and save it in the manager.
+    """
+    get_manager().references.controller = control.Controller()
+
+
+def load_control_manager():
+    """
+    Initialise the control manager instance and save it in the manager.
+    """
+    get_manager().references.control_manager = control.ControlManager()
+
+
+def load_connection():
+    """
+    Initialise the connection instance and save it in the manager.
+    """
+    get_manager().references.connection = comms.Connection()
+
+
+def load_attempt_connection():
+    """
+    Connect to the ROV. TODO: Move it to code handling automatic connection and disconnection
+    """
+    # Connect to the ROV
+    get_manager().references.connection.connect()
+
+
+# Declare the list of operations to load (must be callable functions)
+OPERATIONS = (
+    load_controller,
+    load_control_manager,
+    load_connection,
+    load_attempt_connection
+)
 
 
 class Loading(Screen):
@@ -32,6 +70,7 @@ class Loading(Screen):
         * _set_style - a method to set the style of the loading screen - this screen uses custom assets
         * post_init - default implementation of the inherited method
         * on_switch - default implementation of the inherited method
+        * on_exit - default implementation of the inherited method
         * progress - a property used to handle current progress bar's progress value
         * load - a function used to load all assets and initialise any objects needed later
 
@@ -96,12 +135,13 @@ class Loading(Screen):
             QLabel {
                 font-size: 30px;
                 font-weight: bold;
+                font-family: "Courier New", Courier, monospace;
                 color: white;
             }
             """)
 
         # Fetch the model image and scale it to fit the window if it's too big
-        model = QPixmap(os.path.join(common.GUI_LOADING, "model.png"))
+        model = QPixmap(os.path.join(common.GUI_LOADING_DIR, "model.png"))
         model = model.scaled(min(SCREEN_WIDTH, model.width()), min(SCREEN_HEIGHT, model.height()))
 
         # Paint the background and render the net and the model in the middle
@@ -127,6 +167,12 @@ class Loading(Screen):
         Default inherited.
         """
         super().on_switch()
+
+    def on_exit(self):
+        """
+        Default inherited.
+        """
+        super().on_exit()
 
     @property
     def progress(self) -> int:
@@ -154,14 +200,20 @@ class Loading(Screen):
 
     def load(self):
         """
-        TODO: Currently a sample to be removed later. This function should load all assets and initialise all objects.
-          Storing the objects is undecided as of now, probably put them into the manager because every screen can access
-          the manager. Perhaps create a DataManager instance within the ScreenManager?
+        Method used to "load" the assets and other objects by calling the loading functions.
         """
-        from time import sleep
+        Log.debug("Loading started")
+
+        # Make sure the loading bar increments the correct amount, by knowing the total number of operations to perform
+        step_increment = 100 / len(OPERATIONS)
+
+        # Display empty bar (usually too quick to notice!)
         QApplication.instance().processEvents()
-        sleep(1)
-        for x in range(101):
+
+        # Do each operation and increment the loading bar
+        for i, op in enumerate(OPERATIONS):
+            op()
+            self.progress = int(step_increment * (i+1))
             QApplication.instance().processEvents()
-            self.progress = x
-            sleep(0.01)
+
+        Log.debug("Loading finished")
