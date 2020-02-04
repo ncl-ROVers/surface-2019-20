@@ -1,5 +1,12 @@
 """
-TODO: Document
+Controller screen
+==============
+
+Module storing an implementation of a controller layout screen that uses QPixmap.
+
+Although QPixmap supports many ccmmon image formats, this implementation currently only supports PNG image
+format due to a need to implement filename processing. The QPixmap will be displayed as long as it is located within
+assets/gui_controller and is named controller.png 
 """
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
@@ -10,7 +17,19 @@ import os
 
 class Controller(Screen):
     """
-    TODO: Document
+    Screen used to display sample image of the controller. QPixmap that is contained within a QLabel is used to
+    display the controller asset located in GUI_CONTROLLER_DIR that is specified within utils.py.
+
+    Functions
+    ---------
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create all QT objects and class-specific fields
+        * _config - a method to place all items created in __init__ as well as set the margins to ensure consistency.
+        * _set_style - a method to set the style of QPixmap
+        * post_init - default implementation of the inherited method
+        * on_switch - a method to retrieve the information about screen size
+        * on_exit - default implementation of the inherited method
     """
 
     def __init__(self):
@@ -43,6 +62,12 @@ class Controller(Screen):
     def _set_style(self):
         """
         Standard styling method.
+
+        If width and height of the controller pixmap exceeds the screen length, then pixmap will be scaled to the
+        size of the window calculated during on_switch. Otherwise, the original size of the controller is used.
+
+        Qt.SmoothTransformation option needs to be passed to the QPixmap.scaled method to ensure that image is not
+        pixelated.
         """
         super()._set_style()
 
