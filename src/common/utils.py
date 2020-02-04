@@ -5,6 +5,7 @@ Common Utils
 Standard utils module storing common to the package classes, functions, constants, and other objects.
 """
 import os as _os
+import psutil as _psutil
 
 # Declare path to the root folder (surface)
 ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
@@ -56,3 +57,54 @@ CONTROL_DICT = {
 RECEIVED_DICT = {
     "test": ""
 }
+
+
+def get_processes():
+    # TODO need to use the defined MASTER PID, not the current pid (won't return
+    # all processes if current is child)
+    currentPid = _os.getpid()
+    processList = [currentPid]
+
+    currentProcess = _psutil.Process(currentPid)
+
+    children = currentProcess.children(recursive=True)
+    for child in children:
+        processList.append(child.pid)
+
+    return processList
+
+
+def get_threads(processes):
+    """TODO: document """
+
+    processThreads = {}
+
+    for process in processes:
+        processThreads[process] = _psutil.Process(process).num_threads()
+
+    return processThreads
+
+
+def get_cpu_load(processes):
+    """TODO: document"""
+
+    processCPULoad = {}
+
+    for process in processes:
+        p = _psutil.Process(process)
+        p.cpu_percent(interval=None)
+        processCPULoad[process] = p.cpu_percent(interval=None)
+
+    return processCPULoad
+
+
+def get_total_memory(processes):
+    """TODO: document"""
+
+    totalRAM = 0
+
+    for process in processes:
+        memoryInfo = _psutil.Process(process).memory_info()
+        totalRAM = totalRAM + memoryInfo.rss + memoryInfo.vms
+
+    return totalRAM / (1024.0 * 1024.0)

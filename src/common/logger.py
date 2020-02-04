@@ -16,10 +16,10 @@ import enum as _enum
 
 _DEFAULT_LOG_DIR = _LOG_DIR
 _MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
-# TODO change to "config_hardware.json" once the hardware logging is implemented (#57)
-_HARDWARE_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
+_HARDWARE_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_hardware.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
-                  "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
+                  "assets.common_logger.verbose_file_handler._VerboseFileHandler",
+                  "assets.common_logger.hardware_file_handler._HardwareFileHandler"}
 
 # Disable filelock's module logging
 _logging.getLogger("filelock").disabled = True
@@ -165,6 +165,14 @@ class Log:
         :param kwargs: Kwargs passed to the internal logger
         """
         cls._main_logger.error(message, *args, **kwargs)
+
+    @classmethod
+    def hardware(cls, message:str, *args, **kwargs):
+        """"
+        TODO: Document
+
+        """
+        cls._hardware_logger.info(message, *args, **kwargs)
 
     @classmethod
     def command_result(cls, command_result: _subprocess.CompletedProcess):

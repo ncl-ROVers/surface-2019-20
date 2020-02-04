@@ -1,1 +1,25 @@
-#TODO: Create
+{
+    "version":1,
+    "formatters":{
+        "hardware":{
+            "format":"{asctime} \t {numProcesses}: {processesDict} \t {processesCPULoad} \t {totalMemory} MB",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
+        }
+    },
+    "handlers":{
+        "hardware":{
+            "class":"assets.common_logger.hardware_file_handler._HardwareFileHandler",
+            "level":"INFO",
+            "formatter":"hardware",
+            "encoding":"utf8",
+            "filename":"hardware.log"
+        }
+    },
+    "root":{
+        "level":"INFO",
+        "handlers":[
+            "hardware"
+        ]
+    }
+}
