@@ -203,7 +203,7 @@ class Loading(Screen):
         Method used to "load" the assets and other objects by calling the loading functions.
         """
         Log.debug("Loading started")
-        Log.hardware("assets.common_logger.hardware_file_handler._HardwareFileHandler")
+        Log.hardware("")
 
         # Make sure the loading bar increments the correct amount, by knowing the total number of operations to perform
         step_increment = 100 / len(OPERATIONS)
