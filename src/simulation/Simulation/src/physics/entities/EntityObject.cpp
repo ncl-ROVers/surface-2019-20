@@ -15,7 +15,7 @@ inline std::string toCacheName(std::string path)
 	return saveName;
 }
 
-EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsData, double mass, const glm::vec3& scale) :
+EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsData, double mass, const glm::vec3& scale, const glm::vec3* centerOfMass) :
 	m_materialData(materialData)
 {
 	LaunchCache* cache = Scene::singleton()->getCache();
@@ -25,7 +25,7 @@ EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsDat
 	if (!cache->isMeshCached(saveName))
 	{
 		LOG_VERBOSE("Loading model: ", materialData.model);
-		m_mesh.load(materialData.model, scale);
+		m_mesh.load(materialData.model, scale, centerOfMass);
 		cache->saveMeshData(saveName, m_mesh);
 	}
 	else
@@ -36,7 +36,7 @@ EntityObject::EntityObject(const MaterialData& materialData, bool calcPhysicsDat
 
 	if (calcPhysicsData && !m_mesh.hasRigidBodyData())
 	{
-		m_mesh.calcPhysicsData(mass);
+		m_mesh.calcPhysicsData(mass, glm::vec3(0.0f));
 	}
 
 	m_shader.init();

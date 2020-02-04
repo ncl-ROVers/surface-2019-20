@@ -16,13 +16,26 @@
 
 #define THRUSTER_COUNT 8
 
+struct RovSetup
+{
+	double mass = 1.0;
+	float thrusterPower[THRUSTER_COUNT] = { 0.0f };
+	glm::vec3 thrusterPositions[THRUSTER_COUNT];
+	quaternion thrusterRotations[THRUSTER_COUNT];
+
+	glm::vec3 position = glm::vec3(0.0f);
+	glm::vec3 rotation = glm::vec3(0.0f);
+
+	glm::vec3 centerOfMass = glm::vec3(0.0f);
+};
+
 class EntityROV : public EntityRigidBody
 {
 private:
 	std::tuple<glm::vec3, quaternion, float> m_thrusterPositions[8];
 	EntityObject* m_entityThrusters[8];
 public:
-	EntityROV(double mass = 1.0);
+	EntityROV(const RovSetup& setup);
 	~EntityROV();
 
 	void update(double delta) override;

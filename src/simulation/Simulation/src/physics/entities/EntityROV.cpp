@@ -1,7 +1,5 @@
 #include "EntityROV.h"
 
-#define BODY_SCALE glm::vec3(0.3f)
-
 MaterialData getMaterialData()
 {
 	MaterialData material;
@@ -13,21 +11,22 @@ MaterialData getMaterialData()
 	return material;
 }
 
-EntityROV::EntityROV(double mass) :
-	EntityRigidBody(getMaterialData(), mass, BODY_SCALE)
+EntityROV::EntityROV(const RovSetup& setup) :
+	EntityRigidBody(getMaterialData(), setup.mass, glm::vec3(1.0f), &setup.centerOfMass)
 {
-	m_thrusterPositions[THRUSTER_HORIZONTAL_FORE_PORT] = { glm::vec3(-2.57f, -1.07f, 0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, -45), 0 };
-	m_thrusterPositions[THRUSTER_HORIZONTAL_FORE_STARBOARD] = { glm::vec3(-2.57f, -1.07f, -0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, -135), 0 };
-	m_thrusterPositions[THRUSTER_HORIZONTAL_AFT_PORT] = { glm::vec3(2.77f, -1.07f, -0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, 135), 0 };
-	m_thrusterPositions[THRUSTER_HORIZONTAL_AFT_STARBOARD] = { glm::vec3(2.77f, -1.07f, 0.7f), quaternion({ 1, 0, 0 }, 90) * quaternion({ 0, 1, 0 }, 45), 0 };
+	for (int i = 0; i < THRUSTER_COUNT; ++i)
+	{
+		float p = setup.thrusterPower[i];
+		m_thrusterPositions[i] = { setup.thrusterPositions[i] - setup.centerOfMass, setup.thrusterRotations[i], setup.thrusterPower[i] };
+	}
 
-	m_thrusterPositions[THRUSTER_VERTICAL_FORE_PORT] = { glm::vec3(-1.1f, 1.3f, 2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
-	m_thrusterPositions[THRUSTER_VERTICAL_FORE_STARBOARD] = { glm::vec3(-1.1f, 1.3f, -2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
-	m_thrusterPositions[THRUSTER_VERTICAL_AFT_PORT] = { glm::vec3(1.05f, 1.3f, -2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
-	m_thrusterPositions[THRUSTER_VERTICAL_AFT_STARBOARD] = { glm::vec3(1.05f, 1.3f, 2.45f), quaternion({ 0, 0, 0, 1 }), 0 };
+	m_transform.position(setup.position);
+	m_transform.rotation(quaternion(glm::vec3(1, 0, 0), setup.rotation.x) *
+						 quaternion(glm::vec3(0, 1, 0), setup.rotation.y) *
+						 quaternion(glm::vec3(0, 0, 1), setup.rotation.z));
 
 	EntityObject* thrusters = (EntityObject*)m_entityThrusters;
-	for(int i = 0; i < 8; ++i)
+	for(int i = 0; i < THRUSTER_COUNT; ++i)
 	{
 		MaterialData thrusterMaterial;
 		thrusterMaterial.model = "./res/models/thruster.obj";
@@ -36,7 +35,7 @@ EntityROV::EntityROV(double mass) :
 		thrusterMaterial.albedo = "./res/textures/thruster.png";
 
 		m_entityThrusters[i] = new EntityObject(thrusterMaterial);
-		m_entityThrusters[i]->getTransform().position(std::get<0>(m_thrusterPositions[i]) * BODY_SCALE);
+		m_entityThrusters[i]->getTransform().position(std::get<0>(m_thrusterPositions[i]));
 		m_entityThrusters[i]->getTransform().rotation(std::get<1>(m_thrusterPositions[i]));
 		m_entityThrusters[i]->getTransform().scale(glm::vec3(0.1f));
 

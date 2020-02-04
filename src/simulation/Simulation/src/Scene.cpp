@@ -29,18 +29,7 @@ void Scene::init(int width, int height)
 		m_cache.setCacheDir(m_config.getCacheDir());
 	}
 
-	EntityROV* rov = new EntityROV(m_config.getRovMass());
-	rov->getTransform().position(m_config.getRovPosition());
-	rov->getTransform().rotation(quaternion(glm::vec3(1, 0, 0), m_config.getRovRotation().x) *
- 								 quaternion(glm::vec3(0, 1, 0), m_config.getRovRotation().y) *
-								 quaternion(glm::vec3(0, 0, 1), m_config.getRovRotation().z));
-
-	for (int i = 0; i < THRUSTER_COUNT; ++i)
-	{
-		rov->setThrusterPower(i, m_config.getThrusterPower(i));
-	}
-
-	m_entities.push_back(rov);
+	m_entities.push_back(new EntityROV(m_config.getRov()));
 
 	if (m_config.getSceneType() == SCENE_TYPE_GRID)
 	{

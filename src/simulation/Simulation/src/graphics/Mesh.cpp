@@ -131,7 +131,7 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 	delete[] fileData;
 }
 
-void Mesh::load(const std::string& path, glm::vec3 vertexScale)
+void Mesh::load(const std::string& path, glm::vec3 vertexScale, const glm::vec3* customCOM)
 {
 	std::vector<glm::vec3> modelVertices;
 	std::vector<glm::vec2> modelTexCoords;
@@ -140,14 +140,22 @@ void Mesh::load(const std::string& path, glm::vec3 vertexScale)
 	
 	parseOBJFile(path, modelVertices, modelTexCoords, modelNormals, modelIndices);
 
-	glm::dvec3 centerOfMass = glm::zero<glm::dvec3>();
-	for (size_t i = 0; i < modelIndices.size(); ++i)
+	if (!customCOM)
 	{
-		centerOfMass += modelVertices[modelIndices[i]];
-	}
-	centerOfMass /= (double)modelIndices.size();
+		glm::dvec3 centerOfMass = glm::zero<glm::dvec3>();
 
-	m_centerOfMassOffset = { (float)centerOfMass.x, (float)centerOfMass.y, (float)centerOfMass.z };
+		for (size_t i = 0; i < modelIndices.size(); ++i)
+		{
+			centerOfMass += modelVertices[modelIndices[i]];
+		}
+		centerOfMass /= (double)modelIndices.size();
+
+		m_centerOfMassOffset = { (float)centerOfMass.x, (float)centerOfMass.y, (float)centerOfMass.z };
+	}
+	else
+	{
+		m_centerOfMassOffset = *customCOM;
+	}
 
 	for (size_t i = 0; i < modelVertices.size(); ++i)
 	{
@@ -186,7 +194,7 @@ void Mesh::loadDirect(glm::vec3* vertices, size_t numVertices, glm::vec2* texCoo
 	m_vertexArray.unbind();
 }
 
-void Mesh::calcPhysicsData(double mass)
+void Mesh::calcPhysicsData(double mass, const glm::vec3& comOffset)
 {
 	glm::vec3* vertices = (glm::vec3*)mapMeshData(0, m_numVertices * sizeof(glm::vec3), GL_MAP_READ_BIT, MeshDataType::DATA_VERTICES);
 	unsigned int* indices = (unsigned int*)mapMeshData(0, m_numIndices * sizeof(unsigned int), GL_MAP_READ_BIT, MeshDataType::DATA_INDICES);

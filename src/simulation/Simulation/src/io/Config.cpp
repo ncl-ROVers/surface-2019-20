@@ -35,6 +35,11 @@ const char* typeName(json11::Json::Type type)
 
 bool isFieldOfType(const json11::Json* obj, const char* name, json11::Json::Type type)
 {
+	if (obj->type() == json11::Json::NUL)
+	{
+		return false;
+	}
+
 	if (obj->type() != type)
 	{
 		LOG_WARN("JSON field '", name, "' should be of type '", typeName(type), "' not '", typeName(obj->type()), "'! Ignoring field.");
@@ -78,6 +83,69 @@ void Config::loadConfig(const std::string& path)
 	delete[] src;
 }
 
+void parseROVData(const json11::Json& root, RovSetup& rov)
+{
+	using namespace json11;
+
+	const Json* obj = nullptr;
+	if (isFieldOfType(obj = &root["mass"], "mass", Json::NUMBER))
+	{
+		rov.mass = obj->number_value();
+	}
+
+	if (isValidArray(obj = &root["pos"], "pos", 3))
+	{
+		const Json::array& coords = obj->array_items();
+
+		rov.position = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+	}
+
+	if (isValidArray(obj = &root["rot"], "rot", 3))
+	{
+		const Json::array& coords = obj->array_items();
+
+		rov.rotation = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+	}
+
+	if (isFieldOfType(obj = &root["thrusters"], "thrusters", Json::OBJECT))
+	{
+		for (const std::pair<std::string, Json>& thruster : obj->object_items())
+		{
+			int index = 0;
+			index += (thruster.first[0] == 'v') ? 4 : 0;
+			index += (thruster.first[1] == 'a') ? 2 : 0;
+			index += (thruster.first[2] == 's') ? 1 : 0;
+
+			const Json* comp = nullptr;
+			if (isValidArray(comp = &thruster.second["pos"], "pos", 3))
+			{
+				const Json::array& coords = comp->array_items();
+
+				rov.thrusterPositions[index] = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+			}
+
+			if (isValidArray(comp = &thruster.second["rot"], "rot", 4))
+			{
+				const Json::array& coords = comp->array_items();
+
+				rov.thrusterRotations[index] = glm::vec4((float)coords[1].number_value(), (float)coords[2].number_value(), (float)coords[3].number_value(), (float)coords[0].number_value());
+			}
+
+			if (isFieldOfType(comp = &thruster.second["force"], "force", Json::NUMBER))
+			{
+				rov.thrusterPower[index] = (float)comp->number_value();
+			}
+		}
+	}
+
+	if (isValidArray(obj = &root["center_of_mass"], "center_of_mass", 3))
+	{
+		const Json::array& coords = obj->array_items();
+
+		rov.centerOfMass = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+	}
+}
+
 void Config::loadConfigFromMemory(const char* data, long int dataLength)
 {
 	using namespace json11;
@@ -92,36 +160,9 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 	}
 
 	const Json* obj = nullptr;
-	if (isFieldOfType(obj = &root["mass"], "mass", Json::NUMBER))
+	if (isFieldOfType(obj = &root["rov_setup"], "rov_setup", Json::OBJECT))
 	{
-		m_rovMass = obj->number_value();
-	}
-
-	if (isValidArray(obj = &root["pos"], "pos", 3))
-	{
-		const Json::array& coords = obj->array_items();
-		
-		m_rovPosition = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
-	}
-
-	if (isValidArray(obj = &root["rot"], "rot", 3))
-	{
-		const Json::array& coords = obj->array_items();
-
-		m_rovRotation = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
-	}
-
-	if (isFieldOfType(obj = &root["thrusters"], "thrusters", Json::OBJECT))
-	{
-		for (const std::pair<std::string, Json>& thruster : obj->object_items())
-		{
-			int index = 0;
-			index += (thruster.first[0] == 'v') ? 4 : 0;
-			index += (thruster.first[1] == 'a') ? 2 : 0;
-			index += (thruster.first[2] == 's') ? 1 : 0;
-
-			m_thrusterPower[index] = thruster.second.is_number() ? (float)thruster.second.number_value() : 0.0f;
-		}
+		parseROVData(*obj, m_rov);
 	}
 
 	if (isFieldOfType(obj = &root["scene"], "scene", Json::STRING))
@@ -216,4 +257,6 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 			LOG_WARN("JSON field 'cache' should be either a string or a boolean, not '", typeName(obj->type()), "'.");
 		}
 	}
+
+	
 }

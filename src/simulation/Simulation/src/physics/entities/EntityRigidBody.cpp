@@ -2,8 +2,8 @@
 
 #include "Scene.h"
 
-EntityRigidBody::EntityRigidBody(const MaterialData& materialData, double mass, const glm::vec3& scale) :
-	EntityObject(materialData, true, mass, scale)
+EntityRigidBody::EntityRigidBody(const MaterialData& materialData, double mass, const glm::vec3& scale, const glm::vec3* centerOfMass) :
+	EntityObject(materialData, true, mass, scale, centerOfMass)
 {
 	m_rigidBody = getPhysicsData();
 }

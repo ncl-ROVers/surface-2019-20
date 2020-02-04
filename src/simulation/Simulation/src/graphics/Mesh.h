@@ -34,9 +34,9 @@ private:
 public:
 	Mesh() {}
 
-	void load(const std::string& path, glm::vec3 vertexScale = glm::vec3(1.0f));
+	void load(const std::string& path, glm::vec3 vertexScale = glm::vec3(1.0f), const glm::vec3* customCOM = nullptr);
 	void loadDirect(glm::vec3* vertices, size_t numVertices, glm::vec2* texCoords, size_t numTexCoords, glm::vec3* normals, size_t numNormals, unsigned int* indices, size_t numIndices);
-	void calcPhysicsData(double mass);
+	void calcPhysicsData(double mass, const glm::vec3& comOffset);
 	void draw();
 
 	void copyMeshData(void* dst, long int srcOffset, long int srcSize, MeshDataType type) const;
