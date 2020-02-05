@@ -22,7 +22,7 @@ EntityObject::EntityObject(const MaterialData& materialData) :
 
 	std::string saveName = toCacheName(materialData.model);
 	
-	if (!cache->isMeshCached(saveName))
+	if (cache->isMeshOutdated(saveName, materialData.model))
 	{
 		LOG_VERBOSE("Loading model: ", materialData.model);
 		m_mesh.load(materialData.model);

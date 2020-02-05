@@ -16,8 +16,9 @@ public:
 	LaunchCache() : m_cacheDir(DEFAULT_CACHE_DIR), m_isEnabled(true) {}
 	
 	void saveMeshData(const std::string& saveName, const Mesh& mesh);
-	bool isMeshCached(const std::string& saveName);
 	void loadMeshData(const std::string& saveName, Mesh& mesh);
+	bool isMeshCached(const std::string& saveName);
+	bool isMeshOutdated(const std::string& saveName, const std::string& modelPath);
 
 	inline void setCacheDir(const std::string & cacheDir) { m_cacheDir = cacheDir; }
 	inline void setEnabled(bool enabled) { m_isEnabled = enabled; }

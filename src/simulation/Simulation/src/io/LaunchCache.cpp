@@ -93,8 +93,22 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 bool LaunchCache::isMeshCached(const std::string& saveName)
 {
 	namespace fs = std::filesystem;
-	
  	return fs::exists(fs::path(m_cacheDir).append(saveName));
+}
+
+
+bool LaunchCache::isMeshOutdated(const std::string& saveName, const std::string& modelPath)
+{
+	if (!isMeshCached(saveName))
+	{
+		return true;
+	}
+
+	namespace fs = std::filesystem;
+	fs::file_time_type cacheTime = fs::last_write_time(fs::path(m_cacheDir).append(saveName));
+	fs::file_time_type originalTime = fs::last_write_time(fs::path(modelPath));
+
+	return originalTime > cacheTime;
 }
 
 int throwError()
