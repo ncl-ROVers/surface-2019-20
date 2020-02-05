@@ -9,7 +9,7 @@ class EntityRigidBody : public EntityObject
 private:
 	RigidBodyData m_rigidBody;
 public:
-	EntityRigidBody(const MaterialData& materialData, double mass = 1.0, const glm::vec3& scale = glm::vec3(1.0f), const glm::vec3* centerOfMass = nullptr);
+	EntityRigidBody(const MaterialData& materialData, double mass = 1.0, const glm::vec3* centerOfMass = nullptr);
 	~EntityRigidBody() {}
 
 	void update(double delta) override;

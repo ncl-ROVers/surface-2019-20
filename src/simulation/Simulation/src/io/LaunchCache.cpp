@@ -73,7 +73,7 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 
 	fwrite(writeSrc, sizeof(unsigned int), (size_t)tempCount, file);
 	mesh.unmapMeshData(MeshDataType::DATA_INDICES);
-
+	/*
 	//Write physics datas
 	bool hasRigidBody = mesh.hasRigidBodyData();
 	fwrite(&hasRigidBody, sizeof(bool), 1, file);
@@ -85,7 +85,7 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 		fwrite(&rbData.mass, sizeof(double), 1, file);
 		fwrite(&rbData.bodyI, sizeof(glm::mat3), 1, file);
 		fwrite(&rbData.centerOfMassOffset, sizeof(glm::vec3), 1, file);
-	}
+	}*/
 
 	fclose(file);
 }
@@ -132,7 +132,7 @@ void LaunchCache::loadMeshData(const std::string& saveName, Mesh& mesh)
 
 	uint64_t indexCount = *((uint64_t*)&meshData[CHK_PTR(ptr, sizeof(uint64_t), fileSize)]);
 	unsigned int* indices = (unsigned int*)&meshData[CHK_PTR(ptr, (indexCount * sizeof(unsigned int)), fileSize)];
-
+	/*
 	bool hasRigidBody = *((bool*)&meshData[CHK_PTR(ptr, sizeof(bool), fileSize)]);
 
 	if (hasRigidBody)
@@ -157,7 +157,7 @@ void LaunchCache::loadMeshData(const std::string& saveName, Mesh& mesh)
 		data.totalTorque = glm::zero<glm::vec3>();
 		
 		mesh.setPhysicsData(data);
-	}
+	}*/
 
 	mesh.loadDirect(vertices, (size_t)vertexCount, texCoords, (size_t)texCoordCount, normals, (size_t)normalCount, indices, (size_t)indexCount);
 

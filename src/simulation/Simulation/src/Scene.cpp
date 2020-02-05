@@ -33,7 +33,7 @@ void Scene::init(int width, int height)
 
 	if (m_config.getSceneType() == SCENE_TYPE_GRID)
 	{
-		m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(20)));
+		m_entities.push_back(new EntityGrid(glm::vec2(30), glm::ivec2(30)));
 	}
 	else if (m_config.getSceneType() == SCENE_TYPE_POOL)
 	{

@@ -18,7 +18,7 @@ protected:
 
 	MaterialData m_materialData;
 public:
-	EntityObject(const MaterialData& materialData, bool calcPhysicsData = false, double mass = 1.0, const glm::vec3& scale = glm::vec3(1.0f), const glm::vec3* centerOfMass = nullptr);
+	EntityObject(const MaterialData& materialData);
 	virtual ~EntityObject();
 
 	virtual void update(double delta) override {}
@@ -26,6 +26,4 @@ public:
 
 	inline Mesh* getMesh() { return &m_mesh; }
 	inline const Mesh* getMesh() const { return &m_mesh; }
-
-	inline const RigidBodyData& getPhysicsData() const { return m_mesh.getPhysicsData(); }
 };

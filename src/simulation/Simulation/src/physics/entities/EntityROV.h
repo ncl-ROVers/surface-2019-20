@@ -21,7 +21,7 @@ struct RovSetup
 	double mass = 1.0;
 	float thrusterPower[THRUSTER_COUNT] = { 0.0f };
 	glm::vec3 thrusterPositions[THRUSTER_COUNT];
-	quaternion thrusterRotations[THRUSTER_COUNT];
+	glm::vec3 thrusterRotations[THRUSTER_COUNT];
 
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 rotation = glm::vec3(0.0f);

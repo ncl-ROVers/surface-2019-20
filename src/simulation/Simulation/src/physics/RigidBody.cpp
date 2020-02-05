@@ -1,15 +1,33 @@
 #include "RigidBody.h"
 
-void RigidBodyData::calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
+void RigidBodyData::calcRigidBodyInfo(double mass, const glm::vec3* centerOfMass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
 {
 	float vertexMass = (float)(mass / (double)numIndices);
 
 	this->mass = mass;
 	this->bodyI = glm::zero<glm::mat3>();
 
+	if (!centerOfMass)
+	{
+		glm::dvec3 objectCOM = glm::zero<glm::dvec3>();
+
+		for (size_t i = 0; i < numIndices; ++i)
+		{
+			objectCOM += vertices[indices[i]];
+		}
+		objectCOM /= (double)numIndices;
+
+		this->centerOfMassOffset = glm::vec3(objectCOM);
+	}
+	else
+	{
+		this->centerOfMassOffset = glm::vec3(*centerOfMass);
+	}
+	
+
 	for (size_t i = 0; i < numIndices; ++i)
 	{
-		glm::vec3 vertex = vertices[indices[i]];
+		glm::vec3 vertex = vertices[indices[i]] - this->centerOfMassOffset;
 
 		glm::mat3 asMatrix(vertex, glm::vec3(0.0f), glm::vec3(0.0f));
 
@@ -17,8 +35,6 @@ void RigidBodyData::calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t n
 	}
 
 	this->invBodyI = glm::inverse(this->bodyI);
-
-	this->centerOfMassOffset = glm::zero<glm::vec3>();
 
 	this->linearMomentum = glm::zero<glm::vec3>();
 	this->angularMomentum = glm::zero<glm::vec3>();
@@ -45,8 +61,13 @@ RigidBodyDerivative RigidBodyData::derivative(const Transform& transform) const
 
 void RigidBodyData::step(Transform& transform, const RigidBodyDerivative& derivative)
 {
-	transform.translateTransform(derivative.dPosition);
-	transform.rotation((transform.rotation() + derivative.dRotation).normalize());
+	quaternion newRot = (transform.rotation() + derivative.dRotation).normalize();
+
+	glm::vec3 rotationalOffset = (newRot.matrix() * -centerOfMassOffset) -
+								 (transform.rotation().matrix() * -centerOfMassOffset);
+
+	transform.translateTransform(glm::mat3(transform.matrix()) * derivative.dPosition + rotationalOffset * transform.scale());
+	transform.rotation(newRot);
 
 	this->linearMomentum += derivative.dLinearMomentum;
 	this->angularMomentum += derivative.dAngularMomentum;

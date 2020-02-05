@@ -57,7 +57,7 @@ public:
 	glm::vec3 totalForce;
 	glm::vec3 totalTorque;
 public:
-	void calcRigidBodyInfo(double mass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices);
+	void calcRigidBodyInfo(double mass, const glm::vec3* centerOfMass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices);
 
 	RigidBodyDerivative derivative(const Transform& transform) const;
 	void step(Transform& transform, const RigidBodyDerivative& derivative);

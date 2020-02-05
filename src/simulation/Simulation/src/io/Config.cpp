@@ -124,11 +124,11 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 				rov.thrusterPositions[index] = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
 			}
 
-			if (isValidArray(comp = &thruster.second["rot"], "rot", 4))
+			if (isValidArray(comp = &thruster.second["rot"], "rot", 3))
 			{
 				const Json::array& coords = comp->array_items();
 
-				rov.thrusterRotations[index] = glm::vec4((float)coords[1].number_value(), (float)coords[2].number_value(), (float)coords[3].number_value(), (float)coords[0].number_value());
+				rov.thrusterRotations[index] = glm::vec3((float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value());
 			}
 
 			if (isFieldOfType(comp = &thruster.second["force"], "force", Json::NUMBER))
