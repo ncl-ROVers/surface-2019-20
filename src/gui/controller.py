@@ -1,10 +1,10 @@
 """
 Controller screen
-==============
+=================
 
 Module storing an implementation of a controller layout screen that uses QPixmap.
 
-Although QPixmap supports many ccmmon image formats, this implementation currently only supports PNG image
+Although QPixmap supports many common image formats, this implementation currently only supports PNG image
 format due to a need to implement filename processing. The QPixmap will be displayed as long as it is located within
 assets/gui_controller and is named controller.png 
 """
@@ -17,11 +17,13 @@ import os
 
 class Controller(Screen):
     """
-    Screen used to display sample image of the controller. QPixmap that is contained within a QLabel is used to
-    display the controller asset located in GUI_CONTROLLER_DIR that is specified within utils.py.
+    Screen used to display instructions on using the controller.
+
+    QPixmap contained within a QLabel is used to display the controller image asset (found in GUI_CONTROLLER_DIR).
 
     Functions
     ---------
+
     The following list shortly summarises each function:
 
         * __init__ - a constructor to create all QT objects and class-specific fields
