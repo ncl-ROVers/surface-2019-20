@@ -104,7 +104,7 @@ class _SlidingMenu(QFrame):
             Log.debug("Pressed sliding menu button - {}".format(self._name))
             get_manager().screen = getattr(Screen, self._name)
 
-    def __init__(self, screen_names: set):
+    def __init__(self, screen_names: list):
         """
         Standard constructor.
 
@@ -252,6 +252,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
     Loading = 0
     Home = 1
+    Controller = 2
 
     def __init__(self):
         """
@@ -392,7 +393,7 @@ class ScreenManager(QMainWindow):
         for screen in args:
             self._screens_stacked.addWidget(screen)
             self._screens[screen.name] = screen
-        self._sliding_menu = _SlidingMenu(set(self._screens.keys()))
+        self._sliding_menu = _SlidingMenu(list(self._screens.keys()))
 
         # Setup the layouts correctly
         self._main_layout.addWidget(self._sliding_menu)
