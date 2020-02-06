@@ -8,6 +8,7 @@ Standard utils module storing common to the package classes, functions, constant
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 from PySide2.QtCore import *
+from .. import comms, control
 from ..common import Log
 import pyautogui
 import typing
@@ -29,6 +30,17 @@ def get_manager() -> typing.Union[QMainWindow, None]:
         if "ScreenManager" in repr(widget):
             return widget
     return None
+
+
+class _References:
+    """
+    Helper class used to store the references to objects loaded within the loading screen.
+
+    Each reference can be either None or of the type hinted.
+    """
+    controller: control.Controller = None
+    control_manager: control.ControlManager = None
+    connection: comms.Connection = None
 
 
 class Colour(enum.Enum):
@@ -92,7 +104,7 @@ class _SlidingMenu(QFrame):
             Log.debug("Pressed sliding menu button - {}".format(self._name))
             get_manager().screen = getattr(Screen, self._name)
 
-    def __init__(self, screen_names: set):
+    def __init__(self, screen_names: list):
         """
         Standard constructor.
 
@@ -240,6 +252,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
     Loading = 0
     Home = 1
+    Controller = 2
 
     def __init__(self):
         """
@@ -334,6 +347,7 @@ class ScreenManager(QMainWindow):
     The following list shortly summarises each function:
 
         * __init__ - a constructor to create and configure all QT objects and class-specific fields
+        * references - a getter to retrieve the references loaded in the loading screen
         * screen - a property to switch between the screens
         * screens - a getter to retrieve all screens stored
         * menu - a getter to retrieve the sliding menu
@@ -363,6 +377,9 @@ class ScreenManager(QMainWindow):
         """
         super(ScreenManager, self).__init__()
 
+        # Declare access to the references - objects loaded by the load function will be stored there
+        self._references = _References()
+
         # Declare the screen structure - a box layout with a menu bar and a horizontal layout for screen and menu
         self._base = QVBoxLayout()
         self._main_layout = QHBoxLayout()
@@ -376,7 +393,7 @@ class ScreenManager(QMainWindow):
         for screen in args:
             self._screens_stacked.addWidget(screen)
             self._screens[screen.name] = screen
-        self._sliding_menu = _SlidingMenu(set(self._screens.keys()))
+        self._sliding_menu = _SlidingMenu(list(self._screens.keys()))
 
         # Setup the layouts correctly
         self._main_layout.addWidget(self._sliding_menu)
@@ -398,6 +415,15 @@ class ScreenManager(QMainWindow):
         self._container.setLayout(self._base)
         self.setCentralWidget(self._container)
         self.screen = Screen.Loading
+
+    @property
+    def references(self) -> _References:
+        """
+        Getter to retrieve the references to items
+
+        :return: Instance of the references class
+        """
+        return self._references
 
     @property
     def screen(self) -> Screen:

@@ -10,7 +10,7 @@
             "datefmt":"%y-%m-%d %H:%M:%S"
         },
         "verbose":{
-            "format":"{asctime} {levelname:8} | {processName:>10} {process:8} | {filename:30} {function:12} {lineno:5} | {message}",
+            "format":"{asctime} \t {levelname} \t| {processName} \t {process} \t | {filename:30} \t {function:15} {lineno} \t | {message}",
             "datefmt":"%y-%m-%d %H:%M:%S",
             "style":"{"
         }

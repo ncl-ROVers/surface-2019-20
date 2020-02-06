@@ -25,6 +25,7 @@ class Connection:
 
         * __init__ - a constructor to create and initialise socket and process related constructs
         * status - a getter to retrieve current connection status
+        * connected - a getter to check if the communication is still happening
         * connect - a method used to connect with the ROV
         * disconnect - a method used to disconnect with the ROV
         * reconnect - a helper method used to disconnect and connect in one step
@@ -40,6 +41,11 @@ class Connection:
 
         connection = Connection()
         connection.connect()
+
+    While working, the code should check if the communication is happening, to detect when it stops::
+
+        if not connection.connected():
+            connection.reconnect()
 
     Once finished, to cleanup the resources, a disconnection should happen::
 
@@ -81,6 +87,13 @@ class Connection:
         Getter for the connection status.
         """
         return self._status
+
+    @property
+    def connected(self) -> bool:
+        """
+        Getter to check if the communication is happening.
+        """
+        return self._process.is_alive()
 
     def connect(self):
         """

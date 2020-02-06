@@ -21,6 +21,7 @@ SRC_GUI_DIR = _os.path.join(SRC_DIR, "gui")
 SRC_CONTROL_DIR = _os.path.join(SRC_DIR, "control")
 
 # Declare the paths to the assets folders
+GUI_CONTROLLER_DIR = _os.path.join(ASSETS_DIR, "gui_controller")
 GUI_LOADING_DIR = _os.path.join(ASSETS_DIR, "gui_loading")
 COMMON_LOGGER_DIR = _os.path.join(ASSETS_DIR, "common_logger")
 COMMON_LOCKS_DIR = _os.path.join(ASSETS_DIR, "common_locks")
