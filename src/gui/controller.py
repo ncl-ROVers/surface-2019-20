@@ -2,11 +2,7 @@
 Controller screen
 =================
 
-Module storing an implementation of a controller layout screen that uses QPixmap.
-
-Although QPixmap supports many common image formats, this implementation currently only supports PNG image
-format due to a need to implement filename processing. The QPixmap will be displayed as long as it is located within
-assets/gui_controller and is named controller.png 
+Module storing an implementation of a controller layout screen.
 """
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
