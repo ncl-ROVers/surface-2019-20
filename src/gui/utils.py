@@ -173,7 +173,7 @@ class _SlidingMenu(QFrame):
             self.show()
 
 
-class _MenuBar(QHBoxLayout):
+class _MenuBar(QWidget):
     """
     Menu bar layout containing various widgets which will be visible in all screens (apart from the loading screen).
 
@@ -206,11 +206,29 @@ class _MenuBar(QHBoxLayout):
 
         # Create the exit button
         self._exit_button = QPushButton("Exit application")
-        self._exit_button.clicked.connect(lambda _: get_manager().close())
+        self._exit_button.clicked.connect(lambda _: QApplication.closeAllWindows())
 
         # Add all widgets and set the layout
-        self.addWidget(self._menu_button)
-        self.addWidget(self._exit_button)
+        self._layout = QHBoxLayout()
+        self._layout.addWidget(self._menu_button)
+        self._layout.addWidget(self._exit_button)
+        self.setFixedHeight(MENU_BAR_HEIGHT)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(self._layout)
+
+
+class _LineBreak(QFrame):
+    """
+    TODO: Document
+    """
+
+    def __init__(self):
+        """
+        TODO: Document
+        """
+        super(_LineBreak, self).__init__()
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
 
 
 class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)), {})):
@@ -261,6 +279,7 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
         Additionally sets the name attribute which is used by the screen manager.
         """
         super(Screen, self).__init__()
+        self.setContentsMargins(0, 0, 0, 0)
 
         # Initialise the GUI window name
         self.name = self.__class__.__name__
@@ -352,6 +371,7 @@ class ScreenManager(QMainWindow):
         * screens - a getter to retrieve all screens stored
         * menu - a getter to retrieve the sliding menu
         * bar - a getter to retrieve the menu bar
+        * line_break - a getter to retrieve the line break
         * post_init - a method which calls `post_init` of each screen
 
     Usage
@@ -380,13 +400,25 @@ class ScreenManager(QMainWindow):
         # Declare access to the references - objects loaded by the load function will be stored there
         self._references = _References()
 
-        # Declare the screen structure - a box layout with a menu bar and a horizontal layout for screen and menu
-        self._base = QVBoxLayout()
-        self._main_layout = QHBoxLayout()
-        self._main_layout_container = QWidget()
+        # Prepare the main screen as a vertical box
+        self._base_widget = QWidget()
+        self.setCentralWidget(self._base_widget)
+        self._base_layout = QVBoxLayout(self._base_widget)
+        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        # Create main components - a menu bar and a screen holder widget, separated by a line break
         self._menu_bar = _MenuBar()
-        self._menu_bar_container = QWidget()
+        self._menu_bar.setVisible(False)
+        self._line_break = _LineBreak()
+        self._line_break.setVisible(False)
         self._screens_stacked = QStackedWidget()
+
+        # Construct the layout
+        self._base_layout.setSpacing(0)
+        self._base_layout.setMargin(0)
+        self._base_layout.addWidget(self._menu_bar)
+        self._base_layout.addWidget(self._line_break)
+        self._base_layout.addWidget(self._screens_stacked)
 
         # Add all screens and create an associated sliding window
         self._screens = dict()
@@ -395,25 +427,9 @@ class ScreenManager(QMainWindow):
             self._screens[screen.name] = screen
         self._sliding_menu = _SlidingMenu(list(self._screens.keys()))
 
-        # Setup the layouts correctly
-        self._main_layout.addWidget(self._sliding_menu)
-        self._main_layout.addWidget(self._screens_stacked)
-        self._main_layout_container.setLayout(self._main_layout)
-        self._menu_bar_container.setLayout(self._menu_bar)
-        self._base.addWidget(self._menu_bar_container)
-        self._base.addWidget(self._main_layout_container)
-
-        # Set some basic properties
-        self.setFixedSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-        self._menu_bar_container.setFixedHeight(MENU_BAR_HEIGHT)
-        self._sliding_menu.setVisible(False)
-        self._menu_bar_container.setVisible(False)
-
         # Finally load the layout
         self.showFullScreen()
-        self._container = QWidget()
-        self._container.setLayout(self._base)
-        self.setCentralWidget(self._container)
+        self.setLayout(self._base_layout)
         self.screen = Screen.Loading
 
     @property
@@ -477,6 +493,13 @@ class ScreenManager(QMainWindow):
         Getter to retrieve the menu bar.
         """
         return self._menu_bar
+
+    @property
+    def line_break(self):
+        """
+        Getter to retrieve the line break.
+        """
+        return self._line_break
 
     def post_init(self):
         """
