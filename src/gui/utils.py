@@ -64,8 +64,8 @@ class _SlidingMenu(QListWidget):
 
         * __init__ - a constructor to create the widget and add all buttons
         * toggled - getter determining if the menu is currently shown
-        * show - show the menu (slide in)
-        * hide - hide the menu (slide out)
+        * _show - show the menu (slide in)
+        * _hide - hide the menu (slide out)
         * toggle - show/hide the menu (depending on current state)
 
     Usage
