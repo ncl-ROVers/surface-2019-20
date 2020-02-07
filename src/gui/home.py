@@ -38,7 +38,8 @@ class Home(Screen):
         Display the menu bar as it should only be disabled in the loading screen.
         """
         super().on_switch()
-        self.manager.bar.parent().setVisible(True)
+        self.manager.bar.setVisible(True)
+        self.manager.line_break.setVisible(True)
 
     def on_exit(self):
         """
