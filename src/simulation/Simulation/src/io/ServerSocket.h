@@ -55,6 +55,9 @@ private:
 	Socket(socket_t socket, std::string host, int port) :
 		m_socket(socket), m_host(host), m_port(port) {}
 public:
+	Socket(const Socket& other) :
+		m_socket(other.m_socket), m_host(other.m_host),
+		m_port(other.m_port), m_closed(other.m_closed) {}
 	~Socket();
 
 	int receive(char* buffer, int bufferSize);

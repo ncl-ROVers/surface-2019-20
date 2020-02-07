@@ -10,6 +10,7 @@
 
 #include "io/Config.h"
 #include "io/LaunchCache.h"
+#include "io/ServerCore.h"
 
 class Scene
 {
@@ -17,6 +18,7 @@ private:
 	World m_world;
 	Config m_config;
 	LaunchCache m_cache;
+	ServerCore m_server;
 	PhysicsEngine m_physicsEngine;
 
 	std::vector<Entity*> m_entities;

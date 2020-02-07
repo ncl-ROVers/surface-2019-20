@@ -101,7 +101,6 @@ Socket ServerSocket::accept()
 	socket_t clientSocket = ::accept(m_socket, (sockaddr*)&client, &clientSize);
 	if (clientSocket == INVALID_SOCKET)
 	{
-		int err = WSAGetLastError();
 		LOG_ERROR("Received invalid socket!");
 
 		exit(8);

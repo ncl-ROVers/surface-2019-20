@@ -51,6 +51,9 @@ void Scene::init(int width, int height)
 		EntityObject* pool = new EntityObject(poolMaterial);
 		m_entities.push_back(pool);
 	}
+
+	//Start server
+	m_server.launchServer(50000);
 }
 
 void Scene::update(double delta)
@@ -89,6 +92,8 @@ void Scene::destroy()
 	{
 		delete entity;
 	}
+
+	m_server.shutdownServer();
 }
 
 Scene* Scene::singleton()
