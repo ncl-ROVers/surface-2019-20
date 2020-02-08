@@ -103,7 +103,7 @@ Socket ServerSocket::accept()
 	{
 		LOG_ERROR("Received invalid socket!");
 
-		exit(8);
+		return Socket(EMPTY_SOCKET, "", 0);
 	}
 
 	char clientHost[NI_MAXHOST];
@@ -124,6 +124,11 @@ void ServerSocket::close()
 
 int Socket::receive(char* buffer, int bufferSize)
 {
+	if (m_socket == EMPTY_SOCKET)
+	{
+		return 0;
+	}
+
 	int bytesReceived = recv(m_socket, buffer, bufferSize, 0);
 	if (bytesReceived == SOCKET_ERROR)
 	{
@@ -137,6 +142,11 @@ int Socket::receive(char* buffer, int bufferSize)
 
 int Socket::send(const char* buffer, int bufferSize)
 {
+	if (m_socket == EMPTY_SOCKET)
+	{
+		return 0;
+	}
+
 	int bytesSent = ::send(m_socket, buffer, bufferSize, 0);
 	if (bytesSent == SOCKET_ERROR)
 	{
@@ -150,7 +160,7 @@ int Socket::send(const char* buffer, int bufferSize)
 
 void Socket::close()
 {
-	if (!m_closed)
+	if (!m_closed && m_socket != EMPTY_SOCKET)
 	{
 		closesocket(m_socket);
 		m_closed = true;

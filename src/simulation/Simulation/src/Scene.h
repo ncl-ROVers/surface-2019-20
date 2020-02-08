@@ -1,8 +1,7 @@
 #pragma once
 
-#include "graphics/Camera.h"
-#include "graphics/Mesh.h"
 #include "graphics/World.h"
+#include "graphics/RenderView.h"
 
 #include "physics/entities/Entity.h"
 #include "physics/entities/EntityROV.h"

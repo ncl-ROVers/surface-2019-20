@@ -25,7 +25,6 @@ private:
 	size_t m_numTexCoords = 0;
 	size_t m_numNormals = 0;
 	int m_numIndices = 0;
-
 private:
 	void bufferFromType(MeshDataType type, GLuint& bufferID, GLenum& bufferType) const;
 public:

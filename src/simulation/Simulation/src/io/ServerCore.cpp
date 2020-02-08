@@ -66,15 +66,14 @@ void ServerCore::shutdownServer()
 		LOG_VERBOSE("Shutting down server...");
 
 		//Delete sockets
-		m_syncMutex.lock();
-
 		m_serverSocket->close();
+
 		if (m_socket)
 		{
+			m_syncMutex.lock();
 			m_socket->close();
+			m_syncMutex.unlock();
 		}
-
-		m_syncMutex.unlock();
 
 		//Wait for main server thread to finish
 		m_mainThread->join();

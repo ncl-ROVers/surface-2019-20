@@ -18,6 +18,7 @@
 
 #ifdef PLATFORM_WINDOWS
 typedef unsigned int socket_t;
+#define EMPTY_SOCKET ((unsigned int)-1)
 #else
 #endif
 
