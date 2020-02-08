@@ -307,7 +307,8 @@ class Home(Screen):
         Display the menu bar as it should only be disabled in the loading screen, and start all clocks.
         """
         super().on_switch()
-        self.manager.bar.parent().setVisible(True)
+        self.manager.bar.setVisible(True)
+        self.manager.line_break.setVisible(True)
         self._sensors_clock.start()
         self._connections_clock.start()
 
