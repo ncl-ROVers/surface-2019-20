@@ -6,6 +6,8 @@
 #include "graphics/VertexArray.h"
 #include "graphics/Shader.h"
 
+#include "graphics/RenderingEngine.h"
+
 class EntityWater : public Entity
 {
 private:
@@ -19,5 +21,5 @@ public:
 	~EntityWater();
 
 	void update(double delta) override;
-	void render(const World& world) override;
+	void render(RenderingEngine& renderer) override;
 };

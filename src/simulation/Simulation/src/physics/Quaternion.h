@@ -89,8 +89,8 @@ public:
 	inline bool operator==(const quaternion& other) { return m_base == other.m_base; }
 	inline bool operator!=(const quaternion& other) { return m_base != other.m_base; }
 
-	inline float& operator[](size_t index) { return m_base[index]; }
-	inline const float& operator[](size_t index) const { return m_base[index]; }
+	inline float& operator[](size_t index) { return m_base[(glm::vec4::length_type)index]; }
+	inline const float& operator[](size_t index) const { return m_base[(glm::vec4::length_type)index]; }
 
 	inline float x() const { return m_base.x; }
 	inline float y() const { return m_base.y; }

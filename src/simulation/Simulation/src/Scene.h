@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/World.h"
+#include "graphics/RenderingEngine.h"
 #include "graphics/RenderView.h"
 
 #include "physics/entities/Entity.h"
@@ -14,11 +14,14 @@
 class Scene
 {
 private:
-	World m_world;
 	Config m_config;
 	LaunchCache m_cache;
 	ServerCore m_server;
 	PhysicsEngine m_physicsEngine;
+	RenderingEngine m_renderingEngine;
+
+	RenderView m_view;
+	EntityROV* m_rov;
 
 	std::vector<Entity*> m_entities;
 private:

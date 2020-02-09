@@ -4,7 +4,7 @@
 #include <glm.hpp>
 
 #include "graphics/Camera.h"
-#include "physics/entities/EntityROV.h"
+#include "physics/entities/RovSetup.h"
 
 enum SceneType
 {

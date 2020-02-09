@@ -21,5 +21,7 @@ public:
 	void bindColorAttachment(int unit) const;
 	void unbindColorAttachment() const;
 
+	void readPixels(unsigned char* pixelData);
+
 	void destroy();
 };

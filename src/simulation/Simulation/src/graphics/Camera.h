@@ -42,6 +42,8 @@ public:
 	inline glm::mat4 getViewMatrix() const { return m_viewMatrix; }
 	inline glm::mat4 getProjectionMatrix() const { return m_projMatrix; }
 
+	inline void setViewMatrix(const glm::mat4& viewMatrix) { m_viewMatrix = viewMatrix; }
+
 	inline glm::vec3 getPosition() const { return m_position; }
 	inline void setPosition(const glm::vec3& position) { m_position = position; }
 

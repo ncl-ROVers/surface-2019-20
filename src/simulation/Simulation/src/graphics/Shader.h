@@ -20,7 +20,7 @@ public:
 	void init();
 	void compile();
 
-	inline void addShader(GLenum shaderType, const std::string& source) { addShader(shaderType, source.c_str(), source.size()); }
+	inline void addShader(GLenum shaderType, const std::string& source) { addShader(shaderType, source.c_str(), (int)source.size()); }
 	void addShaderFromPath(GLenum shaderType, const std::string& path);
 	void addShader(GLenum shaderType, const char* source, int sourceLength);
 

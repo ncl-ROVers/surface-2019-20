@@ -45,8 +45,8 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 
 		if (it == indexMap.end())
 		{
-			indexMap[index] = modelVertices.size();
-			modelIndices.push_back(modelVertices.size());
+			indexMap[index] = (unsigned int)modelVertices.size();
+			modelIndices.push_back((unsigned int)modelVertices.size());
 
 			modelVertices.push_back(vertices[index.vertexIndex - 1]);
 			modelTexCoords.push_back(texCoords[index.texCoordIndex - 1]);
@@ -150,7 +150,7 @@ void Mesh::load(const std::string& path)
 void Mesh::loadDirect(glm::vec3* vertices, size_t numVertices, glm::vec2* texCoords, size_t numTexCoords, glm::vec3* normals, size_t numNormals, unsigned int* indices, size_t numIndices)
 {
 	m_numVertices = numVertices;
-	m_numIndices = numIndices;
+	m_numIndices = (int)numIndices;
 	m_numTexCoords = numTexCoords;
 	m_numNormals = numNormals;
 

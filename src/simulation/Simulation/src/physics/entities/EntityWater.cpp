@@ -73,11 +73,11 @@ void EntityWater::update(double delta)
 	
 }
 
-void EntityWater::render(const World& world)
+void EntityWater::render(RenderingEngine& renderer)
 {
 	glm::mat4 model = m_transform.matrix();
-	glm::mat4 view = world.camera.getViewMatrix();
-	glm::mat4 proj = world.camera.getProjectionMatrix();
+	glm::mat4 view = renderer.getActiveCamera().getViewMatrix();
+	glm::mat4 proj = renderer.getActiveCamera().getProjectionMatrix();
 
 	glm::mat4 mvpMatrix = proj * view * model;
 

@@ -110,7 +110,7 @@ int main()
 		{
 			using namespace std::chrono_literals;
 
-			std::this_thread::sleep_for(1ms);
+			std::this_thread::sleep_for(500us);
 		}
 
 		Input::update();

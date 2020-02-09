@@ -70,7 +70,7 @@ EntityGrid::EntityGrid(const glm::vec2& size, const glm::ivec2& segments)
 	m_indexBuffer.create(GL_ELEMENT_ARRAY_BUFFER);
 	m_indexBuffer.data(indices.data(), indices.size() * sizeof(unsigned int));
 
-	m_numLines = indices.size();
+	m_numLines = (int)indices.size();
 
 	m_lineShader.init();
 	m_lineShader.addShaderFromPath(GL_VERTEX_SHADER, "./res/shaders/line.vert");
@@ -88,11 +88,11 @@ EntityGrid::~EntityGrid()
 	m_lineShader.destroy();
 }
 
-void EntityGrid::render(const World& world)
+void EntityGrid::render(RenderingEngine& renderer)
 {
 	glm::mat4 model = m_transform.matrix();
-	glm::mat4 view = world.camera.getViewMatrix();
-	glm::mat4 proj = world.camera.getProjectionMatrix();
+	glm::mat4 view = renderer.getActiveCamera().getViewMatrix();
+	glm::mat4 proj = renderer.getActiveCamera().getProjectionMatrix();
 
 	glm::mat4 mvpMatrix = proj * view * model;
 

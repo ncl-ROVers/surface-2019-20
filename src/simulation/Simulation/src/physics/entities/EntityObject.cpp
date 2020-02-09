@@ -54,8 +54,10 @@ EntityObject::~EntityObject()
 	m_texture.destroy();
 }
 
-void EntityObject::render(const World& world)
+void EntityObject::render(RenderingEngine& renderer)
 {
+	const World& world = renderer.getWorld();
+
 	glm::mat4 model = m_transform.matrix();
 	glm::mat4 view = world.camera.getViewMatrix();
 	glm::mat4 proj = world.camera.getProjectionMatrix();

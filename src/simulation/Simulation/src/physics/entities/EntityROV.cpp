@@ -34,7 +34,6 @@ EntityROV::EntityROV(const RovSetup& setup) :
 	thrusterMaterial.fragmentShader = "./res/shaders/shader.frag";
 	thrusterMaterial.albedo = "./res/textures/thruster.png";
 
-	EntityObject* thrusters = (EntityObject*)m_entityThrusters;
 	for(int i = 0; i < THRUSTER_COUNT; ++i)
 	{
 		m_entityThrusters[i] = new EntityObject(thrusterMaterial);
@@ -44,6 +43,17 @@ EntityROV::EntityROV(const RovSetup& setup) :
 
 		m_entityThrusters[i]->setParent(this);
 	}
+
+	for (int i = 0; i < CAMERA_COUNT; ++i)
+	{
+		m_entityCameras[i] = new EntityCamera((int)setup.cameraResolutions[i].x, (int)setup.cameraResolutions[i].y, setup.cameraFOVs[i]);
+		m_entityCameras[i]->getTransform().position(setup.cameraPositions[i]);
+		m_entityCameras[i]->getTransform().rotation(quaternion({ 1.0f, 0.0f, 0.0f }, setup.cameraRotations[i].x) *
+													quaternion({ 0.0f, 1.0f, 0.0f }, setup.cameraRotations[i].y) *
+													quaternion({ 0.0f, 0.0f, 1.0f }, setup.cameraRotations[i].z));
+
+		m_entityCameras[i]->setParent(this);
+	}
 }
 
 EntityROV::~EntityROV()
@@ -51,6 +61,11 @@ EntityROV::~EntityROV()
 	for (int i = 0; i < THRUSTER_COUNT; ++i)
 	{
 		delete m_entityThrusters[i];
+	}
+
+	for (int i = 0; i < CAMERA_COUNT; ++i)
+	{
+		delete m_entityCameras[i];
 	}
 }
 
@@ -70,14 +85,17 @@ void EntityROV::update(double delta)
 	}
 }
 
-void EntityROV::render(const World& world)
+void EntityROV::render(RenderingEngine& renderer)
 {
-	EntityRigidBody::render(world);
+	EntityRigidBody::render(renderer);
 
-//	glDisable(GL_DEPTH_TEST);
-	for (size_t i = 0; i < THRUSTER_COUNT; ++i)
+	for (int i = 0; i < THRUSTER_COUNT; ++i)
 	{
-		m_entityThrusters[i]->render(world);
+		m_entityThrusters[i]->render(renderer);
 	}
-//	glEnable(GL_DEPTH_TEST);
+
+	for (int i = 0; i < CAMERA_COUNT; ++i)
+	{
+		m_entityCameras[i]->render(renderer);
+	}
 }

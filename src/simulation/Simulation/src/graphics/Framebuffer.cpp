@@ -38,6 +38,13 @@ void Framebuffer::create(int width, int height)
 	m_height = height;
 }
 
+void Framebuffer::readPixels(unsigned char* pixelData)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+	glReadPixels(0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, pixelData);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+}
+
 void Framebuffer::bind() const
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);

@@ -42,4 +42,6 @@ public:
 	inline void scale(const glm::vec3& scale) { m_scale = scale; }
 
 	inline void parent(Transform* parent) { m_parentTransform = parent; }
+	inline Transform* parent() { return m_parentTransform; }
+	inline const Transform* parent() const { return m_parentTransform; }
 };

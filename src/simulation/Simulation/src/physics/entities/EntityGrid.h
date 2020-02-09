@@ -19,5 +19,5 @@ public:
 	~EntityGrid();
 
 	void update(double delta) override {}
-	void render(const World& world) override;
+	void render(RenderingEngine& renderer) override;
 };

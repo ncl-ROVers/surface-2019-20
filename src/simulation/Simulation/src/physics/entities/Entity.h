@@ -4,6 +4,8 @@
 #include "physics/Transform.h"
 #include "graphics/World.h"
 
+#include "graphics/RenderingEngine.h"
+
 #include <cstdint>
 
 class Entity
@@ -17,8 +19,8 @@ public:
 	Entity(const Entity& other) = delete;
 	virtual ~Entity() {}
 
-	virtual void update(double delta) = 0;
-	virtual void render(const World& world) = 0;
+	virtual void update(double delta) {}
+	virtual void render(RenderingEngine& renderer) {}
 
 	inline void operator=(const Entity& other) = delete;
 
