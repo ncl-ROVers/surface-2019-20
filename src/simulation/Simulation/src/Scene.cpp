@@ -6,6 +6,8 @@
 #include "physics/entities/EntityGrid.h"
 #include "physics/entities/EntityWater.h"
 
+#include "io/Input.h"
+
 #include <string>
 
 using namespace std::string_literals;
@@ -35,10 +37,12 @@ void Scene::init(int width, int height)
 	}
 	else if (m_config.getSceneType() == SCENE_TYPE_POOL)
 	{
+#if 0
 		EntityWater* water = new EntityWater(38, 38, 70, 70);
 		water->getTransform().position({ 0, 4, 0 });
 
 		m_entities.push_back(water);
+#endif
 
 		MaterialData poolMaterial;
 		poolMaterial.albedo = "./res/textures/texture.jpg";
@@ -62,7 +66,7 @@ void Scene::update(double delta)
 
 	for (int i = 0; i < THRUSTER_COUNT; ++i)
 	{
-		m_rov->setThrusterPower(i, m_server.getThrusterPower(i));
+		m_rov->setThrusterPower(i, m_server.getThrusterPower(i) * m_rov->getMaxThrsuterPower());
 	}
 
 	for (Entity* entity : m_entities)

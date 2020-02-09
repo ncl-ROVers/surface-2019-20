@@ -69,6 +69,7 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 	long int startIndex = 0;
 	long int endIndex = 0;
 
+	char line[4096];
 	for (; startIndex < size && endIndex < size; startIndex = ++endIndex)
 	{
 		while (fileData[endIndex] != '\n' && endIndex < size) ++endIndex;
@@ -78,7 +79,7 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 			continue;
 		}
 
-		char* line = (char*)malloc(endIndex - startIndex);
+		memset(line, 0, sizeof(line));
 		memcpy(line, fileData + startIndex, endIndex - startIndex);
 
 		//Parse OBJ line
@@ -124,8 +125,6 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 			parseIndex(index1);
 			parseIndex(index2);
 		}
-
-		free(line);
 	}
 
 	delete[] fileData;

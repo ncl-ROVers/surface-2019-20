@@ -12,7 +12,8 @@ MaterialData getMaterialData()
 }
 
 EntityROV::EntityROV(const RovSetup& setup) :
-	EntityRigidBody(getMaterialData(), setup.mass, &setup.centerOfMass)
+	EntityRigidBody(getMaterialData(), setup.mass, &setup.centerOfMass),
+	m_thrusterPower(setup.maxThrsuterPower)
 {
 	for (int i = 0; i < THRUSTER_COUNT; ++i)
 	{

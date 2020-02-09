@@ -14,6 +14,8 @@ private:
 	EntityObject* m_entityThrusters[THRUSTER_COUNT];
 
 	EntityCamera* m_entityCameras[CAMERA_COUNT];
+
+	float m_thrusterPower = 1.0f;
 public:
 	EntityROV(const RovSetup& setup);
 	~EntityROV();
@@ -23,6 +25,7 @@ public:
 
 	inline float getThrusterPower(int index) const { return std::get<2>(m_thrusterPositions[index]); }
 	inline void setThrusterPower(int index, float power) { std::get<2>(m_thrusterPositions[index]) = power; }
+	inline float getMaxThrsuterPower() const { return m_thrusterPower; }
 
 	inline EntityCamera* getCamera(int index) { assert(index < CAMERA_COUNT); return m_entityCameras[index]; }
 };

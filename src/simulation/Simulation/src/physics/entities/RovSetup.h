@@ -28,6 +28,8 @@ struct RovSetup
 	glm::vec2 cameraResolutions[CAMERA_COUNT];
 	float cameraFOVs[CAMERA_COUNT];
 
+	float maxThrsuterPower = 5.0f;
+
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 rotation = glm::vec3(0.0f);
 

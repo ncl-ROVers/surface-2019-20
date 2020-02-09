@@ -51,9 +51,14 @@ RigidBodyDerivative RigidBodyData::derivative(const Transform& transform) const
 {
 	RigidBodyDerivative deriv;
 
+	//Compute (fake) drag
+	glm::vec3 linearDrag = 0.5f * 997.0f * (this->linearVelocity * this->linearVelocity) * (0.5f) * (1.0f);
+	glm::vec3 angularDrag = 0.5f * 997.0f * (this->angularVelocity * this->angularVelocity) * (0.5f) * (1.0f);
+
+	//Set derivative vaules
 	deriv.dPosition = this->linearVelocity;
 	deriv.dRotation = (quaternion(glm::vec4(this->angularVelocity, 0.0f)) * transform.rotation()) * 0.5f;
-	deriv.dLinearMomentum = this->totalForce;
+	deriv.dLinearMomentum = this->totalForce - linearDrag;
 	deriv.dAngularMomentum = this->totalTorque;
 
 	return deriv;

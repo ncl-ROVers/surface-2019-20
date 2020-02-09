@@ -149,7 +149,7 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 				rov.thrusterRotations[index] = glm::vec3((float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value());
 			}
 
-			if (isFieldOfType(comp = &thruster.second["force"], "force", Json::NUMBER))
+			if (isFieldOfType(comp = &thruster.second["power"], "power", Json::NUMBER))
 			{
 				rov.thrusterPower[index] = (float)comp->number_value();
 			}
@@ -202,6 +202,11 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 		const Json::array& coords = obj->array_items();
 
 		rov.centerOfMass = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+	}
+
+	if (isFieldOfType(obj = &root["max_thruster_force"], "max_thruster_force", Json::NUMBER))
+	{
+		rov.maxThrsuterPower = (float)obj->number_value();
 	}
 }
 
