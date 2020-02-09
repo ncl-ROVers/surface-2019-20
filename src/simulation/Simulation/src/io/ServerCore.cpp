@@ -1,5 +1,7 @@
 #include "ServerCore.h"
 
+#include "json/json11.hpp"
+
 #define BUFFER_SIZE 4096
 
 ServerCore::~ServerCore()
@@ -7,11 +9,47 @@ ServerCore::~ServerCore()
 	
 }
 
+float normalize(float value, float currentMin, float currentMax, float intendedMin, float intendedMax)
+{
+	return intendedMin + (value - currentMin) * (intendedMax - intendedMin) / (currentMax - currentMin);
+}
+
 void ServerCore::processMessage(const char* inputBuffer, int inputLength, char* outputBuffer, int& outputLength)
 {
-	//Copy input message to output
-	memcpy(outputBuffer, inputBuffer, inputLength);
-	outputLength = inputLength;
+	using namespace json11;
+
+	std::string err;
+	Json root = Json::parse(std::string(inputBuffer, inputLength), err);
+
+	if (!err.empty())
+	{
+		LOG_ERROR("Error parsing input file: ", err);
+		return;
+	}
+
+	for (int i = 0; i < THRUSTER_COUNT; ++i)
+	{
+		m_thrusterPowers[i] = 0.0f;
+	}
+
+	for (std::pair<std::string, Json> thruster : root.object_items())
+	{
+		int index = 0;
+		index += (thruster.first[2] == 'V') ? 4 : 0;
+		index += (thruster.first[3] == 'A') ? 2 : 0;
+		index += (thruster.first[4] == 'S') ? 1 : 0;
+
+		m_thrusterPowers[index] = normalize((float)thruster.second.number_value(), 1100, 1900, -1, 1);
+	}
+
+	Json response = Json::object{
+		{ "test", "empty" }
+	};
+
+	std::string responseStr = response.dump();
+
+	memcpy(outputBuffer, responseStr.c_str(), responseStr.size());
+	outputLength = responseStr.size();
 }
 
 void ServerCore::launchServer(int port)

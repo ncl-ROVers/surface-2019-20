@@ -60,6 +60,11 @@ void Scene::update(double delta)
 {
 	m_renderingEngine.updateCamera(delta);
 
+	for (int i = 0; i < THRUSTER_COUNT; ++i)
+	{
+		m_rov->setThrusterPower(i, m_server.getThrusterPower(i));
+	}
+
 	for (Entity* entity : m_entities)
 	{
 		entity->update(delta);

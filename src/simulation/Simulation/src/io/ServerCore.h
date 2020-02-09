@@ -2,6 +2,8 @@
 
 #include "ServerSocket.h"
 
+#include "physics/entities/RovSetup.h"
+
 #include <thread>
 #include <memory>
 #include <mutex>
@@ -14,6 +16,8 @@ private:
 
 	std::mutex m_syncMutex;
 	std::thread* m_mainThread = nullptr;
+
+	float m_thrusterPowers[THRUSTER_COUNT];
 private:
 	void processMessage(const char* inputBuffer, int inputLength, char* outputBuffer, int& outputLength);
 	void run();
@@ -24,6 +28,8 @@ public:
 
 	void launchServer(int port);
 	void shutdownServer();
+
+	inline float getThrusterPower(int index) const { return m_thrusterPowers[index]; }
 
 	inline ServerCore& operator=(const ServerCore& other) = delete;
 };
