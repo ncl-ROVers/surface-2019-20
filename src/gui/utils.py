@@ -19,6 +19,20 @@ SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
 SLIDING_MENU_WIDTH = SCREEN_WIDTH // 8
 MENU_BAR_HEIGHT = SCREEN_HEIGHT // 12
 
+# Set the interval to check the connection status and reconnect on errors
+CONNECTION_CLOCK_INTERVAL = 1000
+
+
+def check_connection():
+    """
+    Function used to check the connection and reconnect if disconnected.
+    """
+    if _References.connection.status == comms.ConnectionStatus.DISCONNECTED:
+        _References.connection.connect()
+    elif _References.connection.status == comms.ConnectionStatus.CONNECTED:
+        if not _References.connection.connected:
+            _References.connection.reconnect()
+
 
 def get_manager() -> typing.Union[QMainWindow, None]:
     """
@@ -41,6 +55,7 @@ class _References:
     controller: control.Controller = None
     control_manager: control.ControlManager = None
     connection: comms.Connection = None
+    connection_clock: QTimer = None
 
 
 class Colour(enum.Enum):
@@ -393,7 +408,7 @@ class ScreenManager(QMainWindow):
         super(ScreenManager, self).__init__()
 
         # Declare access to the references - objects loaded by the load function will be stored there
-        self._references = _References()
+        self._references = _References
 
         # Prepare the main screen as a vertical box
         self._base_widget = QWidget()

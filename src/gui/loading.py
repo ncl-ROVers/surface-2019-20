@@ -8,7 +8,7 @@ import os
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
 from PySide2.QtGui import *
-from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH, get_manager
+from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH, CONNECTION_CLOCK_INTERVAL, get_manager, check_connection
 from ..common import Log
 from .. import comms, control, common
 
@@ -41,10 +41,19 @@ def load_connection():
 
 def load_attempt_connection():
     """
-    Connect to the ROV. TODO: Move it to code handling automatic connection and disconnection
+    Connect to the ROV (first attempt only).
     """
-    # Connect to the ROV
     get_manager().references.connection.connect()
+
+
+def load_connection_clock():
+    """
+    Prepare the clock which attempts to connect to the ROV.
+    """
+    _clock = QTimer()
+    _clock.setInterval(CONNECTION_CLOCK_INTERVAL)
+    _clock.timeout.connect(check_connection)
+    get_manager().references.connection_clock = _clock
 
 
 # Declare the list of operations to load (must be callable functions)
@@ -52,6 +61,7 @@ OPERATIONS = (
     load_controller,
     load_control_manager,
     load_connection,
+    load_connection_clock,
     load_attempt_connection
 )
 
