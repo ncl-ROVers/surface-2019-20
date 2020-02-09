@@ -7,6 +7,7 @@ Module storing an implementation of a socket-based connection with the ROV.
 import socket as _socket
 import json as _json
 import multiprocessing as _mp
+import threading as _threading
 from .utils import ConnectionStatus as _ConnectionStatus
 from ..common import data_manager as _dm
 from ..common import Log as _Log
@@ -26,7 +27,8 @@ class Connection:
         * __init__ - a constructor to create and initialise socket and process related constructs
         * status - a getter to retrieve current connection status
         * connected - a getter to check if the communication is still happening
-        * connect - a method used to connect with the ROV
+        * connect - a method used to connect with the ROV (spawns separate thread)
+        * _connect - a method used to connect with the ROV
         * disconnect - a method used to disconnect with the ROV
         * reconnect - a helper method used to disconnect and connect in one step
         * _communicate - a private method which does the actual communication with the ROV (send and recv)
@@ -96,6 +98,12 @@ class Connection:
         return self._process.is_alive()
 
     def connect(self):
+        """
+        Helper method used to connect in a non-blocking way (separate thread)
+        """
+        _threading.Thread(target=self._connect).start()
+
+    def _connect(self):
         """
         Method used to connect to the server and start exchanging the data.
 
@@ -167,7 +175,7 @@ class Connection:
                 data = _dm.transmission.get_all()
 
                 # Encode the transmission data as JSON and send the bytes to the server
-                _Log.debug("Sending transmission data")
+                _Log.debug(f"Sending transmission data - {data}")
                 self._socket.sendall(bytes(_json.dumps(data), encoding="utf-8"))
 
                 _Log.debug("Receiving transmission data")
@@ -186,6 +194,7 @@ class Connection:
 
                 # Only handle valid, non-empty data
                 if data and isinstance(data, dict):
+                    _Log.debug(f"Received the following data - {data}")
                     _dm.received.update(data)
 
             except (ConnectionError, OSError) as e:
