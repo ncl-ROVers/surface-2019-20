@@ -175,7 +175,7 @@ class Connection:
                 data = _dm.transmission.get_all()
 
                 # Encode the transmission data as JSON and send the bytes to the server
-                _Log.debug("Sending transmission data")
+                _Log.debug(f"Sending transmission data - {data}")
                 self._socket.sendall(bytes(_json.dumps(data), encoding="utf-8"))
 
                 _Log.debug("Receiving transmission data")
@@ -194,6 +194,7 @@ class Connection:
 
                 # Only handle valid, non-empty data
                 if data and isinstance(data, dict):
+                    _Log.debug(f"Received the following data - {data}")
                     _dm.received.update(data)
 
             except (ConnectionError, OSError) as e:
