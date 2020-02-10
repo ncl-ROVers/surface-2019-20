@@ -70,8 +70,8 @@ RigidBodyDerivative RigidBodyData::derivative(const Transform& transform) const
 	//Set derivative vaules
 	deriv.dPosition = this->linearVelocity;
 	deriv.dRotation = (quaternion(glm::vec4(this->angularVelocity, 0.0f)) * transform.rotation()) * 0.5f;
-	deriv.dLinearMomentum = this->totalForce - std::min(linearDrag, glm::length(this->totalForce)) * safeNormalize(this->linearVelocity);
-	deriv.dAngularMomentum = this->totalTorque - std::min(angularDrag, glm::length(this->totalForce)) * safeNormalize(this->angularVelocity);
+	deriv.dLinearMomentum = this->totalForce - std::min(10000.0f, linearDrag) * safeNormalize(this->linearVelocity);
+	deriv.dAngularMomentum = this->totalTorque - std::min(10000.0f, angularDrag) * safeNormalize(this->angularVelocity);
 
 	return deriv;
 }
