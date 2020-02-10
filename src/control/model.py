@@ -178,7 +178,7 @@ class ControlManager:
                 value = -surge
 
             elif sway:
-                value = -sway
+                value = sway
 
             elif yaw:
                 value = -yaw
@@ -206,7 +206,7 @@ class ControlManager:
                 value = -surge
 
             elif sway:
-                value = sway
+                value = -sway
 
             elif yaw:
                 value = yaw
@@ -223,7 +223,6 @@ class ControlManager:
             :return: Value between _THURSTER_MAX and _THRUSTER_MIN
             """
             if surge and yaw:
-
                 # If backwards, else forwards
                 if surge < _IDLE:
                     value = -yaw
@@ -234,7 +233,7 @@ class ControlManager:
                 value = surge
 
             elif sway:
-                value = -sway
+                value = sway
 
             elif yaw:
                 value = yaw
@@ -262,7 +261,7 @@ class ControlManager:
                 value = surge
 
             elif sway:
-                value = sway
+                value = -sway
 
             elif yaw:
                 value = -yaw
