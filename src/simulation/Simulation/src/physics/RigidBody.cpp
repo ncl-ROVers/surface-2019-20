@@ -1,5 +1,17 @@
 #include "RigidBody.h"
 
+inline glm::vec3 safeNormalize(const glm::vec3& v)
+{
+	float lengthSqr = glm::dot(v, v);
+
+	if(lengthSqr == 0.0f)
+	{
+		return glm::vec3(0.0f);
+	}
+
+	return v * glm::inversesqrt(lengthSqr);
+}
+
 void RigidBodyData::calcRigidBodyInfo(double mass, const glm::vec3* centerOfMass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
 {
 	float vertexMass = (float)(mass / (double)numIndices);
@@ -52,14 +64,14 @@ RigidBodyDerivative RigidBodyData::derivative(const Transform& transform) const
 	RigidBodyDerivative deriv;
 
 	//Compute (fake) drag
-	glm::vec3 linearDrag = 0.5f * 997.0f * (this->linearVelocity * this->linearVelocity) * (0.5f) * (1.0f);
-	glm::vec3 angularDrag = 0.5f * 997.0f * (this->angularVelocity * this->angularVelocity) * (0.5f) * (1.0f);
+	float linearDrag = 0.5f * 997.0f * glm::dot(this->linearVelocity, this->linearVelocity) * (0.5f) * (1.0f);
+	float angularDrag = 0.5f * 997.0f * glm::dot(this->angularVelocity, this->angularVelocity) * (0.5f) * (1.0f);
 
 	//Set derivative vaules
 	deriv.dPosition = this->linearVelocity;
 	deriv.dRotation = (quaternion(glm::vec4(this->angularVelocity, 0.0f)) * transform.rotation()) * 0.5f;
-	deriv.dLinearMomentum = this->totalForce - linearDrag;
-	deriv.dAngularMomentum = this->totalTorque;
+	deriv.dLinearMomentum = this->totalForce - std::min(linearDrag, glm::length(this->totalForce)) * safeNormalize(this->linearVelocity);
+	deriv.dAngularMomentum = this->totalTorque - std::min(angularDrag, glm::length(this->totalForce)) * safeNormalize(this->angularVelocity);
 
 	return deriv;
 }
