@@ -41,6 +41,7 @@ _DISPATCH_MAP = {
 }
 
 # Declare the max and min values - the hardware and the expected ones
+_DEADZONE = 1025
 _HARDWARE_AXIS_MAX = 32767
 _HARDWARE_AXIS_MIN = -32768
 _HARDWARE_TRIGGER_MAX = 255
@@ -55,10 +56,13 @@ def _normalise_axis(value: float) -> float:
     """
     Helper function used to normalise the controller axis values into a common range.
 
+    Uses a custom dead zone to ignore too small values (hardware limitations).
+
     :param value: Value to be normalised
     :raises: ValueError
     :return: Normalised value
     """
+    value = 0 if -_DEADZONE < value < _DEADZONE else value
     return _normalise(value, _HARDWARE_AXIS_MIN, _HARDWARE_AXIS_MAX, _INTENDED_AXIS_MIN, _INTENDED_AXIS_MAX)
 
 

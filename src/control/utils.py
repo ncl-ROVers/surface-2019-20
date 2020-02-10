@@ -33,11 +33,11 @@ def normalise(value: float, current_min: float, current_max: float, intended_min
     :param intended_min: The expected minimum of the value
     :param intended_max: The expected maximum of the value
     :raises: ValueError
-    :return: Normalised value
+    :return: Normalised value (rounded)
     """
     if current_min == current_max or intended_min == intended_max:
         raise ValueError("Current or intended minimum and maximum can not be equal")
     elif not (current_max >= value >= current_min):
         raise ValueError(f"Value {value} is not be between {current_min} and {current_max}")
 
-    return intended_min + (value - current_min) * (intended_max - intended_min) / (current_max - current_min)
+    return round(intended_min + (value - current_min) * (intended_max - intended_min) / (current_max - current_min), 3)
