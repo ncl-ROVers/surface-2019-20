@@ -96,7 +96,7 @@ project "GLFW"
 			projsrc .. "src/osmesa_context.c"
 		}
 
-		defines {  "_GLFW_WIN32", "_CRT_SECURE_NO_WARNINGS" }
+		defines { "_GLFW_WIN32", "_CRT_SECURE_NO_WARNINGS" }
 
 	filter "configurations:Debug"
 		runtime "Debug"
@@ -123,16 +123,21 @@ project "Simulation"
 	includedirs {
 		"%{prj.name}/src/",
 		"Dependencies/GLFW/include/",
-		"Dependencies/GLAD/include",
+		"Dependencies/GLAD/include/",
 		"Dependencies/glm/glm/"
 	}
 	
-	links { "GLFW", "GLAD", "opengl32.lib" }
+	filter { "system:windows" }
+		links { "GLFW", "GLAD", "OpenGL32" }
+		
+	filter { "system:not windows" }
+		links { "GLFW", "GLAD", "GL" }
+	
 	
 	filter "configurations:Debug"
-		defines { "BUILD_DEBUG" }
+		defines { "BUILD_DEBUG", "_CRT_SECURE_NO_WARNINGS" }
 		symbols "On"
 
    filter "configurations:Release"
-		defines { }
+		defines { "_CRT_SECURE_NO_WARNINGS" }
 		optimize "On"
