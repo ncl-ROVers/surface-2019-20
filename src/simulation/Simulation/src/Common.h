@@ -21,6 +21,10 @@
 
 #include "io/Logger.h"
 
+#ifndef COMPILE_PATH_OFFSET
+#define COMPILE_PATH_OFFSET "."
+#endif
+
 typedef uint8_t byte;
 
 template<int D, typename T, glm::qualifier Q>
@@ -72,4 +76,9 @@ inline byte* readFileContent(const std::string& path, long int& fileSize)
 	fclose(file);
 
 	return data;
+}
+
+inline std::string resolvePath(const std::filesystem::path& path)
+{
+	return std::filesystem::absolute(COMPILE_PATH_OFFSET / path).u8string();
 }

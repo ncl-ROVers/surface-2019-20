@@ -59,7 +59,7 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 	};
 
 	long int size = 0;
-	byte* fileData = readFileContent(path, size);
+	byte* fileData = readFileContent(resolvePath(path), size);
 	
 	if (!fileData)
 	{

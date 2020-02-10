@@ -5,7 +5,7 @@
 void Texture::create(const std::string& path)
 {
 	int width, height, numChannels;
-	stbi_uc* data = stbi_load(path.c_str(), &width, &height, &numChannels, 3);
+	stbi_uc* data = stbi_load(resolvePath(path).c_str(), &width, &height, &numChannels, 3);
 
 	if (!data)
 	{

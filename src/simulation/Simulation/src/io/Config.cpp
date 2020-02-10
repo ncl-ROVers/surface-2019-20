@@ -70,7 +70,7 @@ bool isValidArray(const json11::Json* obj, const char* name, size_t requiredSize
 void Config::loadConfig(const std::string& path)
 {
 	long int size = 0;
-	byte* src = readFileContent(std::filesystem::absolute(path).u8string(), size);
+	byte* src = readFileContent(resolvePath(path), size);
 
 	if (!src)
 	{
@@ -149,7 +149,7 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 				rov.thrusterRotations[index] = glm::vec3((float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value());
 			}
 
-			if (isFieldOfType(comp = &thruster.second["power"], "power", Json::NUMBER))
+			if (isFieldOfType(comp = &thruster.second["force"], "force", Json::NUMBER))
 			{
 				rov.thrusterPower[index] = (float)comp->number_value();
 			}
@@ -320,7 +320,5 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 		{
 			LOG_WARN("JSON field 'cache' should be either a string or a boolean, not '", typeName(obj->type()), "'.");
 		}
-	}
-
-	
+	}	
 }

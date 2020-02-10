@@ -11,12 +11,14 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 
 	namespace fs = std::filesystem;
 	
-	std::string path = fs::path(m_cacheDir).append(saveName).generic_string();
-	if (!fs::exists(m_cacheDir))
+	std::string path = resolvePath(fs::path(m_cacheDir).append(saveName));
+	std::string cacheDirPath = resolvePath(m_cacheDir);
+
+	if (!fs::exists(cacheDirPath))
 	{
 		LOG_VERBOSE("Create cache directory");
 
-		if (!fs::create_directory(m_cacheDir))
+		if (!fs::create_directory(cacheDirPath))
 		{
 			LOG_ERROR("Unable to create cache directory at: ", m_cacheDir);
 			LOG_PAUSE();
@@ -93,7 +95,7 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 bool LaunchCache::isMeshCached(const std::string& saveName)
 {
 	namespace fs = std::filesystem;
- 	return fs::exists(fs::path(m_cacheDir).append(saveName));
+ 	return fs::exists(resolvePath(fs::path(m_cacheDir).append(saveName)));
 }
 
 
@@ -105,8 +107,8 @@ bool LaunchCache::isMeshOutdated(const std::string& saveName, const std::string&
 	}
 
 	namespace fs = std::filesystem;
-	fs::file_time_type cacheTime = fs::last_write_time(fs::path(m_cacheDir).append(saveName));
-	fs::file_time_type originalTime = fs::last_write_time(fs::path(modelPath));
+	fs::file_time_type cacheTime = fs::last_write_time(resolvePath(fs::path(m_cacheDir).append(saveName)));
+	fs::file_time_type originalTime = fs::last_write_time(resolvePath(modelPath));
 
 	return originalTime > cacheTime;
 }
@@ -131,7 +133,7 @@ void LaunchCache::loadMeshData(const std::string& saveName, Mesh& mesh)
 	}
 
 	long int fileSize = 0;
-	byte* meshData = readFileContent(std::filesystem::path(m_cacheDir).append(saveName).generic_string(), fileSize);
+	byte* meshData = readFileContent(resolvePath(std::filesystem::path(m_cacheDir).append(saveName)), fileSize);
 
 	uint64_t ptr = 0;
 
