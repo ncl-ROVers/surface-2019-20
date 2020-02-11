@@ -7,9 +7,8 @@ git clone https://github.com/ncl-ROVers/surface
 cd surface/
 ```
 
-Then, run the following to switch to the simulation branch and navigate to the simulation's root directory.
+Then navigate to the simulation's root directory:
 ```
-git checkout simulation
 cd src
 cd simulation
 ```
