@@ -8,7 +8,7 @@ struct WaterVertex
 
 EntityWater::EntityWater(float waterSizeX, float waterSizeY, int waterWidth, int waterHeight)
 {
-	//Water
+	//Generate water vertices
 	WaterVertex* vertices = new WaterVertex[waterWidth * waterHeight];
 
 	for (int i = 0; i < waterWidth; ++i)

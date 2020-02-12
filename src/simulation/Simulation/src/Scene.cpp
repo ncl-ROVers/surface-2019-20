@@ -22,6 +22,7 @@ void Scene::init(int width, int height)
 	//Setup rendering engine
 	m_renderingEngine.loadSetting(m_config);
 
+	//SEup cache
 	m_cache.setEnabled(m_config.isCacheEnabled());
 	if (m_config.getCacheDir() != "")
 	{

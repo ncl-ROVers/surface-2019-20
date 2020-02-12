@@ -14,6 +14,7 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 	std::string path = resolvePath(fs::path(m_cacheDir).append(saveName));
 	std::string cacheDirPath = resolvePath(m_cacheDir);
 
+	//Create cache dir is it doesn't exist
 	if (!fs::exists(cacheDirPath))
 	{
 		LOG_VERBOSE("Create cache directory");
@@ -75,19 +76,6 @@ void LaunchCache::saveMeshData(const std::string& saveName, const Mesh& mesh)
 
 	fwrite(writeSrc, sizeof(unsigned int), (size_t)tempCount, file);
 	mesh.unmapMeshData(MeshDataType::DATA_INDICES);
-	/*
-	//Write physics datas
-	bool hasRigidBody = mesh.hasRigidBodyData();
-	fwrite(&hasRigidBody, sizeof(bool), 1, file);
-
-	if (hasRigidBody)
-	{
-		const RigidBodyData& rbData = mesh.getPhysicsData();
-
-		fwrite(&rbData.mass, sizeof(double), 1, file);
-		fwrite(&rbData.bodyI, sizeof(glm::mat3), 1, file);
-		fwrite(&rbData.centerOfMassOffset, sizeof(glm::vec3), 1, file);
-	}*/
 
 	fclose(file);
 }
@@ -105,7 +93,8 @@ bool LaunchCache::isMeshOutdated(const std::string& saveName, const std::string&
 	{
 		return true;
 	}
-
+	
+	//Check if cached mesh is outdated based on file timestamps
 	namespace fs = std::filesystem;
 	fs::file_time_type cacheTime = fs::last_write_time(resolvePath(fs::path(m_cacheDir).append(saveName)));
 	fs::file_time_type originalTime = fs::last_write_time(resolvePath(modelPath));
@@ -137,43 +126,21 @@ void LaunchCache::loadMeshData(const std::string& saveName, Mesh& mesh)
 
 	uint64_t ptr = 0;
 
+	//Read vertex data
 	uint64_t vertexCount = *((uint64_t*)&meshData[CHK_PTR(ptr, sizeof(uint64_t), fileSize)]);
 	glm::vec3* vertices = (glm::vec3*)&meshData[CHK_PTR(ptr, (vertexCount * sizeof(glm::vec3)), fileSize)];
 
+	//Read texcoord data
 	uint64_t texCoordCount = *((uint64_t*)&meshData[CHK_PTR(ptr, sizeof(uint64_t), fileSize)]);
 	glm::vec2* texCoords = (glm::vec2*)&meshData[CHK_PTR(ptr, (texCoordCount * sizeof(glm::vec2)), fileSize)];
 
+	//Read normal data
 	uint64_t normalCount = *((uint64_t*)&meshData[CHK_PTR(ptr, sizeof(uint64_t), fileSize)]);
 	glm::vec3* normals = (glm::vec3*)&meshData[CHK_PTR(ptr, (normalCount * sizeof(glm::vec3)), fileSize)];
 
+	//Read index data
 	uint64_t indexCount = *((uint64_t*)&meshData[CHK_PTR(ptr, sizeof(uint64_t), fileSize)]);
 	unsigned int* indices = (unsigned int*)&meshData[CHK_PTR(ptr, (indexCount * sizeof(unsigned int)), fileSize)];
-	/*
-	bool hasRigidBody = *((bool*)&meshData[CHK_PTR(ptr, sizeof(bool), fileSize)]);
-
-	if (hasRigidBody)
-	{
-		RigidBodyData data;
-
-		data.mass = *((double *)&meshData[CHK_PTR(ptr, sizeof(double), fileSize)]);
-		data.bodyI = *((glm::mat3*)&meshData[CHK_PTR(ptr, sizeof(glm::mat3), fileSize)]);
-
-		data.invBodyI = glm::inverse(data.bodyI);
-
-		data.centerOfMassOffset = *((glm::vec3*)&meshData[CHK_PTR(ptr, sizeof(glm::vec3), fileSize)]);
-
-		data.linearMomentum = glm::zero<glm::vec3>();
-		data.angularMomentum = glm::zero<glm::vec3>();
-
-		data.invMomentOfInteria = glm::identity<glm::mat3>();
-		data.linearVelocity = glm::zero<glm::vec3>();
-		data.angularVelocity = glm::zero<glm::vec3>();
-
-		data.totalForce = glm::zero<glm::vec3>();
-		data.totalTorque = glm::zero<glm::vec3>();
-		
-		mesh.setPhysicsData(data);
-	}*/
 
 	mesh.loadDirect(vertices, (size_t)vertexCount, texCoords, (size_t)texCoordCount, normals, (size_t)normalCount, indices, (size_t)indexCount);
 

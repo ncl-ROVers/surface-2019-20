@@ -19,6 +19,6 @@ public:
 	RenderView() {}
 
 	void create();
-	void render(const Transform& transform, const Framebuffer& framebuffer);
+	void render(const Transform& transform, const Framebuffer& framebuffer, int colorAttachment);
 	void destroy();
 };

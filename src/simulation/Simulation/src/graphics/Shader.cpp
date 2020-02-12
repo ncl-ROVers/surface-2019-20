@@ -98,6 +98,7 @@ GLint Shader::getUniformLocation(const std::string& name)
 {
 	std::unordered_map<std::string, GLint>::iterator it = m_uniforms.find(name);
 
+	//Cache uniform location for better performance
 	if (it == m_uniforms.end())
 	{
 		m_uniforms[name] = glGetUniformLocation(m_program, name.c_str());
