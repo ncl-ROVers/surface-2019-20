@@ -43,18 +43,16 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 	{
 		std::unordered_map<ModelIndex, unsigned int>::iterator it = indexMap.find(index);
 
-		if (it == indexMap.end()) //ModelIndex does not exist in the map
+		if (it == indexMap.end())
 		{
-			//Add the ModelIndex to map and to index list
 			indexMap[index] = (unsigned int)modelVertices.size();
 			modelIndices.push_back((unsigned int)modelVertices.size());
 
-			//Added ModelIndex data to mesh graph
 			modelVertices.push_back(vertices[index.vertexIndex - 1]);
 			modelTexCoords.push_back(texCoords[index.texCoordIndex - 1]);
 			modelNormals.push_back(normals[index.normalIndex - 1]);
 		}
-		else //ModelIndex exists
+		else
 		{
 			modelIndices.push_back(it->second);
 		}
@@ -74,7 +72,6 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 	char line[4096];
 	for (; startIndex < size && endIndex < size; startIndex = ++endIndex)
 	{
-		//Find the end of the line
 		while (fileData[endIndex] != '\n' && endIndex < size) ++endIndex;
 
 		if (startIndex == endIndex)
@@ -109,8 +106,6 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 		}
 		else if (!strncmp(line, "f ", 2))
 		{
-			//Allocate required memory once when we start parsing
-			//faces to avoid later memory allocations
 			if (vertices.size() > modelVertices.size())
 			{
 				modelVertices.reserve(vertices.size());
@@ -118,7 +113,6 @@ void parseOBJFile(const std::string& path, std::vector<glm::vec3>& modelVertices
 				modelNormals.reserve(normals.size());
 			}
 
-			//Parse face indices
 			ModelIndex index0;
 			ModelIndex index1;
 			ModelIndex index2;

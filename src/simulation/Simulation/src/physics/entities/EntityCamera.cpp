@@ -20,7 +20,6 @@ EntityCamera::~EntityCamera()
 
 void EntityCamera::render(RenderingEngine& renderer)
 {
-	//Set the camera's translation, rotation and scale to match the entity's
 	m_camera.setViewMatrix(glm::inverse(m_transform.matrix()));
 
 	renderer.enqueueRender(m_camera, m_framebuffer);

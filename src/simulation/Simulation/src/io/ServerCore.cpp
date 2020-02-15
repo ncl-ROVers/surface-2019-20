@@ -34,7 +34,6 @@ void ServerCore::processMessage(const char* inputBuffer, int inputLength, char* 
 
 	for (std::pair<std::string, Json> thruster : root.object_items())
 	{
-		//Calculate thruster index based on thruster name
 		int index = 0;
 		index += (thruster.first[2] == 'V') ? 4 : 0;
 		index += (thruster.first[3] == 'A') ? 2 : 0;

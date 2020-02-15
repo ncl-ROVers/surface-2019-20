@@ -12,6 +12,5 @@ private:
 public:
 	void processEntities(double delta);
 
-	//Add entity to the list of entities to be processed by the physics engine
 	inline void stepEntity(EntityRigidBody* body) { m_submittedEntities.push_back(body); }
 };

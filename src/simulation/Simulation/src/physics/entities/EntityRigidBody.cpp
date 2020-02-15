@@ -27,7 +27,6 @@ void EntityRigidBody::addForceLocal(const glm::vec3& pos, const glm::vec3& force
 
 void EntityRigidBody::addForce(const glm::vec3& pos, const glm::vec3& force)
 {
-	//Transform location and rotation to be in object space
 	glm::vec4 localPos = glm::inverse(m_transform.matrix()) * glm::vec4(pos, 1.0);
 	glm::vec3 localForce = glm::inverse(glm::mat3(m_transform.matrix())) * force;
 	

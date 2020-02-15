@@ -34,13 +34,11 @@ void RenderingEngine::renderWorld(const std::vector<Entity*>& entities)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Render scene
 	for (Entity* entity : entities)
 	{
 		entity->render(*this);
 	}
 
-	//Render from the perspective of other cameras
 	Camera mainCamera = m_world.camera;
 	m_blockRenderEnqueues = true;
 
@@ -72,7 +70,6 @@ void RenderingEngine::renderWorld(const std::vector<Entity*>& entities)
 
 void RenderingEngine::enqueueRender(const Camera& camera, const Framebuffer& framebuffer)
 {
-	//Add render request only if rendering from the main camera
 	if (!m_blockRenderEnqueues)
 	{
 		m_pendingRenderViews.emplace_back(camera, framebuffer);	
