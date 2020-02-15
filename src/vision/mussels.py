@@ -109,16 +109,18 @@ def _find_mussels(img_grey: _np.ndarray, mask: _np.ndarray, hull_rect: _np.ndarr
     circles = _cv2.HoughCircles(img_grey, method=_cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=10, param2=8,
                                 minRadius=1, maxRadius=20)
 
-    # Draw the circles on the image
+    # Draw the circles on the image (and count the circles)
+    num = 0
     for i in circles[0, :]:
         i = i.astype(_np.int32)
         if _cv2.pointPolygonTest(hull_rect, (i[0], i[1]), measureDist=True) > (-i[2] / 3):
-            # draw the outer circle
-            _cv2.circle(mask, (i[0], i[1]), i[2], (0, 255, 0), 2)
-            # draw the center of the circle
-            _cv2.circle(mask, (i[0], i[1]), 2, (0, 0, 255), 3)
 
-    return mask, len(circles[0])
+            # Draw the outer circle, the center of the circle and increment the counter
+            _cv2.circle(mask, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            _cv2.circle(mask, (i[0], i[1]), 2, (0, 0, 255), 3)
+            num += 1
+
+    return mask, num
 
 
 def _drop_noisy(df: _pd.DataFrame) -> _pd.DataFrame:
@@ -195,5 +197,5 @@ _cv2.imshow("2. Circles removed", _circles_removed)
 _cv2.imshow("3. Blurred and smoothed", _blurred_and_smoothed)
 _cv2.imshow("4. Convex hull", _convex_hull)
 _cv2.imshow("5. Mussels", _mussels_found)
-print("Counted", _mussels_count, "mussels")  # TODO: Number of mussels is wrong
+print("Counted", _mussels_count, "mussels")
 _cv2.waitKey(0)
