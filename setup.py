@@ -70,7 +70,7 @@ setuptools.setup(
     name="ncl_rovers",
     description="ROV project for MATE competition",
     version="1.0.dev2",
-    author="Newcastle University Engineering Projects Society",
+    author="Newcastle University Engineering Projects Society (surface)",
     maintainer="Florianski Kacper",
     maintainer_email="k.florianski@newcastle.ac.uk",
     long_description=long_description,
