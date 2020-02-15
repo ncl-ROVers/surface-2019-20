@@ -62,7 +62,6 @@ def _get_edge_points(mask) -> list:
     for x1, y1, x2, y2 in lines:
         points.append((x1, y1))
         points.append((x2, y2))
-    print(points)
     return points
 
 
@@ -167,10 +166,10 @@ def count_mussels(image: _np.ndarray) -> \
     grey = _cv2.inRange(hsv, lower, upper)
 
     # Remove the mussels from the image
-    circles_removed = _remove_circles(grey.copy())
+    circles_removed = _remove_circles(grey)
 
     # Gaussian blur to smooth the edge to get the Hough line easier
-    blurred_and_smoothed = _gaussian_blur_smooth(grey.copy())
+    blurred_and_smoothed = _gaussian_blur_smooth(grey)
 
     # Get the list of points on the edge of the square
     points = _get_edge_points(blurred_and_smoothed)
