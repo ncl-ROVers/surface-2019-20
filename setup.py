@@ -91,6 +91,9 @@ setuptools.setup(
         "PySide2",
         "pyautogui",
         "pytest",
+        "pandas",
+        "sklearn",
+        "opencv-python"
     ],
     python_requires=">=3.8.1",
 )
