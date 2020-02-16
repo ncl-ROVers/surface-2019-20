@@ -56,6 +56,10 @@ class _References:
     control_manager: control.ControlManager = None
     connection: comms.Connection = None
     connection_clock: QTimer = None
+    main_camera: comms.VideoStream = None
+    top_camera: comms.VideoStream = None
+    bottom_camera: comms.VideoStream = None
+    micro_camera: comms.VideoStream = None
 
 
 class Colour(enum.Enum):
@@ -280,7 +284,8 @@ class Screen(QWidget, abc.ABC, metaclass=type("_", (type(abc.ABC), type(QWidget)
 
     Loading = 0
     Home = 1
-    Controller = 2
+    Streams = 2
+    Controller = 3
 
     def __init__(self):
         """
