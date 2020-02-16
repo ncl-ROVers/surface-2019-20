@@ -187,5 +187,3 @@ def count_mussels(image: _np.ndarray) -> \
     mussels_found, mussels_count = _find_mussels(grey, image.copy(), hull_rect)
 
     return image, circles_removed, blurred_and_smoothed, convex_hull, mussels_found, mussels_count
-
-

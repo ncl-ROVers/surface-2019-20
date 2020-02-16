@@ -6,7 +6,7 @@ Documentation to follow...
 
 Example code:
 ```python
-    img = _cv2.imread('./catch.PNG')
+    img = _cv2.imread('./mussels_sample.PNG')
     _orig, _circles_removed, _blurred_and_smoothed, _convex_hull, _mussels_found, _mussels_count = count_mussels(img)
     _cv2.imshow("1. Original", _orig)
     _cv2.imshow("2. Circles removed", _circles_removed)
