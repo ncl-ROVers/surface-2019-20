@@ -10,6 +10,7 @@ Interaction with this module should only happen via the :func:`start` function.
     Kacper Florianski <k.florianski@ncl.ac.uk>
     Adanna Obibuaku <A.Obibuaku@newcastle.ac.uk>
     Zhanqiu Wang <Z.Wang111@newcastle.ac.uk>
+    Riley Heeley <m.h.heeley1@newcastle.ac.uk>
 """
 import os
 import signal
