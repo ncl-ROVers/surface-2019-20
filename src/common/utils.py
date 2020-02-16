@@ -26,6 +26,8 @@ GUI_LOADING_DIR = _os.path.join(ASSETS_DIR, "gui_loading")
 COMMON_LOGGER_DIR = _os.path.join(ASSETS_DIR, "common_logger")
 COMMON_LOCKS_DIR = _os.path.join(ASSETS_DIR, "common_locks")
 TESTS_ASSETS_DIR = _os.path.join(TESTS_DIR, "assets")
+TESTS_ASSETS_LOG_DIR = _os.path.join(TESTS_ASSETS_DIR, "log")
+TESTS_ASSETS_VISION_DIR = _os.path.join(TESTS_ASSETS_DIR, "vision")
 
 # Declare shared memory data mappings
 TRANSMISSION_DICT = {

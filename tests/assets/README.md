@@ -1,1 +1,0 @@
-This folder stores all temp files made by the testing infrastructure.

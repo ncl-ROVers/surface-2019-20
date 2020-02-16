@@ -5,7 +5,8 @@ The tests are first reconfiguring the loggers to use the local assets folder ins
 """
 import pytest
 import os
-from src.common import COMMON_LOGGER_DIR, TESTS_ASSETS_DIR, Log, Logger
+import subprocess
+from src.common import COMMON_LOGGER_DIR, TESTS_ASSETS_DIR, Log, Logger, TESTS_ASSETS_LOG_DIR
 
 
 def get_log_files() -> set:
@@ -15,9 +16,9 @@ def get_log_files() -> set:
     :return: A set of paths
     """
     files = set()
-    for file in os.listdir(TESTS_ASSETS_DIR):
+    for file in os.listdir(TESTS_ASSETS_LOG_DIR):
         if file.endswith(".log"):
-            files.add(os.path.join(TESTS_ASSETS_DIR, file))
+            files.add(os.path.join(TESTS_ASSETS_LOG_DIR, file))
     return files
 
 
@@ -65,4 +66,11 @@ def config():
 
     # Reconfigure the logger to use a separate folder (instead of the real logs)
     Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
-                    log_directory=TESTS_ASSETS_DIR)
+                    log_directory=TESTS_ASSETS_LOG_DIR)
+
+def test_command_result():
+    """
+
+    """
+
+    Log.command_result(subprocess.run(["echo", "hi"], shell=True, stdout=subprocess.PIPE))
