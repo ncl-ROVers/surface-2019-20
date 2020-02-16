@@ -1,10 +1,11 @@
 """
-TODO: Document
+TODO: Document, log things
 """
-from .utils import STREAM_CLOCK_INTERVAL as _INTERVAL, STREAM_WIDTH as _WIDTH, STREAM_HEIGHT as _HEIGHT
+from .utils import DEFAULT_STREAM_WIDTH as _DEFAULT_WIDTH, DEFAULT_STREAM_HEIGHT as _DEFAULT_HEIGHT
 from ..common import Log as _Log
+from PySide2.QtGui import QImage as _QImage, QPixmap as _QPixmap
+import typing as _typing
 import cv2 as _cv2
-from PySide2.QtCore import QTimer as _QTimer
 import numpy as _np
 
 
@@ -20,52 +21,55 @@ class VideoStream:
         :param url:
         """
         self._url = url
-
-        # Frames will have constant shape - therefore initialising it to an empty array of preset shape is fine
-        self._frame = _np.empty((_HEIGHT, _WIDTH, 3))
-
-        # Sometimes the interval might have to be adjusted to offload resources
-        self._interval = _INTERVAL
-
-        # Declare clock-related values to update the frames with a constant rate
-        self._clock = _QTimer()
-        self._clock.setInterval(self._interval)
-        self._clock.timeout.connect(self._read)
+        self._width = _DEFAULT_WIDTH
+        self._height = _DEFAULT_HEIGHT
 
         # Configure OpenCV video capture - set correct resolution and source url
         self._video_capture = _cv2.VideoCapture(self._url)
-        self._video_capture.set(3, _WIDTH)
-        self._video_capture.set(4, _HEIGHT)
+        self._video_capture.set(3, self._width)
+        self._video_capture.set(4, self._height)
 
     @property
     def frame(self) -> _np.ndarray:
         """
         TODO: Document
         """
-        if not self._clock.isActive():
-            _Log.warning(f"Clock isn't active for {self._url} stream, frames will not be updated")
-
-        return self._frame
+        ret, frame = self._video_capture.read()
+        return frame if ret else _np.empty((self._height, self._width, 3))
 
     @property
-    def clock(self) -> _QTimer:
+    def shape(self) -> _typing.Tuple[int, int]:
         """
-        TODO: Document
+        TODO: Docs
+        :return:
         """
-        return self._clock
+        return self._width, self._height
 
-    def set_interval(self, interval: int):
+    @shape.setter
+    def shape(self, shape: _typing.Tuple[int, int]):
         """
-        TODO: Document
+        TODO: Docs
+        :param shape:
+        :return:
+        """
+        self._width = shape[0]
+        self._height = shape[1]
 
-        :param interval:
+    @property
+    def frame_qt(self) -> _QPixmap:
         """
-        self._interval = interval
-        self._clock.setInterval(interval)
-
-    def _read(self):
+        TODO: Docs
+        :return:
         """
-        TODO: Document
-        """
-        data = self._video_capture.read()
-        self._frame = data[1] if data[0] else _np.empty((_HEIGHT, _WIDTH, 3))
+        frame = self.frame
+        height, width, _ = frame.shape
+        bytes_per_line = 3 * width
+        frame = _cv2.cvtColor(frame, _cv2.COLOR_BGR2RGB)
+        frame = _QImage(frame.data, width, height, bytes_per_line, _QImage.Format_RGB888)
+        frame = _QPixmap.fromImage(frame)
+        # TODO: FInished here broken code
+        from PySide2.QtWidgets import QLabel
+        x = QLabel()
+        x.setPixmap(frame)
+        x.show()
+        return frame

@@ -4,7 +4,6 @@ TODO: Document
 from .utils import Screen
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
-from PySide2.QtGui import *
 
 
 class Streams(Screen):
@@ -25,6 +24,16 @@ class Streams(Screen):
         self._bottom_camera = QLabel()
         self._micro_camera = QLabel()
 
+        # Declare clocks to update the frames with a constant rate
+        self._main_camera_clock = QTimer()
+        self._main_camera_clock.setInterval(50)
+        self._top_camera_clock = QTimer()
+        self._top_camera_clock.setInterval(50)
+        self._bottom_camera_clock = QTimer()
+        self._bottom_camera_clock.setInterval(50)
+        self._micro_camera_clock = QTimer()
+        self._micro_camera_clock.setInterval(50)
+
         self._config()
         self.setLayout(self._layout)
 
@@ -40,8 +49,18 @@ class Streams(Screen):
         self._bottom_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._micro_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # TODO: FInished here
-        # self._layout.add
+        # Update clock timeouts
+        #self._main_camera_clock.timeout.connect(self._update_main_camera)
+
+
+        # Each camera takes a different corner of the available space
+        self._layout.addWidget(self._main_camera, 0, 0)
+        self._layout.addWidget(self._top_camera, 0, 1)
+        self._layout.addWidget(self._bottom_camera, 1, 0)
+        self._layout.addWidget(self._micro_camera, 1, 1)
+
+    def _update_main_camera(self):
+        self._main_camera.setPixmap(self.manager.references.main_camera.frame_qt)
 
     def _set_style(self):
         """
@@ -60,16 +79,17 @@ class Streams(Screen):
         Start frame fetching clocks.
         """
         super().on_switch()
-        self.manager.references.main_camera.clock.start()
-        self.manager.references.top_camera.clock.start()
-        self.manager.references.bottom_camera.clock.start()
-        self.manager.references.micro_camera.clock.start()
+        self.manager.references.main_camera.frame_qt
+        # self._main_camera_clock.start()
+        # self._top_camera_clock.start()
+        # self._bottom_camera_clock.start()
+        # self._micro_camera_clock.start()
 
     def on_exit(self):
         """
         Stop frame fetching clocks.
         """
-        self.manager.references.main_camera.clock.stop()
-        self.manager.references.top_camera.clock.stop()
-        self.manager.references.bottom_camera.clock.stop()
-        self.manager.references.micro_camera.clock.stop()
+        # self._main_camera_clock.stop()
+        # self._top_camera_clock.stop()
+        # self._bottom_camera_clock.stop()
+        # self._micro_camera_clock.stop()

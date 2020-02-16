@@ -6,9 +6,8 @@ Standard utils module storing common to the package classes, functions, constant
 """
 import enum as _enum
 
-STREAM_CLOCK_INTERVAL = 1000
-STREAM_WIDTH = 640
-STREAM_HEIGHT = 480
+DEFAULT_STREAM_WIDTH = 640
+DEFAULT_STREAM_HEIGHT = 480
 
 # TODO: Replace with real urls
 MAIN_STREAM_URL = "http://87.75.106.150:8080/mjpg/1/video.mjpg"
