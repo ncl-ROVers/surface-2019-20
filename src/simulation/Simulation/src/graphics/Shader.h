@@ -34,6 +34,7 @@ public:
 	void setUniform(const std::string& name, double value);
 	void setUniform(const std::string& name, const glm::vec3& value);
 	void setUniform(const std::string& name, const glm::mat4& value);
+	void setUniform(const std::string& name, unsigned int value);
 
 	void destroy();
 };

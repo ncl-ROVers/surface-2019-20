@@ -129,6 +129,7 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 	{
 		for (const std::pair<std::string, Json>& thruster : obj->object_items())
 		{
+			//Calculate thruster index based on its name
 			int index = 0;
 			index += (thruster.first[0] == 'v') ? 4 : 0;
 			index += (thruster.first[1] == 'a') ? 2 : 0;
@@ -190,6 +191,7 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 
 			rov.cameraNames[index] = thruster.first;
 
+			//Only parse the first CAMERA_COUNT cameras and ignore the rest (TODO: adjustable number of camera)
 			if (++index >= CAMERA_COUNT)
 			{
 				break;

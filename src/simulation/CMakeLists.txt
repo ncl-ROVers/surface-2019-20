@@ -9,12 +9,12 @@ project(Simulation)
 find_package(OpenGL REQUIRED)
 
 # GLAD settings
-set(GLAD_INCLUDE "./Dependencies/GLAD/include/")
-add_library(GLAD "./Dependencies/GLAD/src/glad.c")
+set(GLAD_INCLUDE "${PROJECT_SOURCE_DIR}/Dependencies/GLAD/include/")
+add_library(GLAD "${PROJECT_SOURCE_DIR}/Dependencies/GLAD/src/glad.c")
 
 # GLFW settings
-set(GLFW_INCLUDE "./Dependencies/GLFW/include/")
-set(GLFW_ROOT "./Dependencies/GLFW/src/")
+set(GLFW_INCLUDE "${PROJECT_SOURCE_DIR}/Dependencies/GLFW/include/")
+set(GLFW_ROOT "${PROJECT_SOURCE_DIR}/Dependencies/GLFW/src/")
 
 set(GLFW_COMMON_SRC "${GLFW_ROOT}/glfw_config.h"
 					"${GLFW_ROOT}/context.c"
@@ -35,7 +35,7 @@ if (WIN32)
 					"${GLFW_ROOT}/wgl_context.c"
 					"${GLFW_ROOT}/egl_context.c"
 					"${GLFW_ROOT}/osmesa_context.c")
-
+					
 	add_compile_definitions("_GLFW_WIN32" "_CRT_SECURE_NO_WARNINGS")
 elseif(LINUX OR APPLE)
 		add_library(GLFW ${GLFW_COMMON_SRC}
@@ -49,19 +49,19 @@ elseif(LINUX OR APPLE)
 					"${GLFW_ROOT}/egl_context.c"
 					"${GLFW_ROOT}/osmesa_context.c"
 					"${GLFW_ROOT}/linux_joystick.c")
-
+					
 		add_compile_definitions("_GLFW_X11")
 endif()
 
 # Main project settings
-set(SIMULATION_ROOT "./Simulation/src/")
+set(SIMULATION_ROOT "${PROJECT_SOURCE_DIR}/Simulation/src/")
 
 file(GLOB_RECURSE SUB_SOURCES
 					"${SIMULATION_ROOT}/*.cpp"
 					"${SIMULATION_ROOT}/*.h")
 
 include_directories("${SIMULATION_ROOT}"
-					"./Dependencies/glm/glm/"
+					"${PROJECT_SOURCE_DIR}/Dependencies/glm/glm/"
 					${GLAD_INCLUDE}
 					${GLFW_INCLUDE}
 )

@@ -14,6 +14,7 @@ void PhysicsEngine::processEntities(double delta)
 	//Process physics
 	for (auto& entity : entityData)
 	{
+		//Step using the Runge-Kutta 4th order method
 		Transform transform = entity.first;
 		RigidBodyData rbData = entity.second;
 

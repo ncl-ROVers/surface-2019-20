@@ -34,11 +34,11 @@ void RenderView::create()
 	m_shader.compile();
 }
 
-void RenderView::render(const Transform& transform, const Framebuffer& framebuffer)
+void RenderView::render(const Transform& transform, const Framebuffer& framebuffer, int colorAttachment)
 {
 	glDisable(GL_CULL_FACE);
 
-	framebuffer.bindColorAttachment(0);
+	framebuffer.bindColorAttachment(colorAttachment);
 
 	m_shader.bind();
 	m_shader.setUniform("transform", transform.matrix());

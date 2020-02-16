@@ -106,6 +106,7 @@ Socket ServerSocket::accept()
 		return Socket(EMPTY_SOCKET, "", 0);
 	}
 
+	//Get address and port of the connected socket
 	char clientHost[NI_MAXHOST];
 	int clientPort = ntohs(client.sin_port);
 	inet_ntop(AF_INET, &client.sin_addr, clientHost, NI_MAXHOST);

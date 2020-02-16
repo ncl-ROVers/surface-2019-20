@@ -25,8 +25,6 @@ private:
 	size_t m_numTexCoords = 0;
 	size_t m_numNormals = 0;
 	int m_numIndices = 0;
-private:
-	void bufferFromType(MeshDataType type, GLuint& bufferID, GLenum& bufferType) const;
 public:
 	Mesh() {}
 
@@ -37,6 +35,8 @@ public:
 	void copyMeshData(void* dst, long int srcOffset, long int srcSize, MeshDataType type) const;
 	void* mapMeshData(long int offset, long int size, GLbitfield access, MeshDataType type) const;
 	void unmapMeshData(MeshDataType type) const;
+
+	void bufferFromType(MeshDataType type, GLuint& bufferID, GLenum& bufferType) const;
 
 	inline VertexArray& getVertexArray() { return m_vertexArray; }
 	inline const VertexArray& getVertexArray() const { return m_vertexArray; }

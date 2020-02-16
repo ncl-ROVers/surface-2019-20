@@ -4,8 +4,10 @@
 
 inline std::string toCacheName(std::string path)
 {
+	//Get the name of the file pointed to by the provided path
 	std::string saveName = std::filesystem::path(path).filename().generic_string();
 
+	//Remove all periods from filename
 	size_t dotIndex = 0;
 	while ((dotIndex = saveName.find_first_of('.')) != std::string::npos)
 	{
@@ -21,7 +23,6 @@ EntityObject::EntityObject(const MaterialData& materialData) :
 	LaunchCache* cache = Scene::singleton()->getCache();
 
 	std::string saveName = toCacheName(materialData.model);
-	
 	if (cache->isMeshOutdated(saveName, materialData.model))
 	{
 		LOG_VERBOSE("Loading model: ", materialData.model);
@@ -44,11 +45,6 @@ EntityObject::EntityObject(const MaterialData& materialData) :
 
 EntityObject::~EntityObject()
 {
-	LaunchCache* cache = Scene::singleton()->getCache();
-	std::string saveName = toCacheName(m_materialData.model);
-
-	cache->saveMeshData(saveName, m_mesh);
-
 	m_mesh.destroy();
 	m_shader.destroy();
 	m_texture.destroy();

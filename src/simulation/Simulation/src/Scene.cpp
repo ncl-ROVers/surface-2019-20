@@ -8,6 +8,8 @@
 
 #include "io/Input.h"
 
+#include "physics/models/BVHBuilder.h"
+
 #include <string>
 
 using namespace std::string_literals;
@@ -22,6 +24,7 @@ void Scene::init(int width, int height)
 	//Setup rendering engine
 	m_renderingEngine.loadSetting(m_config);
 
+	//Setup cache
 	m_cache.setEnabled(m_config.isCacheEnabled());
 	if (m_config.getCacheDir() != "")
 	{
@@ -58,6 +61,15 @@ void Scene::init(int width, int height)
 	m_server.launchServer(50000);
 
 	m_view.create();
+
+	//Temporary
+	Mesh mesh;
+	m_cache.loadMeshData("rov", mesh);
+
+	std::shared_ptr<BVHBuilder> builder = BVHBuilder::fromMesh(mesh);
+	builder->build();
+
+	mesh.destroy();
 }
 
 void Scene::update(double delta)
