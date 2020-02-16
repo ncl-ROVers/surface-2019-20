@@ -1,25 +1,59 @@
 """
-TODO: Document, log things
+Stream
+======
+
+Module storing an implementation of a stream-based connection to a network camera.
 """
-from .utils import DEFAULT_STREAM_WIDTH as _DEFAULT_WIDTH, DEFAULT_STREAM_HEIGHT as _DEFAULT_HEIGHT
+from .utils import DEFAULT_STREAM_WIDTH as _DEFAULT_WIDTH, DEFAULT_STREAM_HEIGHT as _DEFAULT_HEIGHT, \
+    STREAM_THREAD_DELAY as _DELAY
 from ..common import Log as _Log
 from PySide2.QtGui import QImage as _QImage, QPixmap as _QPixmap
 import typing as _typing
 import cv2 as _cv2
 import numpy as _np
 import threading as _threading
+import time as _time
 
 
 class VideoStream:
     """
-    TODO: Document
+    Video stream class used as a stream receiver.
+
+    Handles fetching frames from a remote address in OpenCV format and their conversion to QT format.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create and initialise video capture and thread related constructs
+        * frame - a getter used to retrieve the frame in OpenCV format
+        * frame_qt - a getter used to retrieve the frame in QT format
+        * shape - a property used to get or set the resolution of the frame
+        * _read - helper method to read the frames in a thread
+
+    Usage
+    -----
+
+    The stream object should be created as follows::
+
+        stream = VideoStream(URL)
+
+    where `URL` is a valid url in string format.
+
+
+    ..warning::
+
+        The frame reading process will start immediately, and it's up to the calling code to decide when to use them.
     """
 
     def __init__(self, url: str):
         """
-        TODO: Document
+        Standard constructor.
 
-        :param url:
+        Builds a video capture object and starts receiving the frames in a separate thread.
+
+        :param url: URL of the stream
         """
         self._url = url
         self._width = _DEFAULT_WIDTH
@@ -38,33 +72,16 @@ class VideoStream:
     @property
     def frame(self) -> _np.ndarray:
         """
-        TODO: Document
+        Getter for the frame (OpenCV format).
         """
         return self._frame
 
     @property
-    def shape(self) -> _typing.Tuple[int, int]:
-        """
-        TODO: Docs
-        :return:
-        """
-        return self._width, self._height
-
-    @shape.setter
-    def shape(self, shape: _typing.Tuple[int, int]):
-        """
-        TODO: Docs
-        :param shape:
-        :return:
-        """
-        self._width = shape[0]
-        self._height = shape[1]
-
-    @property
     def frame_qt(self) -> _QPixmap:
         """
-        TODO: Docs
-        :return:
+        Getter for the frame (QT format).
+
+        Transforms the frame into a QPixelmap.
         """
         frame = self.frame
 
@@ -83,12 +100,30 @@ class VideoStream:
         pixel_map = _QPixmap.fromImage(image)
         return pixel_map
 
+    @property
+    def shape(self) -> _typing.Tuple[int, int]:
+        """
+        Getter for the frame's resolution.
+        """
+        return self._width, self._height
+
+    @shape.setter
+    def shape(self, shape: _typing.Tuple[int, int]):
+        """
+        Setter for the frame's resolution.
+
+        :param shape: Width and height
+        """
+        self._width = shape[0]
+        self._height = shape[1]
+        self._video_capture.set(3, self._width)
+        self._video_capture.set(4, self._height)
+
     def _read(self):
         """
-        TODO: Document
-
-        :return:
+        Helper method used to read the frames in a background thread.
         """
         while True:
             ret, frame = self._video_capture.read()
             self._frame = frame if ret else _np.empty((self._height, self._width, 3))
+            _time.sleep(_DELAY)

@@ -6,8 +6,10 @@ Standard utils module storing common to the package classes, functions, constant
 """
 import enum as _enum
 
+# Declare STREAM-related constructs - resolution and read delay
 DEFAULT_STREAM_WIDTH = 640
 DEFAULT_STREAM_HEIGHT = 480
+STREAM_THREAD_DELAY = 0.01
 
 # TODO: Replace with real urls
 MAIN_STREAM_URL = "http://87.75.106.150:8080/mjpg/1/video.mjpg"

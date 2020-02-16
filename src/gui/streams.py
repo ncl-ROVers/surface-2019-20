@@ -1,5 +1,8 @@
 """
-TODO: Document
+Streams screen
+==============
+
+Module storing an implementation of a streams display screen and all values associated with it.
 """
 from ..common import Log
 from .utils import Screen
@@ -7,17 +10,39 @@ from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 
 
-STREAM_UPDATE_INTERVAL = 50
+# Declare FPS - 1 FPS is equivalent to the value being set to 1000.
+STREAM_UPDATE_INTERVAL = 1000//20
 
 
 class Streams(Screen):
     """
-    TODO: Document
+    Loading screen used to load all assets while displaying a visually-pleasing representation of the mentioned task.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create all QT objects and class-specific fields
+        * _config - a method to place all items created in __init__
+        * _set_style - default implementation of the inherited method
+        * post_init - default implementation of the inherited method
+        * on_switch - a method which start the clocks
+        * on_exit - a method which stops the clocks
+        * _update_main_camera - helper function to display main camera's frame
+        * _update_top_camera - helper function to display top camera's frame
+        * _update_bottom_camera - helper function to display bottom camera's frame
+        * _update_micro_camera - helper function to display micro-ROV camera's frame
+
+    Usage
+    -----
+
+    This screen can be switched to as many times as needed.
     """
 
     def __init__(self):
         """
-        Default inherited.
+        Standard constructor.
         """
         super(Streams, self).__init__()
 
@@ -39,7 +64,7 @@ class Streams(Screen):
 
     def _config(self):
         """
-        Default inherited.
+        Standard configuration method.
         """
         super()._config()
 
@@ -62,54 +87,6 @@ class Streams(Screen):
         self._layout.addWidget(self._bottom_camera, 1, 0)
         self._layout.addWidget(self._micro_camera, 1, 1)
 
-    def _update_main_camera(self):
-        """
-        TODO: Document
-        :return:
-        """
-        Log.debug("Updating main, forward-facing camera")
-        frame = self.manager.references.main_camera.frame_qt
-        frame = frame.scaled(min(self._main_camera.width(), frame.width()),
-                             min(self._main_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._main_camera.setPixmap(frame)
-
-    def _update_top_camera(self):
-        """
-        TODO: Document
-        :return:
-        """
-        Log.debug("Updating top-facing camera")
-        frame = self.manager.references.top_camera.frame_qt
-        frame = frame.scaled(min(self._top_camera.width(), frame.width()),
-                             min(self._top_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._top_camera.setPixmap(frame)
-
-    def _update_bottom_camera(self):
-        """
-        TODO: Document
-        :return:
-        """
-        Log.debug("Updating bottom-facing camera")
-        frame = self.manager.references.bottom_camera.frame_qt
-        frame = frame.scaled(min(self._bottom_camera.width(), frame.width()),
-                             min(self._bottom_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._bottom_camera.setPixmap(frame)
-
-    def _update_micro_camera(self):
-        """
-        TODO: Document
-        :return:
-        """
-        Log.debug("Updating micro-ROV camera")
-        frame = self.manager.references.micro_camera.frame_qt
-        frame = frame.scaled(min(self._micro_camera.width(), frame.width()),
-                             min(self._micro_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._micro_camera.setPixmap(frame)
-
     def _set_style(self):
         """
         Default inherited.
@@ -124,7 +101,7 @@ class Streams(Screen):
 
     def on_switch(self):
         """
-        Start frame fetching clocks.
+        Start frame displaying clocks.
         """
         super().on_switch()
         self._main_camera_clock.start()
@@ -134,9 +111,53 @@ class Streams(Screen):
 
     def on_exit(self):
         """
-        Stop frame fetching clocks.
+        Stop frame displaying clocks.
         """
         self._main_camera_clock.stop()
         self._top_camera_clock.stop()
         self._bottom_camera_clock.stop()
         self._micro_camera_clock.stop()
+
+    def _update_main_camera(self):
+        """
+        Update main camera's frame.
+        """
+        Log.debug("Updating main, forward-facing camera")
+        frame = self.manager.references.main_camera.frame_qt
+        frame = frame.scaled(min(self._main_camera.width(), frame.width()),
+                             min(self._main_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._main_camera.setPixmap(frame)
+
+    def _update_top_camera(self):
+        """
+        Update top camera's frame.
+        """
+        Log.debug("Updating top-facing camera")
+        frame = self.manager.references.top_camera.frame_qt
+        frame = frame.scaled(min(self._top_camera.width(), frame.width()),
+                             min(self._top_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._top_camera.setPixmap(frame)
+
+    def _update_bottom_camera(self):
+        """
+        Update bottom camera's frame.
+        """
+        Log.debug("Updating bottom-facing camera")
+        frame = self.manager.references.bottom_camera.frame_qt
+        frame = frame.scaled(min(self._bottom_camera.width(), frame.width()),
+                             min(self._bottom_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._bottom_camera.setPixmap(frame)
+
+    def _update_micro_camera(self):
+        """
+        Update micro-ROV camera's frame.
+        """
+        Log.debug("Updating micro-ROV camera")
+        frame = self.manager.references.micro_camera.frame_qt
+        frame = frame.scaled(min(self._micro_camera.width(), frame.width()),
+                             min(self._micro_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._micro_camera.setPixmap(frame)

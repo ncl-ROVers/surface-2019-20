@@ -58,28 +58,28 @@ def load_connection_clock():
 
 def load_main_stream():
     """
-    Create the video streams for forward-facing ROV camera.
+    Create the video stream for forward-facing ROV camera.
     """
     get_manager().references.main_camera = comms.VideoStream(comms.MAIN_STREAM_URL)
 
 
 def load_top_stream():
     """
-    Create the video streams for top-facing ROV camera.
+    Create the video stream for top-facing ROV camera.
     """
     get_manager().references.top_camera = comms.VideoStream(comms.TOP_STREAM_URL)
 
 
 def load_bottom_stream():
     """
-    Create the video streams for bottom-facing ROV camera.
+    Create the video stream for bottom-facing ROV camera.
     """
     get_manager().references.bottom_camera = comms.VideoStream(comms.BOTTOM_STREAM_URL)
 
 
 def load_micro_stream():
     """
-    Create the video streams for micro-ROV camera.
+    Create the video stream for micro-ROV camera.
     """
     get_manager().references.micro_camera = comms.VideoStream(comms.MICRO_STREAM_URL)
 
