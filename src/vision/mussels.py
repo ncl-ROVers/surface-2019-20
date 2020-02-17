@@ -96,8 +96,7 @@ def _get_corner_points(points: list) -> _np.ndarray:
     return hull_rect
 
 
-def _find_mussels(img_grey: _np.ndarray, mask: _np.ndarray, hull_rect: _np.ndarray) -> \
-        _typing.Tuple[_np.ndarray, int]:
+def _find_mussels(img_grey: _np.ndarray, mask: _np.ndarray, hull_rect: _np.ndarray) -> _typing.Tuple[_np.ndarray, int]:
     """
     Find, count and draw the circles on the image
 
