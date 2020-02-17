@@ -170,7 +170,12 @@ class Log:
         """"
         TODO: Document
         """
-        cls._hardware_logger.info("\t".join(args), **kwargs)
+        # to convert each argument into a string type, make a new tuple
+        str_args = []
+        for arg in args:
+            str_args.append(str(arg))
+
+        cls._hardware_logger.info("\t".join(str_args), **kwargs)
 
     @classmethod
     def command_result(cls, command_result: _subprocess.CompletedProcess):

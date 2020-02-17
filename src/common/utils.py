@@ -60,13 +60,11 @@ RECEIVED_DICT = {
 }
 
 
-def _get_processes():
-    # TODO need to use the defined MASTER PID, not the current pid (won't return
-    # all processes if current is child -- put into _References in src/gui/utils.py ?)
-    current_pid = _os.getpid()
-    process_list = [current_pid]
+def _get_child_processes(pid):
+    """TODO: document"""
+    process_list = [pid]
 
-    current_process = _psutil.Process(current_pid)
+    current_process = _psutil.Process(pid)
 
     children = current_process.children(recursive=True)
     for child in children:
@@ -121,13 +119,13 @@ def _get_gpu_info():
     return load, total_memory
 
 
-def get_hardware():
+def get_hardware(pid):
     """TODO document"""
-    processes = _get_processes()
+    processes = _get_child_processes(pid)
     process_dict = _get_threads(processes)
     num_processes = len(process_dict)
     processes_cpu_load = _get_cpu_load(processes)
     total_memory = _get_total_memory(processes)
     gpu_info = _get_gpu_info()
 
-    return str(process_dict), str(num_processes), str(processes_cpu_load), str(total_memory), str(gpu_info)
+    return process_dict, num_processes, processes_cpu_load, total_memory, gpu_info
