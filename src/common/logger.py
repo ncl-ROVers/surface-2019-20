@@ -18,8 +18,7 @@ _DEFAULT_LOG_DIR = _LOG_DIR
 _MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
 _HARDWARE_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_hardware.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
-                  "assets.common_logger.verbose_file_handler._VerboseFileHandler",
-                  "assets.common_logger.hardware_file_handler._HardwareFileHandler"}
+                  "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
 
 # Disable filelock's module logging
 _logging.getLogger("filelock").disabled = True
@@ -40,7 +39,7 @@ class Logger(_enum.Enum):
     HARDWARE = "_hardware_logger"
 
 
-def _get_logger(config_file_path: str, *, log_directory: str = "") -> _logging.Logger:
+def _get_logger(name:str, config_file_path: str, *, log_directory: str = "") -> _logging.Logger:
     """
     Helper function to configure the built-in logging module and retrieve a logger object.
 
@@ -75,8 +74,9 @@ def _get_logger(config_file_path: str, *, log_directory: str = "") -> _logging.L
         raise LogError(f"An error occurred while setting up the logging module - {e}")
 
     # Load the configuration and return the logger object
-    _config.dictConfig(config)
-    return _logging.getLogger()
+    _logging.config.dictConfig(config)
+    logger = _logging.getLogger(name)
+    return logger
 
 
 class Log:
@@ -104,8 +104,8 @@ class Log:
     """
 
     # Initialise the loggers
-    _main_logger = _get_logger(_MAIN_CONFIG_FILE_PATH)
-    _hardware_logger = _get_logger(_HARDWARE_CONFIG_FILE_PATH)
+    _main_logger = _get_logger("root", _MAIN_CONFIG_FILE_PATH)
+    _hardware_logger = _get_logger("hardware", _HARDWARE_CONFIG_FILE_PATH)
 
     @classmethod
     def reconfigure(cls, logger: Logger, config_file_path: str, *, log_directory: str = ""):
@@ -167,12 +167,11 @@ class Log:
         cls._main_logger.error(message, *args, **kwargs)
 
     @classmethod
-    def hardware(cls, message:str, *args, **kwargs):
+    def hardware(cls, *args, **kwargs):
         """"
         TODO: Document
-
         """
-        cls._hardware_logger.info(message, *args, **kwargs)
+        cls._hardware_logger.info("\t".join(args), **kwargs)
 
     @classmethod
     def command_result(cls, command_result: _subprocess.CompletedProcess):

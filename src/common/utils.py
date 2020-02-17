@@ -6,6 +6,7 @@ Standard utils module storing common to the package classes, functions, constant
 """
 import os as _os
 import psutil as _psutil
+import GPUtil as _GPUtil
 
 # Declare path to the root folder (surface)
 ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
@@ -59,52 +60,74 @@ RECEIVED_DICT = {
 }
 
 
-def get_processes():
+def _get_processes():
     # TODO need to use the defined MASTER PID, not the current pid (won't return
-    # all processes if current is child)
-    currentPid = _os.getpid()
-    processList = [currentPid]
+    # all processes if current is child -- put into _References in src/gui/utils.py ?)
+    current_pid = _os.getpid()
+    process_list = [current_pid]
 
-    currentProcess = _psutil.Process(currentPid)
+    current_process = _psutil.Process(current_pid)
 
-    children = currentProcess.children(recursive=True)
+    children = current_process.children(recursive=True)
     for child in children:
-        processList.append(child.pid)
+        process_list.append(child.pid)
 
-    return processList
+    return process_list
 
 
-def get_threads(processes):
+def _get_threads(processes):
     """TODO: document """
-
-    processThreads = {}
+    process_threads = {}
 
     for process in processes:
-        processThreads[process] = _psutil.Process(process).num_threads()
+        process_threads[process] = _psutil.Process(process).num_threads()
 
-    return processThreads
+    return process_threads
 
 
-def get_cpu_load(processes):
+def _get_cpu_load(processes):
     """TODO: document"""
-
-    processCPULoad = {}
+    process_cpu_load = {}
 
     for process in processes:
         p = _psutil.Process(process)
         p.cpu_percent(interval=None)
-        processCPULoad[process] = p.cpu_percent(interval=None)
+        process_cpu_load[process] = p.cpu_percent(interval=None)
 
-    return processCPULoad
+    return process_cpu_load
 
 
-def get_total_memory(processes):
+def _get_total_memory(processes):
     """TODO: document"""
-
-    totalRAM = 0
+    total_memory = 0
 
     for process in processes:
-        memoryInfo = _psutil.Process(process).memory_info()
-        totalRAM = totalRAM + memoryInfo.rss + memoryInfo.vms
+        memory_info = _psutil.Process(process).memory_info()
+        total_memory += (memory_info.rss + memory_info.vms)
 
-    return totalRAM / (1024.0 * 1024.0)
+    # return the amount in megabytes
+    return total_memory / (1024.0 * 1024.0)
+
+
+def _get_gpu_info():
+    """TODO: document"""
+    load = 0
+    total_memory = 0
+    gpus = _GPUtil.getGPUs()
+
+    for gpu in gpus:
+        load += gpu.load
+        total_memory += gpu.memoryUsed
+    return load, total_memory
+
+
+def get_hardware():
+    """TODO document"""
+    processes = _get_processes()
+    process_dict = _get_threads(processes)
+    num_processes = len(process_dict)
+    processes_cpu_load = _get_cpu_load(processes)
+    total_memory = _get_total_memory(processes)
+    gpu_info = _get_gpu_info()
+
+    return str(process_dict), str(num_processes), str(processes_cpu_load), str(total_memory), str(gpu_info)

@@ -2,14 +2,14 @@
     "version":1,
     "formatters":{
         "hardware":{
-            "format":"{asctime} \t {numProcesses}: {processesDict} \t {processesCPULoad} \t {totalMemory} MB",
+            "format":"{asctime} \t {message}",
             "datefmt":"%y-%m-%d %H:%M:%S",
             "style":"{"
         }
     },
     "handlers":{
         "hardware":{
-            "class":"assets.common_logger.hardware_file_handler._HardwareFileHandler",
+            "class":"logging.FileHandler",
             "level":"INFO",
             "formatter":"hardware",
             "encoding":"utf8",

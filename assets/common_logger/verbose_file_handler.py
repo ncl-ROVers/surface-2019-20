@@ -58,4 +58,4 @@ class _VerboseFileHandler(_logging.FileHandler):
         record.filename = _os.path.relpath(caller.filename, _ROOT_DIR)
         record.function = caller.function
         record.lineno = caller.lineno
-        _logging.FileHandler.emit(self, record)
+        return _logging.FileHandler.emit(self, record)

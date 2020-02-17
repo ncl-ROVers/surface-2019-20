@@ -11,6 +11,7 @@ from PySide2.QtGui import *
 from .utils import Screen, SCREEN_HEIGHT, SCREEN_WIDTH, get_manager
 from ..common import Log
 from .. import comms, control, common
+from src.common.utils import get_hardware as _get_hardware
 
 
 # Declare the progress bar's range
@@ -203,7 +204,8 @@ class Loading(Screen):
         Method used to "load" the assets and other objects by calling the loading functions.
         """
         Log.debug("Loading started")
-        Log.hardware("")
+        hardware = _get_hardware()
+        Log.hardware(hardware[0], hardware[1], hardware[2], hardware[3], hardware[4])
 
         # Make sure the loading bar increments the correct amount, by knowing the total number of operations to perform
         step_increment = 100 / len(OPERATIONS)
