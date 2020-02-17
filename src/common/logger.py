@@ -16,7 +16,6 @@ import enum as _enum
 
 _DEFAULT_LOG_DIR = _LOG_DIR
 _MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
-_HARDWARE_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_hardware.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
                   "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
 
@@ -104,8 +103,8 @@ class Log:
     """
 
     # Initialise the loggers
-    _main_logger = _get_logger("root", _MAIN_CONFIG_FILE_PATH)
-    _hardware_logger = _get_logger("hardware", _HARDWARE_CONFIG_FILE_PATH)
+    _main_logger = _get_logger("main", _MAIN_CONFIG_FILE_PATH)
+    _hardware_logger = _get_logger("hardware", _MAIN_CONFIG_FILE_PATH)
 
     @classmethod
     def reconfigure(cls, logger: Logger, config_file_path: str, *, log_directory: str = ""):

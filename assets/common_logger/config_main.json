@@ -13,6 +13,11 @@
             "format":"{asctime} \t {levelname} \t| {processName} \t {process} \t | {filename:30} \t {function:15} {lineno} \t | {message}",
             "datefmt":"%y-%m-%d %H:%M:%S",
             "style":"{"
+        },
+        "hardware":{
+            "format":"{asctime} \t {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
         }
     },
     "handlers":{
@@ -56,17 +61,32 @@
             "formatter":"verbose",
             "encoding":"utf8",
             "filename":"verbose.log"
+        },
+        "hardware":{
+            "class":"logging.FileHandler",
+            "level":"INFO",
+            "formatter":"hardware",
+            "encoding":"utf8",
+            "filename":"hardware.log"
         }
     },
-    "root":{
-        "level":"DEBUG",
-        "handlers":[
-            "console",
-            "debug",
-            "info",
-            "warning",
-            "error",
-            "verbose"
-        ]
+    "loggers": {
+        "main": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+                "debug",
+                "info",
+                "warning",
+                "error",
+                "verbose"
+            ]
+        },
+        "hardware": {
+            "level": "INFO",
+            "handlers": [
+                "hardware"
+            ]
+        }
     }
 }
