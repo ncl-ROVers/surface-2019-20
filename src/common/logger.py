@@ -4,7 +4,7 @@ Logger
 
 Module storing an implementation of a static log class and all values associated with it.
 
-The config.json files stored within the assets folder are used to configure most of the logging functionality.
+The config.json file stored within the assets folder is used to configure most of the logging functionality.
 """
 from .utils import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
 import logging as _logging
@@ -15,7 +15,7 @@ import os as _os
 import enum as _enum
 
 _DEFAULT_LOG_DIR = _LOG_DIR
-_MAIN_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config_main.json")
+_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
                   "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
 
@@ -38,7 +38,7 @@ class Logger(_enum.Enum):
     HARDWARE = "_hardware_logger"
 
 
-def _get_logger(name:str, config_file_path: str, *, log_directory: str = "") -> _logging.Logger:
+def _get_logger(name: str, *, log_directory: str = "") -> _logging.Logger:
     """
     Helper function to configure the built-in logging module and retrieve a logger object.
 
@@ -55,13 +55,13 @@ def _get_logger(name:str, config_file_path: str, *, log_directory: str = "") -> 
         log_directory = _DEFAULT_LOG_DIR
 
     # Verify both paths are correct or throw an error
-    if not _os.path.exists(config_file_path):
-        raise LogError(f"Failed to find the log config file at {config_file_path}")
+    if not _os.path.exists(_CONFIG_FILE_PATH):
+        raise LogError(f"Failed to find the log config file")
     if not _os.path.exists(log_directory):
         raise LogError(f"The log directory does not exist - {log_directory}")
 
     try:
-        with open(config_file_path, "r") as f:
+        with open(_CONFIG_FILE_PATH, "r") as f:
             config = _json.load(f)
 
             # Extract the handlers and update the paths within them to use the correct folder
@@ -103,8 +103,8 @@ class Log:
     """
 
     # Initialise the loggers
-    _main_logger = _get_logger("main", _MAIN_CONFIG_FILE_PATH)
-    _hardware_logger = _get_logger("hardware", _MAIN_CONFIG_FILE_PATH)
+    _main_logger = _get_logger("main")
+    _hardware_logger = _get_logger("hardware")
 
     @classmethod
     def reconfigure(cls, logger: Logger, config_file_path: str, *, log_directory: str = ""):
