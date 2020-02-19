@@ -5,7 +5,9 @@ The tests are first reconfiguring the loggers to use the local assets folder ins
 """
 import pytest
 import os
-from src.common import TESTS_ASSETS_DIR, Log
+from .utils import TESTS_ASSETS_LOG_DIR
+from src.common import Log
+from src.common import *
 
 
 def get_log_files() -> set:
@@ -15,10 +17,15 @@ def get_log_files() -> set:
     :return: A set of paths
     """
     files = set()
-    for file in os.listdir(TESTS_ASSETS_DIR):
+    for file in os.listdir(TESTS_ASSETS_LOG_DIR):
         if file.endswith(".log"):
-            files.add(os.path.join(TESTS_ASSETS_DIR, file))
+            files.add(os.path.join(TESTS_ASSETS_LOG_DIR, file))
     return files
+
+
+# TODO: Remove later
+def test_temp():
+    print("\n", get_hardware(os.getpid()))
 
 
 def test_create_logs():
@@ -32,8 +39,9 @@ def test_create_logs():
     Log.info("Test info message")
     Log.warning("Test warning message")
     Log.error("Test error message")
+    Log.hardware("Test hardware message")
 
-    assert len(get_log_files()) == 5
+    assert len(get_log_files()) == 6
 
 
 def test_level_filtering():
@@ -64,4 +72,4 @@ def config():
         os.remove(log_file)
 
     # Reconfigure the logger to use a separate folder (instead of the real logs)
-    Log.reconfigure(log_directory=TESTS_ASSETS_DIR)
+    Log.reconfigure(log_directory=TESTS_ASSETS_LOG_DIR)

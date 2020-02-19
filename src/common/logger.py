@@ -6,7 +6,7 @@ Module storing an implementation of a static log class and all values associated
 
 The config.json file stored within the assets folder is used to configure most of the logging functionality.
 """
-from .utils import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER
+from .utils import LOG_DIR as _LOG_DIR, COMMON_LOGGER_DIR as _COMMON_LOGGER_DIR
 import logging as _logging
 import logging.config as _config
 import json as _json
@@ -15,7 +15,7 @@ import os as _os
 import enum as _enum
 
 _DEFAULT_LOG_DIR = _LOG_DIR
-_DEFAULT_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER, "config.json")
+_DEFAULT_CONFIG_FILE_PATH = _os.path.join(_COMMON_LOGGER_DIR, "config.json")
 _FILE_HANDLERS = {"logging.FileHandler", "assets.common_logger.restricted_file_handler._RestrictedFileHandler",
                   "assets.common_logger.verbose_file_handler._VerboseFileHandler"}
 
@@ -101,8 +101,8 @@ class Log:
     # Initially configure the logging package
     _configure()
 
-    @classmethod
-    def reconfigure(cls, config_file_path: str = _DEFAULT_CONFIG_FILE_PATH, log_directory: str = _DEFAULT_LOG_DIR):
+    @staticmethod
+    def reconfigure(config_file_path: str = _DEFAULT_CONFIG_FILE_PATH, log_directory: str = _DEFAULT_LOG_DIR):
         """
         Helper function to reconfigure logging using the internal _config method.
 
@@ -113,8 +113,8 @@ class Log:
         """
         _configure(config_file_path, log_directory)
 
-    @classmethod
-    def debug(cls, message: str, *args, **kwargs):
+    @staticmethod
+    def debug(message: str, *args, **kwargs):
         """
         Standard debug logging.
 
@@ -122,10 +122,10 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._main_logger.debug(message, *args, **kwargs)
+        Logger.MAIN.value.debug(message, *args, **kwargs)
 
-    @classmethod
-    def info(cls, message: str, *args, **kwargs):
+    @staticmethod
+    def info(message: str, *args, **kwargs):
         """
         Standard info logging.
 
@@ -133,10 +133,10 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._main_logger.info(message, *args, **kwargs)
+        Logger.MAIN.value.info(message, *args, **kwargs)
 
-    @classmethod
-    def warning(cls, message: str, *args, **kwargs):
+    @staticmethod
+    def warning(message: str, *args, **kwargs):
         """
         Standard warning logging.
 
@@ -144,10 +144,10 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._main_logger.warning(message, *args, **kwargs)
+        Logger.MAIN.value.warning(message, *args, **kwargs)
 
-    @classmethod
-    def error(cls, message: str, *args, **kwargs):
+    @staticmethod
+    def error(message: str, *args, **kwargs):
         """
         Standard error logging.
 
@@ -155,29 +155,28 @@ class Log:
         :param args: Args passed to the internal logger
         :param kwargs: Kwargs passed to the internal logger
         """
-        cls._main_logger.error(message, *args, **kwargs)
+        Logger.MAIN.value.error(message, *args, **kwargs)
 
-    @classmethod
-    def hardware(cls, *values, **kwargs):
+    @staticmethod
+    def hardware(*values, **kwargs):
         """"
         TODO: Document
         """
-        cls._hardware_logger.info("\t".join(values), **kwargs)
+        Logger.HARDWARE.value.info("\t".join(values), **kwargs)
 
-    @classmethod
-    def command_result(cls, command_result: _subprocess.CompletedProcess):
+    @staticmethod
+    def command_result(command_result: _subprocess.CompletedProcess):
         """
         Method used to log return code as info, stdout as debug and stderr as error.
 
         :param command_result: Result from subprocess.run or similar
         """
-
-        cls._main_logger.info("The command returned {}, logging stdout and stderr...".format(command_result.returncode))
+        Logger.MAIN.value.info(f"The command returned {command_result.returncode}, logging stdout and stderr...")
 
         # Log stdout as info
         if command_result.stdout:
-            cls._main_logger.debug(command_result.stdout.decode("ascii"))
+            Logger.MAIN.value.debug(command_result.stdout.decode("ascii"))
 
         # Log stderr as error
         if command_result.stderr:
-            cls._main_logger.error(command_result.stderr.decode("ascii"))
+            Logger.MAIN.value.error(command_result.stderr.decode("ascii"))

@@ -94,7 +94,9 @@ setuptools.setup(
         "pytest",
         "pandas",
         "sklearn",
-        "opencv-python"
+        "opencv-python",
+        "GPUtil",
+        "psutil"
     ],
     python_requires=">=3.8.1",
 )

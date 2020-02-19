@@ -7,6 +7,7 @@ Standard utils module storing common to the package classes, functions, constant
 import os as _os
 import psutil as _psutil
 import GPUtil as _GPUtil
+import typing as _typing
 
 # Declare path to the root folder (surface)
 ROOT_DIR = _os.path.normpath(_os.path.join(_os.path.dirname(__file__), "..", ".."))
@@ -59,72 +60,84 @@ RECEIVED_DICT = {
 }
 
 
-def _get_child_processes(pid):
-    """TODO: document"""
-    process_list = [pid]
+def get_processes(pid: int) -> _typing.List[_typing.Type[_psutil.Process]]:
+    """
+    TODO: Document
 
-    current_process = _psutil.Process(pid)
+    :param pid:
+    :return:
+    """
+    parent = _psutil.Process(pid)
 
-    children = current_process.children(recursive=True)
-    for child in children:
-        process_list.append(child.pid)
-
-    return process_list
+    return [parent] + parent.children(recursive=True)
 
 
-def _get_threads(processes):
-    """TODO: document """
-    process_threads = {}
+def count_threads(processes: list) -> int:
+    """
+    TODO: Document
 
+    :param processes:
+    :return:
+    """
+    return sum(process.num_threads() for process in processes)
+
+
+def get_cpu_load(processes: list) -> int:
+    """
+    TODO: Document
+
+    :param processes:
+    :return:
+    """
+    # TODO: Seems broken
+    # TODO: psutil.cpu_percent not accurate either
     for process in processes:
-        process_threads[process] = _psutil.Process(process).num_threads()
-
-    return process_threads
-
-
-def _get_cpu_load(processes):
-    """TODO: document"""
-    process_cpu_load = {}
-
-    for process in processes:
-        p = _psutil.Process(process)
-        p.cpu_percent(interval=None)
-        process_cpu_load[process] = p.cpu_percent(interval=None)
-
-    return process_cpu_load
+        process.cpu_percent(interval=None)
+    return sum(process.cpu_percent(interval=None) for process in processes)
 
 
-def _get_total_memory(processes):
-    """TODO: document"""
-    total_memory = 0
+def get_gpu_info():
+    """
+    TODO: Document
 
-    for process in processes:
-        memory_info = _psutil.Process(process).memory_info()
-        total_memory += (memory_info.rss + memory_info.vms)
-
-    # return the amount in megabytes
-    return total_memory / (1024.0 * 1024.0)
-
-
-def _get_gpu_info():
-    """TODO: document"""
-    load = 0
-    total_memory = 0
+    TODO: Seems broken
+    :return:
+    """
     gpus = _GPUtil.getGPUs()
 
-    for gpu in gpus:
-        load += gpu.load
-        total_memory += gpu.memoryUsed
-    return load, total_memory
+    # Calculate total load and memory consumption
+    load = sum(gpu.load for gpu in gpus)
+    memory = sum(gpu.memoryUsed for gpu in gpus)
+
+    return load, memory
 
 
-def get_hardware(pid):
-    """TODO document"""
-    processes = _get_child_processes(pid)
-    process_dict = _get_threads(processes)
-    num_processes = len(process_dict)
-    processes_cpu_load = _get_cpu_load(processes)
-    total_memory = _get_total_memory(processes)
-    gpu_info = _get_gpu_info()
+def get_memory_usage(processes: list) -> float:
+    """
+    TODO: Document
 
-    return process_dict, num_processes, processes_cpu_load, total_memory, gpu_info
+    :param processes:
+    :return:
+    """
+    usage = 0
+
+    for process in processes:
+        info = process.memory_info()
+        usage += (info.rss + info.vms)
+
+    # Return the amount in megabytes
+    return usage / (1024.0 ** 2)
+
+
+def get_hardware(pid: int) -> _typing.Tuple[int, int, int, tuple, float]:
+    """
+    TODO: Document
+
+    :param pid:
+    :return:
+    """
+    processes = get_processes(pid)
+    num_processes = len(processes)
+    num_threads = count_threads(processes)
+
+    return num_processes, num_threads, get_cpu_load(processes), get_gpu_info(), get_memory_usage(processes)

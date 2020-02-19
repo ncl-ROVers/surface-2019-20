@@ -447,7 +447,7 @@ class ScreenManager(QMainWindow):
         self.screen = Screen.Loading
 
     @property
-    def references(self) -> _References:
+    def references(self) -> typing.Type[_References]:
         """
         Getter to retrieve the references to items
 
