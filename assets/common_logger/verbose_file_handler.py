@@ -53,9 +53,11 @@ class _VerboseFileHandler(_logging.FileHandler):
         Overridden function modified so any logging call is put into the verbose file.
         
         :param record: Record used in the emit function
+        :return: Result of the emit function
         """
         caller = _inspect.getframeinfo(_get_frame())
         record.filename = _os.path.relpath(caller.filename, _ROOT_DIR)
         record.function = caller.function
         record.lineno = caller.lineno
+
         return _logging.FileHandler.emit(self, record)
