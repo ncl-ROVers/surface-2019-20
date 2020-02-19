@@ -5,8 +5,20 @@ The tests are first reconfiguring the loggers to use the local assets folder ins
 """
 import pytest
 import os
-from tests.utils import TESTS_ASSETS_LOG_DIR, get_log_files
-from src.common import COMMON_LOGGER_DIR, Log, Logger
+from src.common import TESTS_ASSETS_DIR, Log
+
+
+def get_log_files() -> set:
+    """
+    Helper function used to retrieve a set of absolute paths to the log files.
+    
+    :return: A set of paths
+    """
+    files = set()
+    for file in os.listdir(TESTS_ASSETS_DIR):
+        if file.endswith(".log"):
+            files.add(os.path.join(TESTS_ASSETS_DIR, file))
+    return files
 
 
 def test_create_logs():
@@ -21,7 +33,7 @@ def test_create_logs():
     Log.warning("Test warning message")
     Log.error("Test error message")
 
-    assert len(get_log_files(TESTS_ASSETS_LOG_DIR)) == 5
+    assert len(get_log_files()) == 5
 
 
 def test_level_filtering():
@@ -30,7 +42,7 @@ def test_level_filtering():
 
     Each file should have only the respective, single level logged, except for verbose which should have all of them.
     """
-    for file in get_log_files(TESTS_ASSETS_LOG_DIR):
+    for file in get_log_files():
         with open(file) as f:
             if "verbose" in file:
                 assert (len(f.readlines()) == 4)
@@ -48,9 +60,8 @@ def config():
     """
 
     # Remove all log files from the assets folder.
-    for log_file in get_log_files(TESTS_ASSETS_LOG_DIR):
+    for log_file in get_log_files():
         os.remove(log_file)
 
     # Reconfigure the logger to use a separate folder (instead of the real logs)
-    Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
-                    log_directory=TESTS_ASSETS_LOG_DIR)
+    Log.reconfigure(log_directory=TESTS_ASSETS_DIR)

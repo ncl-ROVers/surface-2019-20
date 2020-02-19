@@ -2,15 +2,22 @@
     "version":1,
     "formatters":{
         "console":{
-            "format":"%(asctime)s %(levelname)s %(message)s",
-            "datefmt":"%y-%m-%d %H:%M:%S"
+            "format":"{asctime} {levelname} {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
         },
         "basic":{
-            "format":"%(asctime)s %(levelname)s %(message)s",
-            "datefmt":"%y-%m-%d %H:%M:%S"
+            "format":"{asctime} {levelname} {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
         },
         "verbose":{
             "format":"{asctime} \t {levelname} \t| {processName} \t {process} \t | {filename:30} \t {function:15} {lineno} \t | {message}",
+            "datefmt":"%y-%m-%d %H:%M:%S",
+            "style":"{"
+        },
+        "hardware":{
+            "format":"{asctime} {message}",
             "datefmt":"%y-%m-%d %H:%M:%S",
             "style":"{"
         }
@@ -56,17 +63,32 @@
             "formatter":"verbose",
             "encoding":"utf8",
             "filename":"verbose.log"
+        },
+        "hardware":{
+            "class":"logging.FileHandler",
+            "level":"INFO",
+            "formatter":"hardware",
+            "encoding":"utf8",
+            "filename":"hardware.log"
         }
     },
-    "root":{
-        "level":"DEBUG",
-        "handlers":[
-            "console",
-            "debug",
-            "info",
-            "warning",
-            "error",
-            "verbose"
-        ]
+    "loggers": {
+        "_ncl_rovers_main": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+                "debug",
+                "info",
+                "warning",
+                "error",
+                "verbose"
+            ]
+        },
+        "_ncl_rovers_hardware": {
+            "level": "INFO",
+            "handlers": [
+                "hardware"
+            ]
+        }
     }
 }
