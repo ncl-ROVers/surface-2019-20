@@ -9,3 +9,4 @@ Communication tools handling the interaction (data exchange) between the surface
 """
 from .utils import *
 from .connection import Connection
+from .stream import VideoStream
