@@ -8,4 +8,6 @@ Supports manual control, autonomous control, and manual control with auto-balanc
 
 .. moduleauthor::
     Kacper Florianski <k.florianski@ncl.ac.uk>
+    Zhanqiu Wang <Z.Wang111@newcastle.ac.uk>
 """
+from .mussels import *
