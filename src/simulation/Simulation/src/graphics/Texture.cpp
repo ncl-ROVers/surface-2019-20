@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-#include "stb_image.h"
+#include "stb/stb_image.h"
 
 void Texture::create(const std::string& path)
 {

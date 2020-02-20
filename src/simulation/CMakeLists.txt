@@ -69,4 +69,4 @@ include_directories("${SIMULATION_ROOT}"
 add_executable(Simulation ${SUB_SOURCES})
 target_link_libraries(${PROJECT_NAME} GLAD GLFW opengl32)
 
-add_compile_definitions("COMPILE_PATH_OFFSET=\"./Simulation\"")
+add_compile_definitions("COMPILE_PATH_OFFSET=\"../Simulation\"")

@@ -67,13 +67,15 @@ The configuration file uses JSON format. The following is a list of available op
 	2. `rot`: The object-space rotation of the thruster around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
 	3. `force`: The initial force of the thruster, in Newtons. (Format: `<force>`) (Deprecated, to be removed).
 
-`cameras`: Specify properties of the ROV's virtual cameras (Format: Object of objects). Each field's name is the name of the camera and its value is an object with all the properties of the camera:
+`cameras`: Specify properties of the ROV's virtual cameras (Format: Array of objects). Each element is an object with all the properties of an individual camera:
 
 * Properties of a camera:
 	1. `pos`: The object-space position of the camera (Format: `[ <x>, <y>, <z> ]`).
 	2. `rot`: The object-space rotation of the camera around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
 	3. `resolution`: The resolution of the camera (Format: `[ <width> <height> ]`).
 	4. `fov`: The Field Of View angle of the camera (in degrees).
+	5. `port`: The port the camera's video stream will available on.
+	6. `quality`: An integer between 1 and 100 (inclusive) indicating the compression quality of the produced stream.
 	
 `center_of_mass`: The object-space position of center of mass of the ROV.
 

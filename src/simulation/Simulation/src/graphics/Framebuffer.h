@@ -24,4 +24,7 @@ public:
 	void readPixels(unsigned char* pixelData);
 
 	void destroy();
+
+	inline int getWidth() const { return m_width; }
+	inline int getHeight() const { return m_height; }
 };

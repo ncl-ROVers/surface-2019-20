@@ -13,7 +13,7 @@ uniform vec3 ambientLighting;
 void main() {
 	float directLightAmount = max(dot(inNormal, -sunDirection), 0);
 	
-	vec3 lighting = vec3(directLightAmount);//vec3(directLightAmount) + ambientLighting;
+	vec3 lighting = vec3(directLightAmount * 0.75 + 0.15);
 	
 	outColor = vec4(texture(albedo, inTexCoords).xyz * lighting, 1.0);
 }

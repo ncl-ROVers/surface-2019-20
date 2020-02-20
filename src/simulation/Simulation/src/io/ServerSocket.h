@@ -41,6 +41,7 @@ public:
 
 	Socket accept();
 
+	inline bool isClosed() const { return m_closed || m_socket == EMPTY_SOCKET; }
 	void close();
 };
 
@@ -64,7 +65,11 @@ public:
 	int receive(char* buffer, int bufferSize);
 	int send(const char* buffer, int bufferSize);
 
+	inline bool isClosed() const { return m_closed || m_socket == EMPTY_SOCKET; }
 	void close();
+
+	inline std::string getHost() const { return m_host; }
+	inline int getPort() const { return m_port; }
 
 	friend class ServerSocket;
 };

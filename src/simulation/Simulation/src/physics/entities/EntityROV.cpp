@@ -48,15 +48,18 @@ EntityROV::EntityROV(const RovSetup& setup) :
 	}
 
 	//Create camera entities
-	for (int i = 0; i < CAMERA_COUNT; ++i)
+	for (size_t i = 0; i < setup.cameras.size(); ++i)
 	{
-		m_entityCameras[i] = new EntityCamera((int)setup.cameraResolutions[i].x, (int)setup.cameraResolutions[i].y, setup.cameraFOVs[i]);
-		m_entityCameras[i]->getTransform().position(setup.cameraPositions[i]);
-		m_entityCameras[i]->getTransform().rotation(quaternion({ 1.0f, 0.0f, 0.0f }, setup.cameraRotations[i].x) *
-													quaternion({ 0.0f, 1.0f, 0.0f }, setup.cameraRotations[i].y) *
-													quaternion({ 0.0f, 0.0f, 1.0f }, setup.cameraRotations[i].z));
+		ROVCameraSetup camSetup = setup.cameras[i];
+		EntityCamera* camera = new EntityCamera((int)camSetup.resolution.x, (int)camSetup.resolution.y, camSetup.fov, camSetup.port, camSetup.quality);
+		camera->getTransform().position(camSetup.position);
+		camera->getTransform().rotation(quaternion({ 1.0f, 0.0f, 0.0f }, camSetup.rotation.x) *
+										quaternion({ 0.0f, 1.0f, 0.0f }, camSetup.rotation.y) *
+										quaternion({ 0.0f, 0.0f, 1.0f }, camSetup.rotation.z));
 
-		m_entityCameras[i]->setParent(this);
+		camera->setParent(this);
+
+		m_entityCameras.push_back(camera);
 	}
 }
 
@@ -67,7 +70,7 @@ EntityROV::~EntityROV()
 		delete m_entityThrusters[i];
 	}
 
-	for (int i = 0; i < CAMERA_COUNT; ++i)
+	for (size_t i = 0; i < m_entityCameras.size(); ++i)
 	{
 		delete m_entityCameras[i];
 	}
@@ -100,8 +103,16 @@ void EntityROV::render(RenderingEngine& renderer)
 		m_entityThrusters[i]->render(renderer);
 	}
 
-	for (int i = 0; i < CAMERA_COUNT; ++i)
+	for (size_t i = 0; i < m_entityCameras.size(); ++i)
 	{
 		m_entityCameras[i]->render(renderer);
+	}
+}
+
+void EntityROV::renderFinished()
+{
+	for (size_t i = 0; i < m_entityCameras.size(); ++i)
+	{
+		m_entityCameras[i]->renderFinished();
 	}
 }

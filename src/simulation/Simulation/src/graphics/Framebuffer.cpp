@@ -48,9 +48,8 @@ void Framebuffer::create(int width, int height)
 
 void Framebuffer::readPixels(unsigned char* pixelData)
 {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-	glReadPixels(0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, pixelData);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, m_colorAttachment);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixelData);
 }
 
 void Framebuffer::bind() const

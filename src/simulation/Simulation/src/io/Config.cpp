@@ -86,25 +86,7 @@ void Config::loadConfig(const std::string& path)
 void parseROVData(const json11::Json& root, RovSetup& rov)
 {
 	using namespace json11;
-
-	rov.cameraNames[0] = "0";
-	rov.cameraFOVs[0] = 70.0f;
-	rov.cameraPositions[0] = glm::vec3(0.4f, 0.4f, 0.0f);
-	rov.cameraRotations[0] = glm::vec3(0.0f, -90.0f, 0.0f);
-	rov.cameraResolutions[0] = glm::vec2(512, 512);
 	
-	rov.cameraNames[1] = "1";
-	rov.cameraFOVs[1] = 70.0f;
-	rov.cameraPositions[1] = glm::vec3(1.8f, 0.75f, 0.8f);
-	rov.cameraRotations[1] = glm::vec3(0.0f, -110.0f, 0.0f);
-	rov.cameraResolutions[1] = glm::vec2(512, 512);
-
-	rov.cameraNames[2] = "2";
-	rov.cameraFOVs[2] = 70.0f;
-	rov.cameraPositions[2] = glm::vec3(1.8f, 0.75f, -0.75f);
-	rov.cameraRotations[2] = glm::vec3(0.0f, -70.0f, 0.0f);
-	rov.cameraResolutions[2] = glm::vec2(512, 512);
-
 	const Json* obj = nullptr;
 	if (isFieldOfType(obj = &root["mass"], "mass", Json::NUMBER))
 	{
@@ -157,45 +139,50 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 		}
 	}
 
-	if (isFieldOfType(obj = &root["cameras"], "cameras", Json::OBJECT))
+	if (isFieldOfType(obj = &root["cameras"], "cameras", Json::ARRAY))
 	{
-		int index = 0;
-		for (const std::pair<std::string, Json>& thruster : obj->object_items())
+		for (const Json& thruster : obj->array_items())
 		{
+			ROVCameraSetup camSetup;
+
 			const Json* comp = nullptr;
-			if (isValidArray(comp = &thruster.second["pos"], "pos", 3))
+			if (isValidArray(comp = &thruster["pos"], "pos", 3))
 			{
 				const Json::array& coords = comp->array_items();
 
-				rov.cameraPositions[index] = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
+				camSetup.position = { (float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value() };
 			}
 
-			if (isValidArray(comp = &thruster.second["rot"], "rot", 3))
+			if (isValidArray(comp = &thruster["rot"], "rot", 3))
 			{
 				const Json::array& coords = comp->array_items();
 
-				rov.cameraRotations[index] = glm::vec3((float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value());
+				camSetup.rotation = glm::vec3((float)coords[0].number_value(), (float)coords[1].number_value(), (float)coords[2].number_value());
 			}
 
-			if (isValidArray(comp = &thruster.second["resolution"], "resolution", 2))
+			if (isValidArray(comp = &thruster["resolution"], "resolution", 2))
 			{
 				const Json::array& size = comp->array_items();
 
-				rov.cameraResolutions[index] = glm::vec2((float)size[0].number_value(), (float)size[1].number_value());
+				camSetup.resolution = glm::vec2((float)size[0].number_value(), (float)size[1].number_value());
 			}
 
-			if (isFieldOfType(comp = &thruster.second["fov"], "fov", Json::NUMBER))
+			if (isFieldOfType(comp = &thruster["fov"], "fov", Json::NUMBER))
 			{
-				rov.cameraFOVs[index] = (float)comp->number_value();
+				camSetup.fov = (float)comp->number_value();
 			}
 
-			rov.cameraNames[index] = thruster.first;
-
-			//Only parse the first CAMERA_COUNT cameras and ignore the rest (TODO: adjustable number of camera)
-			if (++index >= CAMERA_COUNT)
+			if (isFieldOfType(comp = &thruster["port"], "port", Json::NUMBER))
 			{
-				break;
+				camSetup.port = (int)comp->number_value();
 			}
+
+			if (isFieldOfType(comp = &thruster["quality"], "quality", Json::NUMBER))
+			{
+				camSetup.quality = std::clamp((int)comp->number_value(), 1, 100);
+			}
+
+			rov.cameras.push_back(camSetup);
 		}
 	}
 
