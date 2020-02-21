@@ -7,7 +7,7 @@ import cv2
 import os
 import pytest
 from src.vision import count_mussels
-from tests.utils import TESTS_ASSETS_VISION_DIR, get_log_files
+from .utils import TESTS_ASSETS_VISION_DIR, get_log_files
 from src.common import Log
 
 
