@@ -86,7 +86,6 @@ def get_cpu_load() -> float:
     """
     TODO: Document
 
-    :param processes:
     :return:
     """
     return _psutil.cpu_percent()
@@ -101,7 +100,7 @@ def get_memory_usage() -> float:
     return _psutil.virtual_memory().percent
 
 
-def get_gpu_load():
+def get_gpu_load() -> float:
     """
     TODO: Document
 
@@ -110,7 +109,7 @@ def get_gpu_load():
     return sum(gpu.load for gpu in _GPUtil.getGPUs()) * 100
 
 
-def get_hardware(pid: int) -> _typing.Tuple[int, int, float, float, float]:
+def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float, float]:
     """
     TODO: Document
 
