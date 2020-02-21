@@ -82,54 +82,35 @@ def count_threads(processes: list) -> int:
     return sum(process.num_threads() for process in processes)
 
 
-def get_cpu_load(processes: list) -> int:
+def get_cpu_load() -> float:
     """
     TODO: Document
 
     :param processes:
     :return:
     """
-    # TODO: Seems broken
-    # TODO: psutil.cpu_percent not accurate either
-    for process in processes:
-        process.cpu_percent(interval=None)
-    return sum(process.cpu_percent(interval=None) for process in processes)
+    return _psutil.cpu_percent()
 
 
-def get_gpu_info():
+def get_memory_usage() -> float:
     """
     TODO: Document
 
-    TODO: Seems broken
     :return:
     """
-    gpus = _GPUtil.getGPUs()
-
-    # Calculate total load and memory consumption
-    load = sum(gpu.load for gpu in gpus)
-    memory = sum(gpu.memoryUsed for gpu in gpus)
-
-    return load, memory
+    return _psutil.virtual_memory().percent
 
 
-def get_memory_usage(processes: list) -> float:
+def get_gpu_load():
     """
     TODO: Document
 
-    :param processes:
     :return:
     """
-    usage = 0
-
-    for process in processes:
-        info = process.memory_info()
-        usage += (info.rss + info.vms)
-
-    # Return the amount in megabytes
-    return usage / (1024.0 ** 2)
+    return sum(gpu.load for gpu in _GPUtil.getGPUs()) * 100
 
 
-def get_hardware(pid: int) -> _typing.Tuple[int, int, int, tuple, float]:
+def get_hardware(pid: int) -> _typing.Tuple[int, int, float, float, float]:
     """
     TODO: Document
 
@@ -140,4 +121,4 @@ def get_hardware(pid: int) -> _typing.Tuple[int, int, int, tuple, float]:
     num_processes = len(processes)
     num_threads = count_threads(processes)
 
-    return num_processes, num_threads, get_cpu_load(processes), get_gpu_info(), get_memory_usage(processes)
+    return num_processes, num_threads, get_cpu_load(), get_memory_usage(), get_gpu_load()

@@ -7,7 +7,6 @@ import pytest
 import os
 from .utils import TESTS_ASSETS_LOG_DIR
 from src.common import Log
-from src.common import *
 
 
 def get_log_files() -> set:
@@ -21,11 +20,6 @@ def get_log_files() -> set:
         if file.endswith(".log"):
             files.add(os.path.join(TESTS_ASSETS_LOG_DIR, file))
     return files
-
-
-# TODO: Remove later
-def test_temp():
-    print("\n", get_hardware(os.getpid()))
 
 
 def test_create_logs():
