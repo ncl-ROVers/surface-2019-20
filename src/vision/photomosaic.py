@@ -1,50 +1,51 @@
 """
-Cube Photo Mosaic
-================
-Module storing an implementation of the cube cutting.
+Photomosaic
+===========
+
+Module storing an implementation of the cube photomosaic task.
 """
 import cv2 as _cv2
 import numpy as _np
 import typing as _typing
 
 # The height of the cut picture
-image_height = 300
+MOSAIC_HEIGHT = 300
+
 # The filter map for each color
-color_dict = {'white': (_np.array([0, 0, 50]), _np.array([255, 255, 255])),
-              'yellow': (_np.array([15, 0, 0]), _np.array([30, 255, 255])),
-              'green': (_np.array([60, 0, 0]), _np.array([75, 255, 255])),
-              'blue': (_np.array([105, 0, 0]), _np.array([120, 255, 255])),
-              'purple': (_np.array([145, 0, 0]), _np.array([160, 255, 255])),
-              'orange': (_np.array([5, 0, 0]), _np.array([15, 255, 255])),
-              'red': (_np.array([175, 0, 0]), _np.array([190, 255, 255])),
-              'pink': (_np.array([160, 0, 0]), _np.array([175, 255, 255])),
-              'light_blue': (_np.array([90, 0, 0]), _np.array([105, 255, 255]))}
+_COLOR_DICT = {"white": (_np.array([0, 0, 50]), _np.array([255, 255, 255])),
+               "yellow": (_np.array([15, 0, 0]), _np.array([30, 255, 255])),
+               "green": (_np.array([60, 0, 0]), _np.array([75, 255, 255])),
+               "blue": (_np.array([105, 0, 0]), _np.array([120, 255, 255])),
+               "purple": (_np.array([145, 0, 0]), _np.array([160, 255, 255])),
+               "orange": (_np.array([5, 0, 0]), _np.array([15, 255, 255])),
+               "red": (_np.array([175, 0, 0]), _np.array([190, 255, 255])),
+               "pink": (_np.array([160, 0, 0]), _np.array([175, 255, 255])),
+               "light_blue": (_np.array([90, 0, 0]), _np.array([105, 255, 255]))}
 
 
 def _filter_color(lower: _np.ndarray, upper: _np.ndarray, images: list) -> list:
     """
-    filter the color according to the threshold
-    :param lower: the lower threshold for filter
-    :param upper: the upper threshold for filter
-    :param images: the list of HSV images
-    :return: the list of mask after filter
+    Filter the color according to the threshold.
+
+    :param lower: Lower threshold for filter
+    :param upper: Upper threshold for filter
+    :param images: List of HSV images
+    :return: Masks after applying the filter
     """
-    mask = list()
-    for k in range(5):
-        mask.append(_cv2.inRange(images[k], lower, upper))
-    return mask
+    return [_cv2.inRange(image, lower, upper) for image in images]
 
 
 def _cut_images(images: list) -> list:
     """
-    cut the square in the images
+    Cut the square in the images
+
     :param images: list of images
     :return: the cut images
     """
     img_white = list()
     for i in range(5):
         img_white.append(_cv2.bitwise_and(images[i], images[i],
-                                         mask=_filter_color(color_dict['white'][0], color_dict['white'][1], images)[i]))
+                                          mask=_filter_color(_COLOR_DICT["white"][0], _COLOR_DICT["white"][1], images)[i]))
     return img_white
 
 
@@ -56,8 +57,8 @@ def _resize_images(images: list) -> list:
     """
     index = 0
     for img in images:
-        width = int(img.shape[1] * image_height / img.shape[0])
-        images[index] = _cv2.resize(src=img, dsize=(width, image_height))
+        width = int(img.shape[1] * MOSAIC_HEIGHT / img.shape[0])
+        images[index] = _cv2.resize(src=img, dsize=(width, MOSAIC_HEIGHT))
         index += 1
     return images
 
@@ -108,9 +109,9 @@ def _combine_images(img_white: list, dict_color_map: list, bottom_index: list, t
 
     top_img = img_white[top_index]
     width_top = top_img.shape[0] + length_top
-    height_top = top_img.shape[1] + image_height
+    height_top = top_img.shape[1] + MOSAIC_HEIGHT
     result = _np.concatenate((canvas_top, left_img), axis=0)
-    result[length_top: width_top, image_height:height_top] = top_img
+    result[length_top: width_top, MOSAIC_HEIGHT:height_top] = top_img
     return result
 
 
@@ -121,8 +122,8 @@ def _color_detect(images: list) -> list:
     :return: the color map of squares
     """
     color_content = [{}, {}, {}, {}, {}]
-    for color in color_dict:
-        masks = _filter_color(color_dict[color][0], color_dict[color][1], images)
+    for color in _COLOR_DICT:
+        masks = _filter_color(_COLOR_DICT[color][0], _COLOR_DICT[color][1], images)
         index_mask = 0
         for mask in masks:
             shape = mask.shape
@@ -132,11 +133,11 @@ def _color_detect(images: list) -> list:
                 if area > 100:
                     cnt = contours[0]
                     M = _cv2.moments(cnt)
-                    cx = int(M['m10'] / M['m00'])
-                    cy = int(M['m01'] / M['m00'])
+                    cx = int(M["m10"] / M["m00"])
+                    cy = int(M["m01"] / M["m00"])
                     horizontal = cx / shape[1]
                     vertical = cy / shape[0]
-                    if color != 'white':
+                    if color != "white":
                         if (vertical < 0.2) & (horizontal < 0.7) & (horizontal > 0.3):
                             color_content[index_mask][color] = 0
                         elif (vertical > 0.8) & (horizontal < 0.7) & (horizontal > 0.3):
@@ -146,7 +147,7 @@ def _color_detect(images: list) -> list:
                         elif (horizontal < 0.2) & (vertical < 0.7) & (vertical > 0.3):
                             color_content[index_mask][color] = 3
                         else:
-                            print('error')
+                            print("error")
             index_mask += 1
     return color_content
 
@@ -160,35 +161,44 @@ def _get_key(dictionary: dict, value: int) -> list:
     """
     return [l for l, v in dictionary.items() if v == value]
 
-
-def cut_cube(pictures: str) -> \
-        _typing.Tuple[_np.ndarray, list, list]:
+def helper_display(tag, img):
+    for k, i in enumerate(img):
+        _cv2.imshow(tag + str(k), i)
+def create_photomosaic(images: list) -> _typing.Tuple[list, _np.ndarray, list, list]:
     """
-    cut and combine the cube by its color
-    :param pictures: the address of pictures
-    :return: the combined picture, the list of original pictures, the list of cut images
+    Process the images and combine them by their color into a photomosaic.
+
+    :param images: List of images in OpenCV format
+    :return: Original images, Combined picture, the list of original pictures, the list of cut images
     """
-    img = list()
-    img_hsv = list()
-
-    # read and convert images to HSV color
-    for i in range(5):
-        img.append(_cv2.imread(pictures + str(i + 1) + '.PNG'))
-        img_hsv.append(_cv2.cvtColor(img[i], _cv2.COLOR_BGR2HSV))
-
+    # TODO: Finished here
+    helper_display("ORIG", images[:1])
+    # Convert images to HSV color from a copy of the original images
+    images_hsv = [_cv2.cvtColor(image, _cv2.COLOR_BGR2HSV) for image in images.copy()]
+    helper_display("HSV", images_hsv[:1])
     # cut the useless part of the image
-    img_cut = _cut_images(img_hsv)
+    img_cut = _cut_images(images_hsv)
+    helper_display("CUT", img_cut[:1])
     # detect the color in the image and store in a list of map
-    dict_color_map = _color_detect(img_cut)
+    dict_color_map = _color_detect(img_cut[:1])
+    print(dict_color_map)
     # resize the images for combining
     img_white = _resize_images(img_cut)
+    helper_display("WHITE", img_white[:1])
     # divide the top and bottom image
     bottom_index, top_index = _type_division(dict_color_map)
     # combine the images
     result = _combine_images(img_white, dict_color_map, bottom_index, top_index)
+    _cv2.waitKey(0)
+    return images, _cv2.cvtColor(result, _cv2.COLOR_HSV2BGR), img, img_cut
 
-    return _cv2.cvtColor(result, _cv2.COLOR_HSV2BGR), img, img_cut
+img = []
+for i in range(5):
+    img.append(_cv2.imread("./color_cube/" + str(i + 1) + ".PNG"))
+result_img, image, image_cut = create_photomosaic(img.copy())
+import os
+if os.path.exists("result.png"):
+    os.remove("result.png")
+_cv2.imwrite("result.png", result_img)
 
 
-result_img, image, image_cut = cut_cube('./color_cube/')
-_cv2.imwrite('result.png', result_img)
