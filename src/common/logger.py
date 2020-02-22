@@ -160,7 +160,10 @@ class Log:
     @staticmethod
     def hardware(*values, **kwargs):
         """"
-        TODO: Document
+        Standard hardware logging
+        
+        :param values: Hardware information to log
+        :param kwargs: Kwards passed to the internal logger
         """
         Logger.HARDWARE.value.info("\t".join(values), **kwargs)
 
