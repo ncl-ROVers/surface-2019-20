@@ -49,8 +49,7 @@ def config():
         os.remove(log_file)
 
     # Reconfigure the logger to use a separate folder (instead of the real logs)
-    Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
-                    log_directory=TESTS_ASSETS_DIR)
+    Log.reconfigure(log_directory=TESTS_ASSETS_DIR)
 ```
 
 You can use a similar structure in your code to configure your environment before running the tests.
