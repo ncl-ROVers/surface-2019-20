@@ -62,10 +62,10 @@ RECEIVED_DICT = {
 
 def get_processes(pid: int) -> _typing.List[_typing.Type[_psutil.Process]]:
     """
-    TODO: Document
+    Returns a list of all Processes related to the ROV
 
-    :param pid:
-    :return:
+    :param pid: The parent id you wish to get all the children + itself
+    :return: List of Processes
     """
     parent = _psutil.Process(pid)
 
@@ -74,47 +74,52 @@ def get_processes(pid: int) -> _typing.List[_typing.Type[_psutil.Process]]:
 
 def count_threads(processes: list) -> int:
     """
-    TODO: Document
+    Returns the number of threads currently related to the ROV
 
-    :param processes:
-    :return:
+    :param processes: A list of processes to sum up all the individual threads
+    :return: The sum of all the threads for all the passed processes
     """
     return sum(process.num_threads() for process in processes)
 
 
 def get_cpu_load() -> float:
     """
-    TODO: Document
+    Obtains a number representing cpu load as a percentage across the whole system. 
+    This compares CPU times between last call or module import, whichever is most recent 
 
-    :return:
+    :return: A percentage representing system wide cpu utilization between now and either the last call,
+             or the module being imported
     """
     return _psutil.cpu_percent()
 
 
 def get_memory_usage() -> float:
     """
-    TODO: Document
+    Obtain how much memory is being used as a percentage
 
-    :return:
+    :return: A percentage representing how much memory is being used
     """
     return _psutil.virtual_memory().percent
 
 
 def get_gpu_load() -> float:
     """
-    TODO: Document
+    Obtain the sum of each GPUs load as a percentage
+    Note : This function only works with computers with nvidia-smi installed / nvidia graphic cards
 
-    :return:
+    :return: The sum of the gpu usage percentages
     """
     return sum(gpu.load for gpu in _GPUtil.getGPUs()) * 100
 
 
 def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float, float]:
     """
-    TODO: Document
+    Obtain a tuple of hardware information in the following order:
+    Number Of Processes, Number of Threads, CPU Load, Memory usage, GPU load
+    and return this tuple back. Works by calling other methods within this module
 
-    :param pid:
-    :return:
+    :param pid: The pid of the highest process you wish to get information from (and its child processes)
+    :return: A tuple of hardware information. See above for additional info
     """
     processes = get_processes(pid)
     num_processes = len(processes)
