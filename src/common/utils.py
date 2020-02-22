@@ -62,9 +62,9 @@ RECEIVED_DICT = {
 
 def get_processes(pid: int) -> _typing.List[_typing.Type[_psutil.Process]]:
     """
-    Returns a list of all Processes related to the ROV
+    Returns a list of all processes under given PID (including the parent).
 
-    :param pid: The parent id you wish to get all the children + itself
+    :param pid: Parent pid you wish to get child processes from + parent process itself
     :return: List of Processes
     """
     parent = _psutil.Process(pid)
@@ -74,7 +74,7 @@ def get_processes(pid: int) -> _typing.List[_typing.Type[_psutil.Process]]:
 
 def count_threads(processes: list) -> int:
     """
-    Returns the number of threads currently related to the ROV
+    Returns the number of threads under given processes.
 
     :param processes: A list of processes to sum up all the individual threads
     :return: The sum of all the threads for all the passed processes
@@ -84,8 +84,11 @@ def count_threads(processes: list) -> int:
 
 def get_cpu_load() -> float:
     """
-    Obtains a number representing cpu load as a percentage across the whole system. 
-    This compares CPU times between last call or module import, whichever is most recent 
+    Obtains a number representing cpu load as a percentage across the whole system.
+
+    This compares CPU times between last call or module import, whichever is most recent.
+
+    It is recommended for accuracy that this function be called with at least 0.1 seconds delay between calls.
 
     :return: A percentage representing system wide cpu utilization between now and either the last call,
              or the module being imported
@@ -95,7 +98,7 @@ def get_cpu_load() -> float:
 
 def get_memory_usage() -> float:
     """
-    Obtain how much memory is being used as a percentage
+    Obtain how much memory is being used as a percentage.
 
     :return: A percentage representing how much memory is being used
     """
@@ -104,10 +107,13 @@ def get_memory_usage() -> float:
 
 def get_gpu_load() -> float:
     """
-    Obtain the sum of each GPUs load as a percentage
-    Note : This function only works with computers with nvidia-smi installed / nvidia graphic cards
+    Obtain the sum of each GPUs load as a percentage.
 
-    :return: The sum of the gpu usage percentages
+    ..warning::
+
+        This function only works with nvidia-smi installed / nvidia graphic cards
+
+    :return: Sum of the gpu usage percentages
     """
     return sum(gpu.load for gpu in _GPUtil.getGPUs()) * 100
 
@@ -115,11 +121,17 @@ def get_gpu_load() -> float:
 def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float, float]:
     """
     Obtain a tuple of hardware information in the following order:
-    Number Of Processes, Number of Threads, CPU Load, Memory usage, GPU load
-    and return this tuple back. Works by calling other methods within this module
 
-    :param pid: The pid of the highest process you wish to get information from (and its child processes)
-    :return: A tuple of hardware information. See above for additional info
+        1. Number Of Processes
+        2. Number of Threads
+        3. CPU Load
+        4. Memory usage
+        5. GPU load
+
+    and return this tuple back. Works by calling other methods within this module.
+
+    :param pid: PID of the process you wish to get information from (including its child processes)
+    :return: A tuple of hardware information. See above for additional info.
     """
     processes = get_processes(pid)
     num_processes = len(processes)

@@ -160,10 +160,12 @@ class Log:
     @staticmethod
     def hardware(*values, **kwargs):
         """"
-        Standard hardware logging
+        Hardware information logging.
+
+        Logs a variable amount of values separated by `\t` character, INFO level.
         
         :param values: Hardware information to log
-        :param kwargs: Kwards passed to the internal logger
+        :param kwargs: Kwargs passed to the internal logger
         """
         Logger.HARDWARE.value.info("\t".join(values), **kwargs)
 
