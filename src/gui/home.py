@@ -195,7 +195,7 @@ class Home(Screen):
 
         # Connect the clock timers to the functions
         self._hardware_readings_clock.setInterval(3000)
-        self._sensors_clock.timeout.connect(self._sensors.update)
+        self._hardware_readings_clock.timeout.connect(self._sensors.update)
         # TODO: Enable once added to the screen
         # self._connections_clock.timeout.connect(self._connections.update_readings)
 
@@ -250,11 +250,11 @@ class Home(Screen):
         self.manager.bar.setVisible(True)
         self.manager.line_break.setVisible(True)
         self.manager.references.connection_clock.start()
-        self._sensors_clock.start()
+        self._hardware_readings_clock.start()
 
     def on_exit(self):
         """
         Stop the clocks.
         """
         super().on_exit()
-        self._sensors_clock.stop()
+        self._hardware_readings_clock.stop()
