@@ -55,13 +55,7 @@ CONTROL_DICT = {
     "autonomous_heave": 0
 }
 RECEIVED_DICT = {
-    "leak": 0,
-    "temperature": 0,
-    "depth": 0,
-    "acceleration": 0,
-    "rotation_x": 0,
-    "rotation_y": 0,
-    "rotation_z": 0
+    "test": 0
 }
 
 

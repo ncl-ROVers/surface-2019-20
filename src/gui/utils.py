@@ -10,6 +10,7 @@ from PySide2.QtGui import *
 from PySide2.QtCore import *
 from .. import comms, control
 from ..common import Log
+import os
 import pyautogui
 import typing
 import abc
@@ -60,6 +61,7 @@ class _References:
     top_camera: comms.VideoStream = None
     bottom_camera: comms.VideoStream = None
     micro_camera: comms.VideoStream = None
+    parent_pid: int = os.getpid()
 
 
 class Colour(enum.Enum):

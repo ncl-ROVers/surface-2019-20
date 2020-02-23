@@ -167,7 +167,7 @@ class Log:
         :param values: Hardware information to log
         :param kwargs: Kwargs passed to the internal logger
         """
-        Logger.HARDWARE.value.info("\t".join(values), **kwargs)
+        Logger.HARDWARE.value.info(" | ".join(str(v) for v in values), **kwargs)
 
     @staticmethod
     def command_result(command_result: _subprocess.CompletedProcess):
