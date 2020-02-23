@@ -133,5 +133,6 @@ class VideoStream(_QObject):
         while True:
             ret, frame = self._video_capture.read()
             self._frame = frame if ret else _np.empty((self._height, self._width, 3))
-            self.frame_received.emit(self.frame_qt)
+            if ret:
+                self.frame_received.emit(self.frame_qt)
             _time.sleep(_DELAY)
