@@ -304,13 +304,16 @@ class Home(Screen):
 
     def on_switch(self):
         """
-        Display the menu bar as it should only be disabled in the loading screen, and start all clocks.
+        This screen is accessed immediately after the loading screen, hence it will have a lot of start-up
+        functionalities. Currently the following are implemented:
+
+            1. Display the menu bar (and the line break) as it should only be disabled in the loading screen.
+            2. Start the connection check clock
         """
         super().on_switch()
         self.manager.bar.setVisible(True)
         self.manager.line_break.setVisible(True)
-        self._sensors_clock.start()
-        self._connections_clock.start()
+        self.manager.references.connection_clock.start()
 
     def on_exit(self):
         """

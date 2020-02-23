@@ -178,7 +178,7 @@ class ControlManager:
                 value = -surge
 
             elif sway:
-                value = -sway
+                value = sway
 
             elif yaw:
                 value = -yaw
@@ -206,7 +206,7 @@ class ControlManager:
                 value = -surge
 
             elif sway:
-                value = sway
+                value = -sway
 
             elif yaw:
                 value = yaw
@@ -234,7 +234,7 @@ class ControlManager:
                 value = surge
 
             elif sway:
-                value = -sway
+                value = sway
 
             elif yaw:
                 value = yaw
@@ -262,7 +262,7 @@ class ControlManager:
                 value = surge
 
             elif sway:
-                value = sway
+                value = -sway
 
             elif yaw:
                 value = -yaw

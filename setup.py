@@ -62,6 +62,7 @@ with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as f:
 packages_renamed = ["ncl_rovers"] + [package.replace("src", "ncl_rovers.src") for package in setuptools.find_packages()]
 package_dirs_renamed = {package: package.replace("ncl_rovers.", "").replace(".", "/") for package in packages_renamed}
 package_dirs_renamed["ncl_rovers"] = "."
+package_dirs_renamed.__delitem__("tests")
 
 # Non-packaged files which will be included in the global package
 package_data = _get_package_data()
@@ -91,6 +92,11 @@ setuptools.setup(
         "PySide2",
         "pyautogui",
         "pytest",
+        "pandas",
+        "sklearn",
+        "opencv-python",
+        "GPUtil",
+        "psutil"
     ],
     python_requires=">=3.8.1",
 )

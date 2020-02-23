@@ -10,6 +10,7 @@ Interaction with this module should only happen via the :func:`start` function.
     Kacper Florianski <k.florianski@ncl.ac.uk>
     Adanna Obibuaku <A.Obibuaku@newcastle.ac.uk>
     Zhanqiu Wang <Z.Wang111@newcastle.ac.uk>
+    Riley Heeley <m.h.heeley1@newcastle.ac.uk>
 """
 import os
 import signal
@@ -17,6 +18,7 @@ from PySide2.QtWidgets import QApplication as _QApplication
 from .loading import Loading as _Loading
 from .home import Home as _Home
 from .controller import Controller as _Controller
+from .streams import Streams as _Streams
 from .utils import ScreenManager as _ScreenManager, Screen as _Screen
 from ..common import Log
 
@@ -46,7 +48,7 @@ def start() -> int:
     processes_to_terminate = list()
 
     # Create and configure the screen manager, load all assets and switch to the home screen
-    manager = _ScreenManager(_Loading(), _Home(), _Controller())
+    manager = _ScreenManager(_Loading(), _Home(), _Streams(), _Controller())
     manager.post_init()
     manager.show()
     manager.screen.load()
