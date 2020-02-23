@@ -7,8 +7,8 @@ import cv2
 import os
 import pytest
 from src.vision import count_mussels
-from tests.utils import TESTS_ASSETS_VISION_DIR, get_log_files
-from src.common import COMMON_LOGGER_DIR, Log, Logger
+from .utils import TESTS_ASSETS_VISION_DIR, get_log_files
+from src.common import Log
 
 
 def test_final_result():
@@ -35,5 +35,4 @@ def config():
         os.remove(log_file)
 
     # Reconfigure the logger to use a separate folder (instead of the real logs)
-    Log.reconfigure(Logger.MAIN, os.path.join(COMMON_LOGGER_DIR, "config_main.json"),
-                    log_directory=TESTS_ASSETS_VISION_DIR)
+    Log.reconfigure(log_directory=TESTS_ASSETS_VISION_DIR)
