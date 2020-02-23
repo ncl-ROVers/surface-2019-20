@@ -93,6 +93,9 @@ void EntityCamera::streamConnection(int port, int quality)
 
 		std::vector<char> imageData(1024);
 
+		using namespace std::chrono_literals;
+		std::this_thread::sleep_for(10ms);
+
 		while (!socket.isClosed() && m_socketRunning)
 		{
 			//Encode image data
@@ -117,6 +120,8 @@ void EntityCamera::streamConnection(int port, int quality)
 
 			socket.send(frame.str().c_str(), frame.str().size());
 			socket.send(imageData.data(), imageData.size());
+
+			std::this_thread::sleep_for(50ms);
 		}
 
 		socket.close();

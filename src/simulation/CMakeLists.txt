@@ -69,4 +69,7 @@ include_directories("${SIMULATION_ROOT}"
 add_executable(Simulation ${SUB_SOURCES})
 target_link_libraries(${PROJECT_NAME} GLAD GLFW opengl32)
 
-add_compile_definitions("COMPILE_PATH_OFFSET=\"../Simulation\"")
+set_target_properties(Simulation PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_SOURCE_DIR}/")
+set_target_properties(Simulation PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_SOURCE_DIR}/")
+
+add_compile_definitions("COMPILE_PATH_OFFSET=\"./Simulation\"")
