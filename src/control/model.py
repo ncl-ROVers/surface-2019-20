@@ -352,8 +352,7 @@ class ControlManager:
 
             return _normalise_thruster(value)
 
-            # Build the dictionary of values and return it
-
+        # Build the dictionary of values and return it
         return {
             "T_HFP": _thruster_hfp(),
             "T_HFS": _thruster_hfs(),

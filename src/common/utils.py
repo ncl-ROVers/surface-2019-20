@@ -37,7 +37,10 @@ TRANSMISSION_DICT = {
     "T_VFP": 0,
     "T_VFS": 0,
     "T_VAP": 0,
-    "T_VAS": 0
+    "T_VAS": 0,
+    "T_M": 0,
+    "MG": 0,
+    "MC": 0
 }
 CONTROL_DICT = {
     "mode": 0,
@@ -54,9 +57,9 @@ CONTROL_DICT = {
     "autonomous_surge": 0,
     "autonomous_heave": 0
 }
-# TODO: Replace with proper data once known
 RECEIVED_DICT = {
-    "test": ""
+    "ARD_O": False,
+    "ARD_I": False
 }
 
 
