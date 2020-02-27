@@ -37,7 +37,10 @@ TRANSMISSION_DICT = {
     "T_VFP": 0,
     "T_VFS": 0,
     "T_VAP": 0,
-    "T_VAS": 0
+    "T_VAS": 0,
+    "T_M": 0,
+    "MG": 0,
+    "MC": 0
 }
 CONTROL_DICT = {
     "mode": 0,
@@ -55,7 +58,8 @@ CONTROL_DICT = {
     "autonomous_heave": 0
 }
 RECEIVED_DICT = {
-    "test": 0
+    "ARD_O": False,
+    "ARD_I": False
 }
 
 
