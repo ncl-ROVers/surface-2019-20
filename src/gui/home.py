@@ -8,23 +8,25 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 
-class _Reading(QWidget):
+class _Indicator(QWidget):
     """
     TODO: Document
     """
 
-    def __init__(self, header: str, body: str):
+    def __init__(self, header: str, body: str, footer: str = ""):
         """
         TODO: Document
 
         :param header: Header text displayed above the values
         :param body: Body containing the values
+        :param footer: Footer text displayed below the values, empty by default
         """
-        super(_Reading, self).__init__()
+        super(_Indicator, self).__init__()
 
         # Remember passed values and initialise the display text (body with substituted placeholder)
         self._header = header
         self._body = body
+        self._footer = footer
         self._text = self._body.format("0")
 
         # Create the QT objects and set the layout
@@ -40,6 +42,7 @@ class _Reading(QWidget):
         # Set the style and initially update the visible items
         self._set_style()
         self._header_label.setText(self._header)
+        self._footer_label.setText(self._footer)
         self._set_text("0")
 
     @property
@@ -69,6 +72,7 @@ class _Reading(QWidget):
         # Set the alignments to center, to display all text in the middle
         self._body_label.setAlignment(Qt.AlignCenter)
         self._header_label.setAlignment(Qt.AlignHCenter)
+        self._footer_label.setAlignment(Qt.AlignHCenter)
 
         # Set spacing to 0 to remove the default margin
         self._layout.setSpacing(0)
@@ -119,41 +123,87 @@ class _Reading(QWidget):
         self._body_label.setText(text)
 
 
-class _HardwareReadings(QHBoxLayout):
+class _Indicators(QHBoxLayout):
     """
     TODO: Document
     """
+
+    class _HardwareIndicators:
+        """
+        TODO: Document
+        """
+
+        def __init__(self):
+            """
+            TODO: Document
+            """
+            self._processes = _Indicator("Processes", "{}")
+            self._threads = _Indicator("Threads", "{}")
+            self._cpu = _Indicator("CPU", "{}%")
+            self._memory = _Indicator("Memory", "{}%")
+            self._gpu = _Indicator("GPU", "{}%")
+
+            self.indicators = [self._processes, self._threads, self._cpu, self._memory, self._gpu]
+
+        def update(self):
+            """
+            TODO: Document
+            """
+            processes, threads, cpu_load, memory_usage, gpu_load = \
+                get_hardware_info(get_manager().references.parent_pid)
+            Log.hardware(processes, threads, cpu_load, memory_usage, gpu_load)
+
+            self._processes.text = processes
+            self._threads.text = threads
+            self._cpu.text = cpu_load
+            self._memory.text = memory_usage
+            self._gpu.text = gpu_load
+
+    class _ConnectionIndicators:
+        """
+        TODO: Document
+        """
+
+        def __init__(self):
+            """
+            TODO: Document
+            """
+            self._pi = _Indicator("Raspberry Pi", "{}", "Status")
+            self._ard_o = _Indicator("Arduino O", "{}", "Reachable?")
+            self._ard_i = _Indicator("Arduino I", "{}", "Reachable?")
+
+            self.indicators = [self._pi, self._ard_o, self._ard_i]
+
+        def update(self):
+            """
+            TODO: Document
+            """
+            print("Connections update")
 
     def __init__(self):
         """
         TODO: Document
         """
-        super(_HardwareReadings, self).__init__()
-        self._processes = _Reading("Processes", "{}")
-        self._threads = _Reading("Threads", "{}")
-        self._cpu = _Reading("CPU", "{}%")
-        self._memory = _Reading("Memory", "{}%")
-        self._gpu = _Reading("GPU", "{}%")
-        self.addWidget(self._processes)
-        self.addWidget(self._threads)
-        self.addWidget(self._cpu)
-        self.addWidget(self._memory)
-        self.addWidget(self._gpu)
+        super(_Indicators, self).__init__()
+        self._hardware_indicators = self._HardwareIndicators()
+        self._connection_indicators = self._ConnectionIndicators()
 
-    def update(self):
+        for indicator in self._hardware_indicators.indicators + self._connection_indicators.indicators:
+            self.addWidget(indicator)
+
+    @property
+    def hardware(self):
         """
         TODO: Document
-
-        :return:
         """
-        processes, threads, cpu_load, memory_usage, gpu_load = get_hardware_info(get_manager().references.parent_pid)
-        Log.hardware(processes, threads, cpu_load, memory_usage, gpu_load)
+        return self._hardware_indicators
 
-        self._processes.text = processes
-        self._threads.text = threads
-        self._cpu.text = cpu_load
-        self._memory.text = memory_usage
-        self._gpu.text = gpu_load
+    @property
+    def connections(self):
+        """
+        TODO: Document
+        """
+        return self._connection_indicators
 
 
 class Home(Screen):
@@ -169,20 +219,17 @@ class Home(Screen):
 
         # Clocks used to update the sensor readings and the connections
         self._hardware_readings_clock = QTimer()
+        self._connection_readings_clock = QTimer()
 
         # Basic layout consists of vertical box layout, within which there are two rows (cameras and indicators)
         self._layout = QVBoxLayout()
         self._cameras = QGridLayout()
-        self._indicators = QHBoxLayout()
+        self._indicators = _Indicators()
 
         # Within the cameras section, there are 3 cameras provided (main and two side cameras)
         self._main_camera = QPushButton("Main camera placeholder")
         self._top_camera = QPushButton("Top camera placeholder")
         self._bottom_camera = QPushButton("Bottom camera placeholder")
-
-        # Within the indicators, there are sensor and connection indicators
-        self._sensors = _HardwareReadings()
-        self._connections = QPushButton("Indicators placeholder")
 
         self._config()
         self.setLayout(self._layout)
@@ -195,15 +242,14 @@ class Home(Screen):
 
         # Connect the clock timers to the functions
         self._hardware_readings_clock.setInterval(3000)
-        self._hardware_readings_clock.timeout.connect(self._sensors.update)
-        # TODO: Enable once added to the screen
-        # self._connections_clock.timeout.connect(self._connections.update_readings)
+        self._hardware_readings_clock.timeout.connect(self._indicators.hardware.update)
+        self._connection_readings_clock.setInterval(1000)
+        self._connection_readings_clock.timeout.connect(self._indicators.connections.update)
 
         # TODO: Placeholders - making them take max space available for properly visible items
         self._main_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._top_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._bottom_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self._connections.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Main camera takes the height of 2 side cameras and 2/3 of the width of the screen
         self._cameras.addWidget(self._main_camera, 0, 0, 2, 1)
@@ -211,10 +257,6 @@ class Home(Screen):
         self._cameras.addWidget(self._bottom_camera, 1, 1)
         self._cameras.setColumnStretch(0, 2)
         self._cameras.setColumnStretch(1, 1)
-
-        # Sensors are to the left, whereas connections are to the right
-        self._indicators.addLayout(self._sensors)
-        self._indicators.addWidget(self._connections)
 
         # Cameras take 3/4 of the height of the screen
         self._layout.addLayout(self._cameras)
@@ -251,6 +293,7 @@ class Home(Screen):
         self.manager.line_break.setVisible(True)
         self.manager.references.connection_clock.start()
         self._hardware_readings_clock.start()
+        self._connection_readings_clock.start()
 
     def on_exit(self):
         """
@@ -258,3 +301,4 @@ class Home(Screen):
         """
         super().on_exit()
         self._hardware_readings_clock.stop()
+        self._connection_readings_clock.stop()
