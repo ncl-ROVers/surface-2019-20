@@ -1,11 +1,15 @@
 """
 TODO: Document
 """
-from ..common import get_hardware_info, Log
+from ..common import get_hardware_info, Log, dm
 from .utils import Screen, Colour, get_manager
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
+
+
+HARDWARE_READINGS_INTERVAL = 3000
+CONNECTION_READINGS_INTERVAL = 1000
 
 
 class _Indicator(QWidget):
@@ -169,6 +173,11 @@ class _Indicators(QHBoxLayout):
             TODO: Document
             """
             self._pi = _Indicator("Raspberry Pi", "{}", "Status")
+            self._pi._body_label.setStyleSheet("""
+                        QLabel {
+                            color: white;
+                            font-size: 25px;
+                        }""")
             self._ard_o = _Indicator("Arduino O", "{}", "Reachable?")
             self._ard_i = _Indicator("Arduino I", "{}", "Reachable?")
 
@@ -178,7 +187,12 @@ class _Indicators(QHBoxLayout):
             """
             TODO: Document
             """
-            print("Connections update")
+            pi_status = get_manager().references.connection.status.name
+            o_connection, i_connection = dm.received["A_O"], dm.received["A_I"]
+
+            self._pi.text = pi_status
+            self._ard_o.text = o_connection
+            self._ard_i.text = i_connection
 
     def __init__(self):
         """
@@ -227,9 +241,9 @@ class Home(Screen):
         self._indicators = _Indicators()
 
         # Within the cameras section, there are 3 cameras provided (main and two side cameras)
-        self._main_camera = QPushButton("Main camera placeholder")
-        self._top_camera = QPushButton("Top camera placeholder")
-        self._bottom_camera = QPushButton("Bottom camera placeholder")
+        self._main_camera = QLabel()
+        self._top_camera = QLabel()
+        self._bottom_camera = QLabel()
 
         self._config()
         self.setLayout(self._layout)
@@ -241,9 +255,9 @@ class Home(Screen):
         super()._config()
 
         # Connect the clock timers to the functions
-        self._hardware_readings_clock.setInterval(3000)
+        self._hardware_readings_clock.setInterval(HARDWARE_READINGS_INTERVAL)
         self._hardware_readings_clock.timeout.connect(self._indicators.hardware.update)
-        self._connection_readings_clock.setInterval(1000)
+        self._connection_readings_clock.setInterval(CONNECTION_READINGS_INTERVAL)
         self._connection_readings_clock.timeout.connect(self._indicators.connections.update)
 
         # TODO: Placeholders - making them take max space available for properly visible items
@@ -292,8 +306,13 @@ class Home(Screen):
         self.manager.bar.setVisible(True)
         self.manager.line_break.setVisible(True)
         self.manager.references.connection_clock.start()
+
         self._hardware_readings_clock.start()
         self._connection_readings_clock.start()
+
+        self.manager.references.main_camera.frame_received.connect(self._update_main_camera)
+        self.manager.references.top_camera.frame_received.connect(self._update_top_camera)
+        self.manager.references.bottom_camera.frame_received.connect(self._update_bottom_camera)
 
     def on_exit(self):
         """
@@ -302,3 +321,40 @@ class Home(Screen):
         super().on_exit()
         self._hardware_readings_clock.stop()
         self._connection_readings_clock.stop()
+
+        self.manager.references.main_camera.frame_received.disconnect(self._update_main_camera)
+        self.manager.references.top_camera.frame_received.disconnect(self._update_top_camera)
+        self.manager.references.bottom_camera.frame_received.disconnect(self._update_bottom_camera)
+
+    @Slot(QPixmap)
+    def _update_main_camera(self, frame):
+        """
+        Update main camera's frame.
+        """
+        Log.debug("Updating main, forward-facing camera")
+        frame = frame.scaled(min(self._main_camera.width(), frame.width()),
+                             min(self._main_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._main_camera.setPixmap(frame)
+
+    @Slot(QPixmap)
+    def _update_top_camera(self, frame):
+        """
+        Update top camera's frame.
+        """
+        Log.debug("Updating top-facing camera")
+        frame = frame.scaled(min(self._top_camera.width(), frame.width()),
+                             min(self._top_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._top_camera.setPixmap(frame)
+
+    @Slot(QPixmap)
+    def _update_bottom_camera(self, frame):
+        """
+        Update bottom camera's frame.
+        """
+        Log.debug("Updating bottom-facing camera")
+        frame = frame.scaled(min(self._bottom_camera.width(), frame.width()),
+                             min(self._bottom_camera.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        self._bottom_camera.setPixmap(frame)
