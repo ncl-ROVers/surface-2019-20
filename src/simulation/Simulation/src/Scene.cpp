@@ -54,7 +54,7 @@ void Scene::init(int width, int height)
 	}
 
 	//Start server
-	m_server.launchServer(50000);
+	m_server.launchServer(m_config.getRov().serverPort);
 
 	m_view.create();
 }

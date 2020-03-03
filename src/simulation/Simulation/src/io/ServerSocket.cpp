@@ -74,7 +74,6 @@ void ServerSocket::bind(int port)
 
 	if (::bind(m_socket, (sockaddr*)&hint, sizeof(hint)) == SOCKET_ERROR)
 	{
-		int err = WSAGetLastError();
 		LOG_ERROR("Unable to bind server socket to port ", port);
 
 		exit(7);

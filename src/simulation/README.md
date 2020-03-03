@@ -50,36 +50,38 @@ The configuration file uses JSON format. The following is a list of available op
 
 `rov_setup`: Specify the properties of the ROV (Format: object). The following is a list of all possible fields:
 
-`mass`: Specify the mass of the ROV in kilograms. (Format: `<mass>`)
+* `mass`: Specify the mass of the ROV in kilograms. (Format: `<mass>`)
 
-`pos`: Specify the initial offset of the ROV from the origin in meters. (Format: `[ <x>, <y>, <z> ]`)
+* `pos`: Specify the initial offset of the ROV from the origin in meters. (Format: `[ <x>, <y>, <z> ]`)
 
-`rot`: Specify the initial rotation of the ROV around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
+* `rot`: Specify the initial rotation of the ROV around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
 
-`thrusters`: Specify properties of the ROV's thrusters (Format: Object of obje-cts). Each field's name is the index of the thruster and its value is an object with all the properties of the thruster:
+* `thrusters`: Specify properties of the ROV's thrusters (Format: Object of obje-cts). Each field's name is the index of the thruster and its value is an object with all the properties of the thruster:
 
-* A thruster index is made out of three characters:
-	1. `s` or `v`: `h` for horizontal (down). `v` for vertical (up).
-	2. `a` or`f`: `a` for aft (backward). `f` for fore (forward).
-	3. `h` or `p`: `s` for starboard (right). `p` for port (left).
-* Properties of a thruster:
-	1. `pos`: The object-space position of the thruster (Format: `[ <x>, <y>, <z> ]`).
-	2. `rot`: The object-space rotation of the thruster around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
-	3. `force`: The initial force of the thruster, in Newtons. (Format: `<force>`) (Deprecated, to be removed).
+	* A thruster index is made out of three characters:
+		1. `s` or `v`: `h` for horizontal (down). `v` for vertical (up).
+		2. `a` or`f`: `a` for aft (backward). `f` for fore (forward).
+		3. `h` or `p`: `s` for starboard (right). `p` for port (left).
+	* Properties of a thruster:
+		1. `pos`: The object-space position of the thruster (Format: `[ <x>, <y>, <z> ]`).
+		2. `rot`: The object-space rotation of the thruster around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
+		3. `force`: The initial force of the thruster, in Newtons. (Format: `<force>`) (Deprecated, to be removed).
 
-`cameras`: Specify properties of the ROV's virtual cameras (Format: Array of objects). Each element is an object with all the properties of an individual camera:
+* `cameras`: Specify properties of the ROV's virtual cameras (Format: Array of objects). Each element is an object with all the properties of an individual camera:
 
-* Properties of a camera:
-	1. `pos`: The object-space position of the camera (Format: `[ <x>, <y>, <z> ]`).
-	2. `rot`: The object-space rotation of the camera around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, <y_angle>, <z_angle> ]`)
-	3. `resolution`: The resolution of the camera (Format: `[ <width> <height> ]`).
-	4. `fov`: The Field Of View angle of the camera (in degrees).
-	5. `port`: The port the camera's video stream will available on.
-	6. `quality`: An integer between 1 and 100 (inclusive) indicating the compression quality of the produced stream.
+	* Properties of a camera:
+		1. `pos`: The object-space position of the camera (Format: `[ <x>, <y>, <z> ]`).
+		2. `rot`: The object-space rotation of the camera around the 3 axes. Each angle is in degrees. (Format: `[ <x_angle>, 	<y_angle>, <z_angle> ]`)
+		3. `resolution`: The resolution of the camera (Format: `[ <width> <height> ]`).
+        4. `fov`: The Field Of View angle of the camera (in degrees).
+		5. `port`: The port the camera's video stream will available on.
+		6. `quality`: An integer between 1 and 100 (inclusive) indicating the compression quality of the produced stream.
 	
-`center_of_mass`: The object-space position of center of mass of the ROV.
+* `center_of_mass`: The object-space position of center of mass of the ROV.
 
-`max_thruster_force`: The maximum amount of force, in Newtons, that can be produced by a single thruster.
+* `max_thruster_force`: The maximum amount of force, in Newtons, that can be produced by a single thruster.
+
+* `server_port`: The port number the ROV control server will be assigned to.
 
 # Configuration examples
 

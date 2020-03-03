@@ -38,4 +38,6 @@ struct RovSetup
 	glm::vec3 rotation = glm::vec3(0.0f);
 
 	glm::vec3 centerOfMass = glm::vec3(0.0f);
+
+	int serverPort = 49000;
 };

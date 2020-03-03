@@ -197,6 +197,11 @@ void parseROVData(const json11::Json& root, RovSetup& rov)
 	{
 		rov.maxThrsuterPower = (float)obj->number_value();
 	}
+
+	if (isFieldOfType(obj = &root["server_port"], "server_prot", Json::NUMBER))
+	{
+		rov.serverPort = (int)obj->number_value();
+	}
 }
 
 void Config::loadConfigFromMemory(const char* data, long int dataLength)
@@ -309,5 +314,5 @@ void Config::loadConfigFromMemory(const char* data, long int dataLength)
 		{
 			LOG_WARN("JSON field 'cache' should be either a string or a boolean, not '", typeName(obj->type()), "'.");
 		}
-	}	
+	}
 }

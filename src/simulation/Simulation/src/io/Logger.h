@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <mutex>
 
 enum LogLevel
 {
@@ -13,6 +14,8 @@ enum LogLevel
 class Logger
 {
 private:
+	std::mutex m_logMutex;
+
 	static Logger s_instance;
 private:
 	Logger() {}
