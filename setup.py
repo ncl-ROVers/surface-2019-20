@@ -96,7 +96,8 @@ setuptools.setup(
         "sklearn",
         "opencv-python",
         "GPUtil",
-        "psutil"
+        "psutil",
+        "simplejpeg"
     ],
     python_requires=">=3.8.1",
 )
