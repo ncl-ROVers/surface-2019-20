@@ -72,6 +72,10 @@ def start() -> int:
 
     # Cleanup the sockets and terminate the connection process
     manager.references.connection.disconnect()
+    manager.references.main_camera.close()
+    manager.references.top_camera.close()
+    manager.references.bottom_camera.close()
+    manager.references.micro_camera.close()
 
     # Kill all child processes and exit the application
     _kill_processes(*processes_to_terminate)
