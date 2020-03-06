@@ -1,5 +1,8 @@
 """
-TODO: Document
+Home screen
+===========
+
+Module storing an implementation of a home screen and all values associated with it.
 """
 from ..common import get_hardware_info, Log, dm
 from .utils import Screen, Colour, get_manager, new_camera_update_func
@@ -8,6 +11,7 @@ from PySide2.QtWidgets import *
 from PySide2.QtGui import *
 
 
+# Declare screen-specific clock intervals for the indicators
 HARDWARE_READINGS_INTERVAL = 3000
 CONNECTION_READINGS_INTERVAL = 1000
 
@@ -173,13 +177,16 @@ class _Indicators(QHBoxLayout):
             TODO: Document
             """
             self._pi = _Indicator("Raspberry Pi", "{}", "Status")
+            self._ard_o = _Indicator("Arduino O", "{}", "Reachable?")
+            self._ard_i = _Indicator("Arduino I", "{}", "Reachable?")
+
+            # TODO: Access violation because there is no method in place at the moment to automatically scale things
+            #  correctly, and leave them in a fixed width state
             self._pi._body_label.setStyleSheet("""
                         QLabel {
                             color: white;
-                            font-size: 25px;
+                            font-size: 20px;
                         }""")
-            self._ard_o = _Indicator("Arduino O", "{}", "Reachable?")
-            self._ard_i = _Indicator("Arduino I", "{}", "Reachable?")
 
             self.indicators = [self._pi, self._ard_o, self._ard_i]
 
@@ -222,7 +229,28 @@ class _Indicators(QHBoxLayout):
 
 class Home(Screen):
     """
-    TODO: Document
+    Home screen used to display 3 main video streams and various indicators with the information about CPU, GPU, memory
+    and the connections' statuses.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create all QT objects and class-specific fields
+        * _config - a method to place all items created in __init__
+        * _set_style - a method to re-style some of the components to display correctly
+        * post_init - default implementation of the inherited method
+        * on_switch - a method which connects the stream slots on switch and starts system-wide and home-specific clocks
+        * on_exit - a method which disconnects the slots on exit and stops some of the clocks
+        * _update_main_camera - helper function to display main camera's frame
+        * _update_top_camera - helper function to display top camera's frame
+        * _update_bottom_camera - helper function to display bottom camera's frame
+
+    Usage
+    -----
+
+    This screen can be switched to as many times as needed.
     """
 
     def __init__(self):
@@ -259,17 +287,6 @@ class Home(Screen):
         """
         super()._config()
 
-        # Connect the clock timers to the functions
-        self._hardware_readings_clock.setInterval(HARDWARE_READINGS_INTERVAL)
-        self._hardware_readings_clock.timeout.connect(self._indicators.hardware.update)
-        self._connection_readings_clock.setInterval(CONNECTION_READINGS_INTERVAL)
-        self._connection_readings_clock.timeout.connect(self._indicators.connections.update)
-
-        # TODO: Placeholders - making them take max space available for properly visible items
-        self._main_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self._top_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self._bottom_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
         # Main camera takes the height of 2 side cameras and 2/3 of the width of the screen
         self._cameras.addWidget(self._main_camera, 0, 0, 2, 1)
         self._cameras.addWidget(self._top_camera, 0, 1)
@@ -283,13 +300,22 @@ class Home(Screen):
         self._layout.setStretch(0, 3)
         self._layout.setStretch(1, 1)
 
+        # Connect the clock timers to the functions
+        self._hardware_readings_clock.setInterval(HARDWARE_READINGS_INTERVAL)
+        self._hardware_readings_clock.timeout.connect(self._indicators.hardware.update)
+        self._connection_readings_clock.setInterval(CONNECTION_READINGS_INTERVAL)
+        self._connection_readings_clock.timeout.connect(self._indicators.connections.update)
+
     def _set_style(self):
         """
-        Default inherited.
-
-        TODO: Actually use this lol
+        Standard styling method.
         """
         super()._set_style()
+
+        # The cameras should take as much space as possible (frames get scaled anyway)
+        self._main_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._top_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._bottom_camera.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def post_init(self):
         """
@@ -299,34 +325,41 @@ class Home(Screen):
 
     def on_switch(self):
         """
-        TODO: Document (adjust)
-
         This screen is accessed immediately after the loading screen, hence it will have a lot of start-up
         functionalities. Currently the following are implemented:
 
             1. Display the menu bar (and the line break) as it should only be disabled in the loading screen.
             2. Start the connection check clock
+            3. Start the hardware readings clock for indicators
+            4. Connect the stream slots to the functions emitting frame signals
         """
         super().on_switch()
+
+        # Set the
         self.manager.bar.setVisible(True)
         self.manager.line_break.setVisible(True)
         self.manager.references.connection_clock.start()
 
+        # Start indicator clocks
         self._hardware_readings_clock.start()
         self._connection_readings_clock.start()
 
+        # Connect stream slots
         self.manager.references.main_camera.frame_received.connect(self._update_main_camera)
         self.manager.references.top_camera.frame_received.connect(self._update_top_camera)
         self.manager.references.bottom_camera.frame_received.connect(self._update_bottom_camera)
 
     def on_exit(self):
         """
-        Stop the clocks.
+        Stop the clocks and disconnect the streams.
         """
         super().on_exit()
+
+        # Stop indicator clocks
         self._hardware_readings_clock.stop()
         self._connection_readings_clock.stop()
 
+        # Disconnect stream slots
         self.manager.references.main_camera.frame_received.disconnect(self._update_main_camera)
         self.manager.references.top_camera.frame_received.disconnect(self._update_top_camera)
         self.manager.references.bottom_camera.frame_received.disconnect(self._update_bottom_camera)

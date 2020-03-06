@@ -38,6 +38,7 @@ def check_connection():
 def get_manager() -> typing.Union[QMainWindow, None]:
     """
     Getter to find the screen manager and return it.
+
     :return: :class:`ScreenManager` or None if couldn't be found
     """
     Log.debug("Retrieving screen manager")
@@ -47,17 +48,23 @@ def get_manager() -> typing.Union[QMainWindow, None]:
     return None
 
 
-def new_camera_update_func(view: QWidget, name: str) -> typing.Callable:
+def new_camera_update_func(view: QWidget, log_name: str) -> typing.Callable:
     """
-    TODO: Document
+    Function used to generate a new slotted function capable of updating the view with video stream frames.
+
+    :param view: View displaying the frames, most likely a QLabel
+    :param log_name: String representing the name of the camera view, which will be logged on debug level
+    :return: New function which takes a single argument (frame) and updates the view with it
     """
 
     @Slot(QPixmap)
     def _update(frame: QPixmap):
         """
-        TODO: Document
+        Function used to update given view with a frame.
+
+        Scales the frame to fit into as much space as possible, without changing the aspect ratio.
         """
-        Log.debug(f"Updating camera view {name}")
+        Log.debug(f"Updating camera view {log_name}")
         frame = frame.scaled(min(view.width(), frame.width()), min(view.height(), frame.height()),
                              aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
         view.setPixmap(frame)
