@@ -47,6 +47,24 @@ def get_manager() -> typing.Union[QMainWindow, None]:
     return None
 
 
+def new_camera_update_func(view: QWidget, name: str) -> typing.Callable:
+    """
+    TODO: Document
+    """
+
+    @Slot(QPixmap)
+    def _update(frame: QPixmap):
+        """
+        TODO: Document
+        """
+        Log.debug(f"Updating camera view {name}")
+        frame = frame.scaled(min(view.width(), frame.width()), min(view.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        view.setPixmap(frame)
+
+    return _update
+
+
 class _References:
     """
     Helper class used to store the references to objects loaded within the loading screen.

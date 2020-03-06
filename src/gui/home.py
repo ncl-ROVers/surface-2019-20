@@ -2,7 +2,7 @@
 TODO: Document
 """
 from ..common import get_hardware_info, Log, dm
-from .utils import Screen, Colour, get_manager
+from .utils import Screen, Colour, get_manager, new_camera_update_func
 from PySide2.QtCore import *
 from PySide2.QtWidgets import *
 from PySide2.QtGui import *
@@ -245,6 +245,11 @@ class Home(Screen):
         self._top_camera = QLabel()
         self._bottom_camera = QLabel()
 
+        # Create the video stream frame update functions
+        self._update_main_camera = new_camera_update_func(self._main_camera, "Main")
+        self._update_top_camera = new_camera_update_func(self._top_camera, "Top-facing")
+        self._update_bottom_camera = new_camera_update_func(self._bottom_camera, "Bottom-facing")
+
         self._config()
         self.setLayout(self._layout)
 
@@ -325,36 +330,3 @@ class Home(Screen):
         self.manager.references.main_camera.frame_received.disconnect(self._update_main_camera)
         self.manager.references.top_camera.frame_received.disconnect(self._update_top_camera)
         self.manager.references.bottom_camera.frame_received.disconnect(self._update_bottom_camera)
-
-    @Slot(QPixmap)
-    def _update_main_camera(self, frame):
-        """
-        Update main camera's frame.
-        """
-        Log.debug("Updating main, forward-facing camera")
-        frame = frame.scaled(min(self._main_camera.width(), frame.width()),
-                             min(self._main_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._main_camera.setPixmap(frame)
-
-    @Slot(QPixmap)
-    def _update_top_camera(self, frame):
-        """
-        Update top camera's frame.
-        """
-        Log.debug("Updating top-facing camera")
-        frame = frame.scaled(min(self._top_camera.width(), frame.width()),
-                             min(self._top_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._top_camera.setPixmap(frame)
-
-    @Slot(QPixmap)
-    def _update_bottom_camera(self, frame):
-        """
-        Update bottom camera's frame.
-        """
-        Log.debug("Updating bottom-facing camera")
-        frame = frame.scaled(min(self._bottom_camera.width(), frame.width()),
-                             min(self._bottom_camera.height(), frame.height()),
-                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
-        self._bottom_camera.setPixmap(frame)
