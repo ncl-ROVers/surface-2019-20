@@ -15,27 +15,58 @@ from PySide2.QtGui import *
 HARDWARE_READINGS_INTERVAL = 3000
 CONNECTION_READINGS_INTERVAL = 1000
 
+# Declare the initial reading to display on the indicators
+DEFAULT_READING = "_"
+
 
 class _Indicator(QWidget):
     """
-    TODO: Document
+    Indicator widget used to represent a single indicator.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create the widget and all associated values
+        * text - a property to access text in the body
+        * _set_style - method used to update the style of an indicator
+        * _set_text - method used to format and update text in the body (exposed via `text` property)
+
+    Usage
+    -----
+
+    You should create an indicator and set it's header and body (footer is optional)::
+
+        ind = _Indicator("Header (title)", "{}% (body)", "Footer (optional)")
+
+    The indicator should then be added to the :class:`_Indicators` class to be displayed on the screen.
+
+    ..warning::
+
+        You must include "{}" placeholder in the indicator's body.
     """
 
     def __init__(self, header: str, body: str, footer: str = ""):
         """
-        TODO: Document
+        Standard constructor.
 
         :param header: Header text displayed above the values
         :param body: Body containing the values
         :param footer: Footer text displayed below the values, empty by default
+        :raises: ValueError on missing placeholder
         """
         super(_Indicator, self).__init__()
+
+        # Raise an error early if no placeholder in body
+        if "{}" not in body:
+            raise ValueError("Indicator's body must include \"{}\" placeholder characters")
 
         # Remember passed values and initialise the display text (body with substituted placeholder)
         self._header = header
         self._body = body
         self._footer = footer
-        self._text = self._body.format("0")
+        self._text = ""
 
         # Create the QT objects and set the layout
         self._layout = QVBoxLayout()
@@ -47,28 +78,29 @@ class _Indicator(QWidget):
         self._layout.addWidget(self._footer_label)
         self.setLayout(self._layout)
 
-        # Set the style and initially update the visible items
+        # Set the style and initially update the visible items to
         self._set_style()
         self._header_label.setText(self._header)
         self._footer_label.setText(self._footer)
-        self._set_text("0")
+        self._set_text(DEFAULT_READING)
 
     @property
-    def text(self):
+    def text(self) -> str:
         """
-        TODO: Document
-        :return:
+        Getter for unformatted, but with the placeholder replaced, text
         """
         return self._text
 
     @text.setter
     def text(self, value):
         """
-        TODO: Document
-        :param value:
-        :return:
+        Setter for the body text.
+
+        Sets both str and QT versions.
+
+        :param value: New text to display
         """
-        # TODO: Error check
+        self._text = self._body.format(value)
         self._set_text(value)
 
     def _set_style(self):
@@ -118,32 +150,48 @@ class _Indicator(QWidget):
 
     def _set_text(self, value):
         """
-        TODO: Document
+        Formats and updates passed text to display it as the indicator's body.
 
-        :param value:
-        :return:
+        :param value: New text to be displayed
         """
-        self._text = self._body.format(value)
+
+        # Text must be formatted in QT-parsable format, to apply styling on the fly.
         index = self._body.rfind("{}") + 2
         text = self._body[:index] + "<span style=\"font-size:30px;\">" + self._body[index:] + "</span>"
         text = text.replace("\n", "<br>")
+
+        # Replace placeholder "{}" with passed value
         text = text.format(value)
+
+        # Update the indicator's body
         self._body_label.setText(text)
 
 
 class _Indicators(QHBoxLayout):
     """
-    TODO: Document
+    Indicators class used to store all indicators in a horizontal layout.
+
+    Functions
+    ---------
+
+    The following list shortly summarises each function:
+
+        * __init__ - a constructor to create all indicators and add them to the layout
+        * hardware - getter for hardware indicators
+        * connections - getter for connection indicators
+
     """
 
     class _HardwareIndicators:
         """
-        TODO: Document
+        Helper class used to bundle hardware-related indicators.
+
+        Exposes update function to update the indicators correctly.
         """
 
         def __init__(self):
             """
-            TODO: Document
+            Standard constructor.
             """
             self._processes = _Indicator("Processes", "{}")
             self._threads = _Indicator("Threads", "{}")
@@ -155,7 +203,7 @@ class _Indicators(QHBoxLayout):
 
         def update(self):
             """
-            TODO: Document
+            Method used to update hardware indicators' values.
             """
             processes, threads, cpu_load, memory_usage, gpu_load = \
                 get_hardware_info(get_manager().references.parent_pid)
@@ -169,12 +217,14 @@ class _Indicators(QHBoxLayout):
 
     class _ConnectionIndicators:
         """
-        TODO: Document
+        Helper class used to bundle connection-related indicators.
+
+        Exposes update function to update the indicators correctly.
         """
 
         def __init__(self):
             """
-            TODO: Document
+            Standard constructor.
             """
             self._pi = _Indicator("Raspberry Pi", "{}", "Status")
             self._ard_o = _Indicator("Arduino O", "{}", "Reachable?")
@@ -192,7 +242,7 @@ class _Indicators(QHBoxLayout):
 
         def update(self):
             """
-            TODO: Document
+            Method used to update connection indicators' values.
             """
             pi_status = get_manager().references.connection.status.name
             o_connection, i_connection = dm.received["A_O"], dm.received["A_I"]
@@ -203,7 +253,9 @@ class _Indicators(QHBoxLayout):
 
     def __init__(self):
         """
-        TODO: Document
+        Standard constructor.
+
+        Stores each list of indicators and adds all widgets within them to itself.
         """
         super(_Indicators, self).__init__()
         self._hardware_indicators = self._HardwareIndicators()
@@ -213,16 +265,16 @@ class _Indicators(QHBoxLayout):
             self.addWidget(indicator)
 
     @property
-    def hardware(self):
+    def hardware(self) -> _HardwareIndicators:
         """
-        TODO: Document
+        Getter for hardware indicators
         """
         return self._hardware_indicators
 
     @property
-    def connections(self):
+    def connections(self) -> _ConnectionIndicators:
         """
-        TODO: Document
+        Getter for connection indicators
         """
         return self._connection_indicators
 
@@ -274,9 +326,9 @@ class Home(Screen):
         self._bottom_camera = QLabel()
 
         # Create the video stream frame update functions
-        self._update_main_camera = new_camera_update_func(self._main_camera, "Main")
-        self._update_top_camera = new_camera_update_func(self._top_camera, "Top-facing")
-        self._update_bottom_camera = new_camera_update_func(self._bottom_camera, "Bottom-facing")
+        self._update_main_camera = new_camera_update_func(self._main_camera, "Main in Home")
+        self._update_top_camera = new_camera_update_func(self._top_camera, "Top-facing in Home")
+        self._update_bottom_camera = new_camera_update_func(self._bottom_camera, "Bottom-facing in Home")
 
         self._config()
         self.setLayout(self._layout)
@@ -335,10 +387,14 @@ class Home(Screen):
         """
         super().on_switch()
 
-        # Set the
+        # Set/Start global items - connections checker and menu bar
         self.manager.bar.setVisible(True)
         self.manager.line_break.setVisible(True)
         self.manager.references.connection_clock.start()
+
+        # Initially update the readings
+        self._indicators.hardware.update()
+        self._indicators.connections.update()
 
         # Start indicator clocks
         self._hardware_readings_clock.start()

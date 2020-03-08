@@ -48,10 +48,10 @@ class Streams(Screen):
         self._micro_camera = QLabel()
 
         # Create the video stream update functions
-        self._update_main_camera = new_camera_update_func(self._main_camera, "Main")
-        self._update_top_camera = new_camera_update_func(self._top_camera, "Top-facing")
-        self._update_bottom_camera = new_camera_update_func(self._bottom_camera, "Bottom-facing")
-        self._update_micro_camera = new_camera_update_func(self._micro_camera, "Micro")
+        self._update_main_camera = new_camera_update_func(self._main_camera, "Main in Streams")
+        self._update_top_camera = new_camera_update_func(self._top_camera, "Top-facing in Streams")
+        self._update_bottom_camera = new_camera_update_func(self._bottom_camera, "Bottom-facing in Streams")
+        self._update_micro_camera = new_camera_update_func(self._micro_camera, "Micro in Streams")
 
         self._config()
         self.setLayout(self._layout)
