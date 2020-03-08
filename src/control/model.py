@@ -192,7 +192,7 @@ class ControlManager:
             """
             Hierarchical control for horizontal fore starboard thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if surge and yaw:
 
@@ -220,7 +220,7 @@ class ControlManager:
             """
             Hierarchical control for horizontal aft port thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if surge and yaw:
 
@@ -248,7 +248,7 @@ class ControlManager:
             """
             Hierarchical control for vertical aft starboard thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if surge and yaw:
 
@@ -276,7 +276,7 @@ class ControlManager:
             """
             Hierarchical control for vertical fore port thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if heave:
                 value = heave
@@ -296,7 +296,7 @@ class ControlManager:
             """
             Hierarchical control for vertical fore starboard thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if heave:
                 value = heave
@@ -316,7 +316,7 @@ class ControlManager:
             """
             Hierarchical control for vertical aft port thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if heave:
                 value = heave
@@ -336,7 +336,7 @@ class ControlManager:
             """
             Hierarchical control for vertical aft starboard thruster.
 
-            :return: Value between _THURSTER_MAX and _THRUSTER_MIN
+            :return: Value between _THRUSTER_MAX and _THRUSTER_MIN
             """
             if heave:
                 value = heave

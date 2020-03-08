@@ -39,8 +39,8 @@ TRANSMISSION_DICT = {
     "T_VAP": 0,
     "T_VAS": 0,
     "T_M": 0,
-    "MG": 0,
-    "MC": 0
+    "M_G": 0,
+    "M_C": 0
 }
 CONTROL_DICT = {
     "mode": 0,
@@ -58,8 +58,8 @@ CONTROL_DICT = {
     "autonomous_heave": 0
 }
 RECEIVED_DICT = {
-    "ARD_O": False,
-    "ARD_I": False
+    "A_O": False,
+    "A_I": False
 }
 
 
