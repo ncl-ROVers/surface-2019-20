@@ -197,23 +197,20 @@ class _Indicators(QHBoxLayout):
             self._threads = _Indicator("Threads", "{}")
             self._cpu = _Indicator("CPU", "{}%")
             self._memory = _Indicator("Memory", "{}%")
-            self._gpu = _Indicator("GPU", "{}%")
 
-            self.indicators = [self._processes, self._threads, self._cpu, self._memory, self._gpu]
+            self.indicators = [self._processes, self._threads, self._cpu, self._memory]
 
         def update(self):
             """
             Method used to update hardware indicators' values.
             """
-            processes, threads, cpu_load, memory_usage, gpu_load = \
-                get_hardware_info(get_manager().references.parent_pid)
-            Log.hardware(processes, threads, cpu_load, memory_usage, gpu_load)
+            processes, threads, cpu_load, memory_usage = get_hardware_info(get_manager().references.parent_pid)
+            Log.hardware(processes, threads, cpu_load, memory_usage)
 
             self._processes.text = processes
             self._threads.text = threads
             self._cpu.text = cpu_load
             self._memory.text = memory_usage
-            self._gpu.text = gpu_load
 
     class _ConnectionIndicators:
         """
@@ -229,6 +226,8 @@ class _Indicators(QHBoxLayout):
             self._pi = _Indicator("Raspberry Pi", "{}", "Status")
             self._ard_o = _Indicator("Arduino O", "{}", "Reachable?")
             self._ard_i = _Indicator("Arduino I", "{}", "Reachable?")
+            self._ard_o_status = _Indicator("Arduino O", "{}", "Status")
+            self._ard_i_status = _Indicator("Arduino I", "{}", "Status")
 
             # TODO: Access violation because there is no method in place at the moment to automatically scale things
             #  correctly, and leave them in a fixed width state
@@ -238,7 +237,7 @@ class _Indicators(QHBoxLayout):
                             font-size: 20px;
                         }""")
 
-            self.indicators = [self._pi, self._ard_o, self._ard_i]
+            self.indicators = [self._pi, self._ard_o, self._ard_i, self._ard_o_status, self._ard_i_status]
 
         def update(self):
             """
@@ -246,10 +245,13 @@ class _Indicators(QHBoxLayout):
             """
             pi_status = get_manager().references.connection.status.name
             o_connection, i_connection = dm.received["A_O"], dm.received["A_I"]
+            o_status, i_status = dm.received["S_O"], dm.received["S_I"]
 
             self._pi.text = pi_status
             self._ard_o.text = o_connection
             self._ard_i.text = i_connection
+            self._ard_o_status.text = o_status
+            self._ard_i_status.text = i_status
 
     def __init__(self):
         """
@@ -281,7 +283,7 @@ class _Indicators(QHBoxLayout):
 
 class Home(Screen):
     """
-    Home screen used to display 3 main video streams and various indicators with the information about CPU, GPU, memory
+    Home screen used to display 3 main video streams and various indicators with the information about CPU, memory
     and the connections' statuses.
 
     Functions
