@@ -65,13 +65,8 @@ void Scene::update(double delta)
 
 	for (int i = 0; i < THRUSTER_COUNT; ++i)
 	{
-		//m_rov->setThrusterPower(i, m_server.getThrusterPower(i) * m_rov->getMaxThrsuterPower());
+		m_rov->setThrusterPower(i, m_server.getThrusterPower(i) * m_rov->getMaxThrsuterPower());
 	}
-
-	m_rov->setThrusterPower(THRUSTER_VERTICAL_FORE_PORT, 10);
-	m_rov->setThrusterPower(THRUSTER_VERTICAL_FORE_STARBOARD, 10);
-	m_rov->setThrusterPower(THRUSTER_VERTICAL_AFT_PORT, 10);
-	m_rov->setThrusterPower(THRUSTER_VERTICAL_AFT_STARBOARD, 10);
 
 	for (Entity* entity : m_entities)
 	{

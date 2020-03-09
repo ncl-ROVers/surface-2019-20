@@ -44,8 +44,15 @@ EntityCamera::~EntityCamera()
 
 void EntityCamera::render(RenderingEngine& renderer)
 {
+	//Flip the scren vertically. THIS IS NOT THE PROPER WAY TO DO THIS!
+	//Doing it this way requires that face culling is flipped (or at least disabled)
+	glm::mat4 flipMatrix(glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+						 glm::vec4(0.0f, -1.0f, 0.0f, 0.0f),
+						 glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+						 glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
 	//Set the camera's translation, rotation and scale to match the entity's
-	m_camera.setViewMatrix(glm::inverse(m_transform.matrix()));
+	m_camera.setViewMatrix(flipMatrix * glm::inverse(m_transform.matrix()));
 
 	renderer.enqueueRender(m_camera, m_framebuffer);
 }
@@ -104,7 +111,7 @@ void EntityCamera::streamConnection(int port, int quality)
 
 			int width = m_framebuffer.getWidth();
 			int height = m_framebuffer.getHeight();
-			tjCompress2(compressor, m_frameData.data(), width, width * 4, height, TJPF_RGBA, &imageData, &dataLength, TJSAMP_444, 50, TJFLAG_FASTDCT);
+			tjCompress2(compressor, m_frameData.data(), width, width * 4, height, TJPF_RGBA, &imageData, &dataLength, TJSAMP_444, quality, TJFLAG_FASTDCT);
 
 			//Send response
 			std::stringstream frame;

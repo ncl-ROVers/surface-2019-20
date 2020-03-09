@@ -4,6 +4,8 @@
 
 #include "io/Config.h"
 
+#include "VertexArray.h"
+#include "Shader.h"
 #include "Framebuffer.h"
 #include "World.h"
 #include "Camera.h"

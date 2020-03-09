@@ -76,7 +76,7 @@ void Camera::update(double delta)
 		//Calculate new view matrix
 		glm::mat4 tMat = glm::translate(-m_position);
 		glm::mat4 rMat = glm::inverse(glm::rotate(glm::radians(m_yaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::rotate(glm::radians(m_pitch), glm::vec3(1.0f, 0.0f, 0.0f)));
+						 glm::rotate(glm::radians(m_pitch), glm::vec3(1.0f, 0.0f, 0.0f)));
 
 		m_viewMatrix = rMat * tMat;
 	}

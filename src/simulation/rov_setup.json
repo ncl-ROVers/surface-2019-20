@@ -21,7 +21,7 @@
 				"rot": [ 0.0, -90.0, 0.0 ],
 				"resolution": [ 670, 480 ],
 				"port": 11024,
-				"quality": 30
+				"quality": 60
 			},
 			{
 				"fov": 70.0,
@@ -29,7 +29,7 @@
 				"rot": [ 0.0, -70.0, 0.0 ],
 				"resolution": [ 670, 480 ],
 				"port": 11025,
-				"quality": 30
+				"quality": 60
 			},
 			{
 				"fov": 70.0,
@@ -37,7 +37,7 @@
 				"rot": [ 0.0, -110.0, 0.0 ],
 				"resolution": [ 670, 480 ],
 				"port": 11026,
-				"quality": 30
+				"quality": 60
 			}
 		],
 		"max_thruster_force": 5.0,

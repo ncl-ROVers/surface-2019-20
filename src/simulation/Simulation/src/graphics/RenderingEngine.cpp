@@ -54,10 +54,13 @@ void RenderingEngine::renderWorld(const std::vector<Entity*>& entities)
 		//Render scene
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		glDisable(GL_CULL_FACE);
 		for (Entity* entity : entities)
 		{
 			entity->render(*this);
 		}
+
+		glEnable(GL_CULL_FACE);
 
 		//Unbind framebuffer
 		renderRequest.second.unbind();
