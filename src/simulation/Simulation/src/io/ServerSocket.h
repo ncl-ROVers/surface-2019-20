@@ -58,7 +58,7 @@ private:
 	bool m_closed = true;
 private:
 	Socket(socket_t socket, std::string host, int port) :
-		m_socket(socket), m_host(host), m_port(port), m_closed(true) {}
+		m_socket(socket), m_host(host), m_port(port), m_closed(false) {}
 public:
 	Socket(const Socket& other) :
 		m_socket(other.m_socket), m_host(other.m_host),

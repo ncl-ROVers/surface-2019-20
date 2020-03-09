@@ -2,7 +2,7 @@
 
 #include "io/Logger.h"
 
-#include "graphics/stb/stb_image_write.h"
+#include <turbojpeg.h>
 
 #include <vector>
 
@@ -91,37 +91,34 @@ void EntityCamera::streamConnection(int port, int quality)
 
 		socket.send(header.str().c_str(), header.str().length());
 
-		std::vector<char> imageData(1024);
-
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(10ms);
 
 		while (!socket.isClosed() && m_socketRunning)
 		{
 			//Encode image data
-			imageData.clear();
+			tjhandle compressor = tjInitCompress();
 
-			stbi_flip_vertically_on_write(true);
-			stbi_write_jpg_to_func([](void* context, void* data, int size)
-			{
-				std::vector<unsigned char>* buffer = ((std::vector<unsigned char>*)context);
+			unsigned char* imageData = nullptr;
+			unsigned long dataLength = 0;
 
-				size_t writeIndex = buffer->size();
-				buffer->resize(writeIndex + size);
-
-				memcpy(&buffer->at(writeIndex), data, size);
-			}, &imageData, m_framebuffer.getWidth(), m_framebuffer.getHeight(), 4, m_frameData.data(), quality);
+			int width = m_framebuffer.getWidth();
+			int height = m_framebuffer.getHeight();
+			tjCompress2(compressor, m_frameData.data(), width, width * 4, height, TJPF_RGBA, &imageData, &dataLength, TJSAMP_444, 50, TJFLAG_FASTDCT);
 
 			//Send response
 			std::stringstream frame;
 			frame << "--mjpegstream\r\n";
 			frame << "Content-type: image/jpeg\r\n";
-			frame << "Content-Length: " << imageData.size() << "\r\n\r\n";
+			frame << "Content-Length: " << dataLength << "\r\n\r\n";
 
 			socket.send(frame.str().c_str(), frame.str().size());
-			socket.send(imageData.data(), imageData.size());
+			socket.send((const char*)imageData, dataLength);
 
-			std::this_thread::sleep_for(50ms);
+			tjFree(imageData);
+			tjDestroy(compressor);
+
+			std::this_thread::sleep_for(5ms);
 		}
 
 		socket.close();
