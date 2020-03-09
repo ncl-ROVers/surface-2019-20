@@ -74,7 +74,6 @@ void ServerSocket::bind(int port)
 
 	if (::bind(m_socket, (sockaddr*)&hint, sizeof(hint)) == SOCKET_ERROR)
 	{
-		int err = WSAGetLastError();
 		LOG_ERROR("Unable to bind server socket to port ", port);
 
 		exit(7);
@@ -101,11 +100,15 @@ Socket ServerSocket::accept()
 	socket_t clientSocket = ::accept(m_socket, (sockaddr*)&client, &clientSize);
 	if (clientSocket == INVALID_SOCKET)
 	{
-		LOG_ERROR("Received invalid socket!");
+		if (!isClosed())
+		{
+			LOG_ERROR("Received invalid socket!");
+		}
 
 		return Socket(EMPTY_SOCKET, "", 0);
 	}
 
+	//Get address and port of the connected socket
 	char clientHost[NI_MAXHOST];
 	int clientPort = ntohs(client.sin_port);
 	inet_ntop(AF_INET, &client.sin_addr, clientHost, NI_MAXHOST);
@@ -124,17 +127,18 @@ void ServerSocket::close()
 
 int Socket::receive(char* buffer, int bufferSize)
 {
-	if (m_socket == EMPTY_SOCKET)
+	if (isClosed())
 	{
+		LOG_ERROR("Socket closed: Cannot receive from ", m_host, ":", m_port);
+
 		return 0;
 	}
 
 	int bytesReceived = recv(m_socket, buffer, bufferSize, 0);
 	if (bytesReceived == SOCKET_ERROR)
 	{
-		LOG_ERROR("Error receiving message from ", m_host, ":", m_port);
-
-		exit(8);
+		close();
+		return 0;
 	}
 
 	return bytesReceived;
@@ -142,17 +146,18 @@ int Socket::receive(char* buffer, int bufferSize)
 
 int Socket::send(const char* buffer, int bufferSize)
 {
-	if (m_socket == EMPTY_SOCKET)
+	if (isClosed())
 	{
+		LOG_ERROR("Socket closed: Cannot send to ", m_host, ":", m_port);
+
 		return 0;
 	}
 
 	int bytesSent = ::send(m_socket, buffer, bufferSize, 0);
 	if (bytesSent == SOCKET_ERROR)
 	{
-		LOG_ERROR("Error sending message to ", m_host, ":", m_port);
-
-		exit(8);
+		close();
+		return 0;
 	}
 
 	return bytesSent;
@@ -160,7 +165,7 @@ int Socket::send(const char* buffer, int bufferSize)
 
 void Socket::close()
 {
-	if (!m_closed && m_socket != EMPTY_SOCKET)
+	if (!isClosed())
 	{
 		closesocket(m_socket);
 		m_closed = true;

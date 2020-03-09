@@ -8,6 +8,7 @@ struct LineVertex
 
 EntityGrid::EntityGrid(const glm::vec2& size, const glm::ivec2& segments)
 {
+	//Generate grid vertices
 	LineVertex* vertices = new LineVertex[(segments.x + 1) * (segments.y + 1) + 4];
 
 	vertices[0].position = { size.x / 2.0f + size.x / segments.x, 0, 0 };

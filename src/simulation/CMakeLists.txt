@@ -48,7 +48,7 @@ if (WIN32)
 					"${GLFW_ROOT}/wgl_context.c"
 					"${GLFW_ROOT}/egl_context.c"
 					"${GLFW_ROOT}/osmesa_context.c")
-
+					
 	add_compile_definitions("_GLFW_WIN32" "_CRT_SECURE_NO_WARNINGS")
 elseif(LINUX OR APPLE)
 		add_library(GLFW ${GLFW_COMMON_SRC}
@@ -62,7 +62,7 @@ elseif(LINUX OR APPLE)
 					"${GLFW_ROOT}/egl_context.c"
 					"${GLFW_ROOT}/osmesa_context.c"
 					"${GLFW_ROOT}/linux_joystick.c")
-
+					
 		add_compile_definitions("_GLFW_X11")
 endif()
 

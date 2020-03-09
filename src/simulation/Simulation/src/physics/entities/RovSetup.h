@@ -13,7 +13,15 @@
 
 #define THRUSTER_COUNT 8
 
-#define CAMERA_COUNT 3
+struct ROVCameraSetup
+{
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec2 resolution;
+	float fov;
+	int port;
+	int quality;
+};
 
 struct RovSetup
 {
@@ -22,11 +30,7 @@ struct RovSetup
 	glm::vec3 thrusterPositions[THRUSTER_COUNT];
 	glm::vec3 thrusterRotations[THRUSTER_COUNT];
 
-	std::string cameraNames[CAMERA_COUNT];
-	glm::vec3 cameraPositions[CAMERA_COUNT];
-	glm::vec3 cameraRotations[CAMERA_COUNT];
-	glm::vec2 cameraResolutions[CAMERA_COUNT];
-	float cameraFOVs[CAMERA_COUNT];
+	std::vector<ROVCameraSetup> cameras;
 
 	float maxThrsuterPower = 5.0f;
 
@@ -34,4 +38,6 @@ struct RovSetup
 	glm::vec3 rotation = glm::vec3(0.0f);
 
 	glm::vec3 centerOfMass = glm::vec3(0.0f);
+
+	int serverPort = 49000;
 };

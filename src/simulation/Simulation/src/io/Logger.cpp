@@ -24,7 +24,9 @@ void Logger::pushMessage(LogLevel level, const std::string& str)
 		break;
 	}
 
-	fprintf(stdout, "[%s] %s\n", levelStr, str.c_str());
+	m_logMutex.lock();
+	std::cout << "[" << levelStr << "] " << str << std::endl;
+	m_logMutex.unlock();
 }
 
 void Logger::pause()

@@ -8,8 +8,6 @@
 
 #include "io/Input.h"
 
-#include <string>
-
 using namespace std::string_literals;
 
 void Scene::init(int width, int height)
@@ -22,6 +20,7 @@ void Scene::init(int width, int height)
 	//Setup rendering engine
 	m_renderingEngine.loadSetting(m_config);
 
+	//Setup cache
 	m_cache.setEnabled(m_config.isCacheEnabled());
 	if (m_config.getCacheDir() != "")
 	{
@@ -39,7 +38,7 @@ void Scene::init(int width, int height)
 	{
 #if 0
 		EntityWater* water = new EntityWater(38, 38, 70, 70);
-		water->getTransform().position({ 0, 4, 0 });
+		water->getTransform().position({ 0, 7, 0 });
 
 		m_entities.push_back(water);
 #endif
@@ -55,7 +54,7 @@ void Scene::init(int width, int height)
 	}
 
 	//Start server
-	m_server.launchServer(50000);
+	m_server.launchServer(m_config.getRov().serverPort);
 
 	m_view.create();
 }
@@ -80,6 +79,7 @@ void Scene::update(double delta)
 void Scene::render()
 {
 	m_renderingEngine.renderWorld(m_entities);
+	m_rov->renderFinished();
 
 #if 0
 	glm::vec3 screenScale = { (float)m_renderingEngine.getTargetHeight() / m_renderingEngine.getTargetWidth(), 1.0f, 1.0f };
@@ -88,7 +88,7 @@ void Scene::render()
 	transform.position({ 0.0f, 0.0f, 0.0f });
 	transform.scale(screenScale * glm::vec3(0.3f, 0.3f, 1.0f));
 
-	m_view.render(transform, m_rov->getCamera(2)->getView());
+	m_view.render(transform, m_rov->getCamera(0)->getView(), 0);
 #endif
 }
 

@@ -4,6 +4,7 @@ inline glm::vec3 safeNormalize(const glm::vec3& v)
 {
 	float lengthSqr = glm::dot(v, v);
 
+	//Return (0, 0, 0) if the length of v is 0
 	if(lengthSqr == 0.0f)
 	{
 		return glm::vec3(0.0f);
@@ -14,20 +15,22 @@ inline glm::vec3 safeNormalize(const glm::vec3& v)
 
 void RigidBodyData::calcRigidBodyInfo(double mass, const glm::vec3* centerOfMass, glm::vec3* vertices, size_t numVertices, unsigned int* indices, size_t numIndices)
 {
-	float vertexMass = (float)(mass / (double)numIndices);
+	//Calcukate the mass of an individual vertex (assume that each vertex has the same 
+	float vertexMass = (float)(mass / (double)numVertices);
 
 	this->mass = mass;
 	this->bodyI = glm::zero<glm::mat3>();
 
+	//Compute center of mass if none provided
 	if (!centerOfMass)
 	{
 		glm::dvec3 objectCOM = glm::zero<glm::dvec3>();
 
-		for (size_t i = 0; i < numIndices; ++i)
+		for (size_t i = 0; i < numVertices; ++i)
 		{
-			objectCOM += vertices[indices[i]];
+			objectCOM += vertices[i];
 		}
-		objectCOM /= (double)numIndices;
+		objectCOM /= (double)numVertices;
 
 		this->centerOfMassOffset = glm::vec3(objectCOM);
 	}
@@ -36,10 +39,10 @@ void RigidBodyData::calcRigidBodyInfo(double mass, const glm::vec3* centerOfMass
 		this->centerOfMassOffset = glm::vec3(*centerOfMass);
 	}
 	
-
-	for (size_t i = 0; i < numIndices; ++i)
+	//Calculate body-space inertia tensor
+	for (size_t i = 0; i < numVertices; ++i)
 	{
-		glm::vec3 vertex = vertices[indices[i]] - this->centerOfMassOffset;
+		glm::vec3 vertex = vertices[i] - this->centerOfMassOffset;
 
 		glm::mat3 asMatrix(vertex, glm::vec3(0.0f), glm::vec3(0.0f));
 
@@ -78,8 +81,10 @@ RigidBodyDerivative RigidBodyData::derivative(const Transform& transform) const
 
 void RigidBodyData::step(Transform& transform, const RigidBodyDerivative& derivative)
 {
+	//Calculte new rotation
 	quaternion newRot = (transform.rotation() + derivative.dRotation).normalize();
 
+	//Calculate the origin's translation due to rotation around the center of mass
 	glm::vec3 rotationalOffset = (newRot.matrix() * -centerOfMassOffset) -
 								 (transform.rotation().matrix() * -centerOfMassOffset);
 

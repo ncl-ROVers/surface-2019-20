@@ -29,7 +29,7 @@ class Socket;
 class ServerSocket
 {
 private:
-	socket_t m_socket;
+	socket_t m_socket = EMPTY_SOCKET;
 
 	bool m_closed = true;
 public:
@@ -41,6 +41,10 @@ public:
 
 	Socket accept();
 
+	inline bool isClosed() const
+	{
+		return m_closed || m_socket == EMPTY_SOCKET;
+	}
 	void close();
 };
 
@@ -51,10 +55,10 @@ private:
 	std::string m_host;
 	int m_port;
 
-	bool m_closed = false;
+	bool m_closed = true;
 private:
 	Socket(socket_t socket, std::string host, int port) :
-		m_socket(socket), m_host(host), m_port(port) {}
+		m_socket(socket), m_host(host), m_port(port), m_closed(true) {}
 public:
 	Socket(const Socket& other) :
 		m_socket(other.m_socket), m_host(other.m_host),
@@ -64,7 +68,11 @@ public:
 	int receive(char* buffer, int bufferSize);
 	int send(const char* buffer, int bufferSize);
 
+	inline bool isClosed() const { return m_closed || m_socket == EMPTY_SOCKET; }
 	void close();
+
+	inline std::string getHost() const { return m_host; }
+	inline int getPort() const { return m_port; }
 
 	friend class ServerSocket;
 };
