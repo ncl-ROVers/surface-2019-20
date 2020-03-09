@@ -4,17 +4,30 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-project(Simulation)
+project(ROVSimulation)
 
 find_package(OpenGL REQUIRED)
 
+# TurboJPEG settings
+add_library(TurboJPEG INTERFACE)
+
+target_include_directories(TurboJPEG INTERFACE "${CMAKE_SOURCE_DIR}/Dependencies/TurboJPEG/install/include")
+if(WIN32)
+	target_link_libraries(TurboJPEG INTERFACE "${CMAKE_SOURCE_DIR}/Dependencies/TurboJPEG/install/lib/turbojpeg-static.lib")
+elseif(APPLE)
+	target_link_libraries(TurboJPEG INTERFACE "${CMAKE_SOURCE_DIR}/Dependencies/TurboJPEG/install/lib/turbojpeg-static.so")
+elseif(UNIX)
+	target_link_libraries(TurboJPEG INTERFACE "${CMAKE_SOURCE_DIR}/Dependencies/TurboJPEG/install/lib/turbojpeg-static.a")
+endif()
+
 # GLAD settings
-set(GLAD_INCLUDE "./Dependencies/GLAD/include/")
-add_library(GLAD "./Dependencies/GLAD/src/glad.c")
+set(GLAD_INCLUDE "${CMAKE_SOURCE_DIR}/Dependencies/GLAD/include/")
+add_library(GLAD "${CMAKE_SOURCE_DIR}/Dependencies/GLAD/src/glad.c" ${GLAD_INCLUDE})
+target_include_directories(GLAD PUBLIC ${GLAD_INCLUDE}) 
 
 # GLFW settings
-set(GLFW_INCLUDE "./Dependencies/GLFW/include/")
-set(GLFW_ROOT "./Dependencies/GLFW/src/")
+set(GLFW_INCLUDE "${CMAKE_SOURCE_DIR}/Dependencies/GLFW/include/")
+set(GLFW_ROOT "${CMAKE_SOURCE_DIR}/Dependencies/GLFW/src/")
 
 set(GLFW_COMMON_SRC "${GLFW_ROOT}/glfw_config.h"
 					"${GLFW_ROOT}/context.c"
@@ -53,20 +66,9 @@ elseif(LINUX OR APPLE)
 		add_compile_definitions("_GLFW_X11")
 endif()
 
+target_include_directories(GLFW PUBLIC ${GLFW_INCLUDE})
+
 # Main project settings
-set(SIMULATION_ROOT "./Simulation/src/")
+add_subdirectory(Simulation)
 
-file(GLOB_RECURSE SUB_SOURCES
-					"${SIMULATION_ROOT}/*.cpp"
-					"${SIMULATION_ROOT}/*.h")
-
-include_directories("${SIMULATION_ROOT}"
-					"./Dependencies/glm/glm/"
-					${GLAD_INCLUDE}
-					${GLFW_INCLUDE}
-)
-
-add_executable(Simulation ${SUB_SOURCES})
-target_link_libraries(${PROJECT_NAME} GLAD GLFW opengl32)
-
-add_compile_definitions("COMPILE_PATH_OFFSET=\"./Simulation\"")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
