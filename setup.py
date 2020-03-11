@@ -95,7 +95,6 @@ setuptools.setup(
         "pandas",
         "sklearn",
         "opencv-python",
-        "GPUtil",
         "psutil",
         "simplejpeg"
     ],

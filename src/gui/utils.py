@@ -10,6 +10,7 @@ from PySide2.QtGui import *
 from PySide2.QtCore import *
 from .. import comms, control
 from ..common import Log
+import os
 import pyautogui
 import typing
 import abc
@@ -37,6 +38,7 @@ def check_connection():
 def get_manager() -> typing.Union[QMainWindow, None]:
     """
     Getter to find the screen manager and return it.
+
     :return: :class:`ScreenManager` or None if couldn't be found
     """
     Log.debug("Retrieving screen manager")
@@ -44,6 +46,30 @@ def get_manager() -> typing.Union[QMainWindow, None]:
         if "ScreenManager" in repr(widget):
             return widget
     return None
+
+
+def new_camera_update_func(view: QWidget, log_name: str) -> typing.Callable:
+    """
+    Function used to generate a new slotted function capable of updating the view with video stream frames.
+
+    :param view: View displaying the frames, most likely a QLabel
+    :param log_name: String representing the name of the camera view, which will be logged on debug level
+    :return: New function which takes a single argument (frame) and updates the view with it
+    """
+
+    @Slot(QPixmap)
+    def _update(frame: QPixmap):
+        """
+        Function used to update given view with a frame.
+
+        Scales the frame to fit into as much space as possible, without changing the aspect ratio.
+        """
+        Log.debug(f"Updating camera view {log_name}")
+        frame = frame.scaled(min(view.width(), frame.width()), min(view.height(), frame.height()),
+                             aspectMode=Qt.KeepAspectRatio, mode=Qt.SmoothTransformation)
+        view.setPixmap(frame)
+
+    return _update
 
 
 class _References:
@@ -60,6 +86,7 @@ class _References:
     top_camera: comms.VideoStream = None
     bottom_camera: comms.VideoStream = None
     micro_camera: comms.VideoStream = None
+    parent_pid: int = os.getpid()
 
 
 class Colour(enum.Enum):
@@ -68,8 +95,8 @@ class Colour(enum.Enum):
 
     Each colour is in the RGBA format.
     """
-
     MAJOR = 34, 51, 54, 255
+    ACCENT = 8, 64, 67, 255
 
 
 class _SlidingMenu(QListWidget):

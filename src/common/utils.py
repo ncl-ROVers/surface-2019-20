@@ -6,7 +6,6 @@ Standard utils module storing common to the package classes, functions, constant
 """
 import os as _os
 import psutil as _psutil
-import GPUtil as _GPUtil
 import typing as _typing
 
 # Declare path to the root folder (surface)
@@ -39,8 +38,8 @@ TRANSMISSION_DICT = {
     "T_VAP": 0,
     "T_VAS": 0,
     "T_M": 0,
-    "MG": 0,
-    "MC": 0
+    "M_G": 0,
+    "M_C": 0
 }
 CONTROL_DICT = {
     "mode": 0,
@@ -58,8 +57,10 @@ CONTROL_DICT = {
     "autonomous_heave": 0
 }
 RECEIVED_DICT = {
-    "ARD_O": False,
-    "ARD_I": False
+    "A_O": False,
+    "A_I": False,
+    "S_O": 0,
+    "S_I": 0
 }
 
 
@@ -108,20 +109,7 @@ def get_memory_usage() -> float:
     return _psutil.virtual_memory().percent
 
 
-def get_gpu_load() -> float:
-    """
-    Obtain the sum of each GPUs load as a percentage.
-
-    ..warning::
-
-        This function only works with nvidia-smi installed / nvidia graphic cards
-
-    :return: Sum of the gpu usage percentages
-    """
-    return sum(gpu.load for gpu in _GPUtil.getGPUs()) * 100
-
-
-def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float, float]:
+def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float]:
     """
     Obtain a tuple of hardware information in the following order:
 
@@ -129,7 +117,6 @@ def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float, float]:
         2. Number of Threads
         3. CPU Load
         4. Memory usage
-        5. GPU load
 
     and return this tuple back. Works by calling other methods within this module.
 
@@ -140,4 +127,4 @@ def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float, float]:
     num_processes = len(processes)
     num_threads = count_threads(processes)
 
-    return num_processes, num_threads, get_cpu_load(), get_memory_usage(), get_gpu_load()
+    return num_processes, num_threads, get_cpu_load(), get_memory_usage()
