@@ -117,7 +117,7 @@ class Connection:
         On errors, the status is set to `DISCONNECTED` and the cleanup function is called.
         """
         if self._status != _ConnectionStatus.DISCONNECTED:
-            _Log.error(f"Can't' connect to {self._ip}:{self._port} - not disconnected (status is {self._status.name})")
+            _Log.error(f"Can't connect to {self._ip}:{self._port} - not disconnected (status is {self._status.name})")
             return
 
         _Log.info(f"Connecting to {self._ip}:{self._port}...")
@@ -140,7 +140,7 @@ class Connection:
         on errors.
         """
         if self._status != _ConnectionStatus.CONNECTED:
-            _Log.error(f"Can't' disconnect from {self._ip}:{self._port} - not connected "
+            _Log.error(f"Can't disconnect from {self._ip}:{self._port} - not connected "
                        f"(status is {self._status.name})")
             return
 

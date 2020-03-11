@@ -7,6 +7,7 @@ Module storing an http-based implementation of a video stream reader to a networ
 
 import socket as _socket
 from src.comms.utils import STREAM_THREAD_DELAY as _DELAY
+from .buffered_socket import BufferedSocket as _BufferedSocket
 from .video_stream_reader import VideoStreamReader as _VideoStreamReader
 from ..utils import ConnectionStatus as _ConnectionStatus
 from src.common import Log as _Log
@@ -52,68 +53,16 @@ class HTTPStreamReader(_VideoStreamReader):
         _Log.info(f"Connecting to {self.host['host_address']}:{self.host['host_port']}.")
 
         # Connect socket to server
-        self.__socket = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+        self.__socket = _BufferedSocket(_socket.AF_INET, _socket.SOCK_STREAM)
         self.__socket.connect((self.host["host_address"], self.host["host_port"]))
 
+        # Initialize status variables
         self.__running = True
-
         self.__status = _ConnectionStatus.CONNECTING
 
         # Start streaming thread
         self.__thread = _threading.Thread(target=self.__process, daemon=True)
         self.__thread.start()
-
-    def __read_ahead(self):
-        """
-        Read bytes from the socket into the stream buffer.
-        """
-        data = self.__socket.recv(4096)
-        self.__stream_buffer.extend(data)
-
-    def __collapse_head(self, head_size):
-        """
-        Remove the section [0, head_size) from the start of the buffer.
-        The remaining data will be moved to the beginning of the buffer.
-
-        :param head_size: The amount of bytes to remove from the start of the buffer.
-        """
-        self.__stream_buffer = self.__stream_buffer[head_size:]
-
-    def __read_until(self, delim):
-        """
-        Read from the strean until 'delim' is encountered.
-
-        :param delim: The sequence of bytes that terminates reading.
-        """
-        delim_index = 0
-
-        while True:
-            if delim_index >= len(self.__stream_buffer):
-                self.__read_ahead()
-
-            if self.__stream_buffer[delim_index:(delim_index + len(delim))] == bytearray(delim):
-                break
-
-            delim_index += 1
-
-        data = self.__stream_buffer[:delim_index]
-        self.__collapse_head(delim_index + len(delim))
-
-        return data
-
-    def __read_amount(self, count):
-        """
-        Read a number of bytes from the stream.
-
-        :param count: The number of bytes to be read.
-        """
-        while len(self.__stream_buffer) < count:
-            self.__read_ahead()
-
-        data = self.__stream_buffer[:count]
-        self.__collapse_head(count)
-
-        return data
 
     def __find_option(self, lines, option_name):
         """
@@ -142,7 +91,7 @@ class HTTPStreamReader(_VideoStreamReader):
         self.__socket.send(http_request.encode())
 
         # Read response header
-        stream_header = self.__read_until(b'\r\n\r\n').decode()
+        stream_header = self.__socket.read_until(b'\r\n\r\n').decode()
         header_lines = stream_header.split("\r\n")
 
         if not header_lines[0].split(" ")[1] == "200":
@@ -164,7 +113,7 @@ class HTTPStreamReader(_VideoStreamReader):
         last_emit_time = _time.time()
         while self.__running:
             # Read header
-            frame_header = self.__read_until(b'\r\n\r\n')
+            frame_header = self.__socket.read_until(b'\r\n\r\n')
 
             try:
                 frame_header = frame_header.decode()
@@ -189,7 +138,7 @@ class HTTPStreamReader(_VideoStreamReader):
             frame_length = int(self.__find_option(frame_header_lines, "Content-Length").lstrip())
 
             # Read frame
-            frame_data = self.__read_amount(frame_length)
+            frame_data = self.__socket.read_amount(frame_length)
 
             self.__image_lock.acquire()
             self.__image_buffer = bytearray(len(frame_data))
