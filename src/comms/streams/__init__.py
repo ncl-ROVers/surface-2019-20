@@ -8,6 +8,9 @@ Streaming tools handling different types of video streams
     Jason Philippou <i.philippou1@newcastle.ac.uk>
 """
 from .http_stream import HTTPStreamReader
+from .rtsp_stream import RTSPStreamReader
+
+from .video_stream_reader import VideoStreamReader as _VideoStreamReader
 
 
 def parse_url(stream_url: str):
@@ -62,7 +65,7 @@ def parse_url(stream_url: str):
     return url_data
 
 
-def stream_from_url(url: str):
+def stream_from_url(url: str) -> _VideoStreamReader:
     """
     Create a video stream reader compatible with the url provided
 
@@ -73,5 +76,7 @@ def stream_from_url(url: str):
 
     if url_tokens["protocol"] == "http":
         return HTTPStreamReader(url_tokens)
+    elif url_tokens["protocol"] == "rtsp":
+        return RTSPStreamReader(url_tokens)
 
     return

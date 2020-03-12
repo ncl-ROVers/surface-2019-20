@@ -16,6 +16,8 @@ import simplejpeg as _simplejpeg
 import numpy as _np
 import time as _time
 
+from . import utils as _http_utils
+
 
 class HTTPStreamReader(_VideoStreamReader):
     """
@@ -64,17 +66,6 @@ class HTTPStreamReader(_VideoStreamReader):
         self.__thread = _threading.Thread(target=self.__process, daemon=True)
         self.__thread.start()
 
-    def __find_option(self, lines, option_name):
-        """
-        Find the value of an option inside an HTTP header.
-
-        :param lines: A list of all the lines of the HTTP header.
-        :param option_name: The name of the option to search for.
-        :return: The value of the option.
-        """
-        option = list(filter(lambda line: line.lower().startswith(option_name.lower()), lines))[-1]
-        return option[(option.find(":") + 1):]
-
     def __process(self):
         """
         Process the video stream.
@@ -101,7 +92,7 @@ class HTTPStreamReader(_VideoStreamReader):
         self.__status = _ConnectionStatus.CONNECTED
 
         # Find content type tag
-        content_type = self.__find_option(header_lines, "Content-Type").split(";")
+        content_type = _http_utils.http_find_option(header_lines, "Content-Type").split(";")
 
         boundary = list(filter(lambda token: token.lower().startswith("boundary="),
                                [t.lstrip() for t in content_type]))[-1]
@@ -134,8 +125,8 @@ class HTTPStreamReader(_VideoStreamReader):
                 _Log.error("Expected frame boundary at line 0. Not found!")
                 continue
 
-            frame_type = self.__find_option(frame_header_lines, "Content-Type").lstrip()
-            frame_length = int(self.__find_option(frame_header_lines, "Content-Length").lstrip())
+            frame_type = _http_utils.http_find_option(frame_header_lines, "Content-Type").lstrip()
+            frame_length = int(_http_utils.http_find_option(frame_header_lines, "Content-Length").lstrip())
 
             # Read frame
             frame_data = self.__socket.read_amount(frame_length)

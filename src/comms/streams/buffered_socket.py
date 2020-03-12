@@ -63,4 +63,4 @@ class BufferedSocket(_socket.socket):
         """
         Close the underlying socket.
         """
-        self.close()
+        super().close()
