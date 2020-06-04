@@ -128,3 +128,19 @@ def get_hardware_info(pid: int) -> _typing.Tuple[int, int, float, float]:
     num_threads = count_threads(processes)
 
     return num_processes, num_threads, get_cpu_load(), get_memory_usage()
+
+
+def index_of_safe(value_list, value):
+    """
+    Returns the index of a specific value in a list.
+    If the value is not found, -1 will be returned.
+
+    :param value_list: The list to search in
+    :param value: The value to search for
+    :return: The index of the specified value
+    """
+    for i in range(len(value_list)):
+        if value_list[i] == value:
+            return i
+
+    return -1
