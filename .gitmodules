@@ -7,3 +7,9 @@
 [submodule "src/simulation/Dependencies/TurboJPEG"]
 	path = src/simulation/Dependencies/TurboJPEG
 	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git
+[submodule "src/comms/streams/native/external/pybind11"]
+	path = src/comms/streams/native/external/pybind11
+	url = https://github.com/pybind/pybind11
+[submodule "src/comms/streams/native/external/libde265"]
+	path = src/comms/streams/native/external/libde265
+	url = https://github.com/strukturag/libde265
